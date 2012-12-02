@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>net.dontdrinkandroot</groupId>
+		<artifactId>parent</artifactId>
+		<version>2</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>cache</artifactId>
+	<version>0.3.0-SNAPSHOT</version>
+	<description>Simple and versatile caching framework</description>
+
+	<developers>
+		<developer>
+			<name>Philip Washington Sorst</name>
+			<url>http://sorst.net</url>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<repositories>
+		<repository>
+			<id>public</id>
+			<url>http://maven.dontdrinkandroot.net/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<scm>
+		<developerConnection>scm:git:https://github.com/philipsorst/cache.git</developerConnection>
+	</scm>
+
+
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<systemPropertyVariables>
+						<cache.test.ramdisk>${cache.test.ramdisk}</cache.test.ramdisk>
+						<cache.test.runloadtest>${cache.test.runloadtest}</cache.test.runloadtest>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<!-- TODO: Remove with next parent version -->
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.9.0</version>
+				<configuration>
+					<header>license.txt</header>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>net.dontdrinkandroot</groupId>
+			<artifactId>utils</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+</project>
