@@ -167,9 +167,9 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 		final M metaData = this.entriesMetaDataMap.get(key);
 
-		/* If entry not found: cache miss */
 		if (metaData == null) {
 
+			/* Entry not found: cache miss */
 			this.statistics.increaseCacheMissesNotFound();
 			this.statistics.increaseGetCount();
 			this.getLogger().trace("Cache Miss for '{}'", key);
@@ -177,9 +177,9 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			return null;
 		}
 
-		/* If entry expired: cache miss expired */
 		if (metaData != null && metaData.isExpired()) {
 
+			/* Entry expired: cache miss expired */
 			this.statistics.increaseCacheMissesExpired();
 			this.statistics.increaseGetCount();
 			this.getLogger().trace("Cache Miss expired '{}'", key);

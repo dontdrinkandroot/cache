@@ -29,6 +29,11 @@ import net.dontdrinkandroot.utils.lang.SerializationUtils;
 
 
 /**
+ * A {@link SerializableIndexedDiskCache} that buffers entries in memory on successful disk put and
+ * get operations. The size and contents of the buffer are determined by a buffer
+ * {@link ExpungeStrategy} that works the same way as a normal {@link ExpungeStrategy} but only on
+ * the buffer entries.
+ * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
 public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDiskCache {
@@ -95,6 +100,13 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	}
 
 
+	/**
+	 * Get the cache statistics of the buffer. The buffer statistics indicate the following: a cache
+	 * hit means that the entry exists in the cache and was found in the buffer, a cache miss means
+	 * that the entry exists in the cache and was not found in the buffer, the get and put count
+	 * reflects gets and puts to the buffer, not the cache itself, the size is the current size of
+	 * the buffer.
+	 */
 	public SimpleCacheStatistics getBufferStatistics() {
 
 		return this.bufferStatistics;
@@ -124,11 +136,10 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 		} else {
 
 			this.bufferStatistics.increaseCacheMissesNotFound();
-
 		}
 
+		/* Get data from disk and store it in the buffer */
 		final Serializable data = super.doGet(key, metaData);
-
 		this.addToBuffer(key, data);
 
 		return data;
@@ -142,6 +153,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 			final long timeToLive,
 			final long maxIdleTime) throws CacheException {
 
+		/* Put data to disk and store it in the buffer */
 		Serializable putData = super.doPut(key, data, timeToLive, maxIdleTime);
 		this.addToBuffer(key, putData);
 
@@ -160,11 +172,15 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	@Override
 	protected void doDelete(Serializable key, final BlockMetaData metaData) throws CacheException {
 
+		/* Remove entry from buffer and from disk */
 		this.buffer.remove(metaData);
 		super.doDelete(key, metaData);
 	}
 
 
+	/**
+	 * Creates a copy of the given data.
+	 */
 	protected Serializable copyData(Serializable data) {
 
 		Serializable serializable = data;
@@ -184,6 +200,10 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	}
 
 
+	/**
+	 * Sets if a successful get should return a copy of the cache entry, so when manipulating the
+	 * object no changes are persisted in the buffer.
+	 */
 	public BufferedSerializableIndexedDiskCache setCopyOnRead(boolean copyOnRead) {
 
 		this.copyOnRead = copyOnRead;
@@ -191,6 +211,10 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	}
 
 
+	/**
+	 * Sets if a successful put should return a copy of the cache entry, so when manipulating the
+	 * object no changes are persisted in the buffer.
+	 */
 	public BufferedSerializableIndexedDiskCache setCopyOnWrite(boolean copyOnWrite) {
 
 		this.copyOnWrite = copyOnWrite;
@@ -205,14 +229,17 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
 		if (this.bufferExpungeStrategy.triggers(this.bufferStatistics)) {
 
+			/* Expunge buffer entries */
 			Map<Serializable, BlockMetaData> bufferEntries = new HashMap<Serializable, BlockMetaData>();
 			for (Serializable bufferKey : this.buffer.keySet()) {
 				BlockMetaData metaData = this.getEntriesMetaDataMap().get(bufferKey);
 				if (metaData == null) {
-					System.out.println(key);
+					this.getLogger().error("Metadata for %s was null", bufferKey.toString());
+				} else {
+					bufferEntries.put(bufferKey, metaData);
 				}
-				bufferEntries.put(bufferKey, metaData);
 			}
+
 			final Collection<Entry<Serializable, BlockMetaData>> toExpunge =
 					this.bufferExpungeStrategy.getToExpungeMetaData(bufferEntries.entrySet());
 			for (final Entry<Serializable, BlockMetaData> expunge : toExpunge) {
