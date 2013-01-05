@@ -32,7 +32,7 @@
 	</repositories>
 
 	<scm>
-		<developerConnection>scm:git:https://github.com/philipsorst/cache.git</developerConnection>
+		<developerConnection>scm:git:https://github.com/dontdrinkandroot/cache.git</developerConnection>
 	</scm>
 
 
