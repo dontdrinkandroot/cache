@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 
 import net.dontdrinkandroot.cache.metadata.impl.TestMetaData;
 import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
-import net.dontdrinkandroot.utils.lang.time.DateUtils;
+import net.dontdrinkandroot.cache.utils.Duration;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class ExpiredOnlyExpungeStrategyTest {
 		ExpiredOnlyExpungeStrategy strategy = new ExpiredOnlyExpungeStrategy(0);
 
 		TestMetaData m1 = new TestMetaData().setExpiry(0);
-		TestMetaData m2 = new TestMetaData().setExpiry(System.currentTimeMillis() + DateUtils.MILLIS_PER_DAY);
+		TestMetaData m2 = new TestMetaData().setExpiry(System.currentTimeMillis() + Duration.days(1));
 
 		Map<String, TestMetaData> map = new HashMap<String, TestMetaData>();
 		map.put("m1", m1);

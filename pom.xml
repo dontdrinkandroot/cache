@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cache</artifactId>
 	<version>0.3.1-SNAPSHOT</version>
-	<description>Simple and versatile caching framework</description>
+	<description>Simple caching framework</description>
 
 	<developers>
 		<developer>
@@ -67,11 +67,11 @@
 
 	<dependencies>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>net.dontdrinkandroot</groupId>
 			<artifactId>utils</artifactId>
 			<version>0.1.0</version>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

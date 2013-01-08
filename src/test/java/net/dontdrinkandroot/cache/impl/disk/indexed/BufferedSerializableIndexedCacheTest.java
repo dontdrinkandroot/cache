@@ -25,13 +25,13 @@ import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.ExampleObject;
 import net.dontdrinkandroot.cache.SimulationRunner;
+import net.dontdrinkandroot.cache.TestUtils;
 import net.dontdrinkandroot.cache.expungestrategy.impl.LruRecyclingExpungeStrategy;
 import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
-import net.dontdrinkandroot.utils.lang.math.RandomUtils;
-import net.dontdrinkandroot.utils.lang.time.DateUtils;
+import net.dontdrinkandroot.cache.utils.Duration;
+import net.dontdrinkandroot.cache.utils.FileUtils;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -67,7 +67,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 		final AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new BufferedSerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir,
@@ -87,7 +87,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 		final AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new BufferedSerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir,
@@ -111,7 +111,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 		AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new BufferedSerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir,
@@ -128,7 +128,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 		cache =
 				new BufferedSerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir,
@@ -160,7 +160,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 			final BufferedSerializableIndexedDiskCache loadTestCache =
 					new BufferedSerializableIndexedDiskCache(
 							"serializableMetaFileCacheTest",
-							DateUtils.MILLIS_PER_SECOND,
+							Duration.seconds(1),
 							Cache.UNLIMITED_IDLE_TIME,
 							new LruRecyclingExpungeStrategy(100000, .1f),
 							this.baseDir,
@@ -178,7 +178,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 							loadTestCache.getDataFileNumAllocatedBlocks());
 				}
 			};
-			runner.runLoadTest(loadTestCache, 10, 1000000, RandomUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
+			runner.runLoadTest(loadTestCache, 10, 1000000, TestUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
 
 			final int size = loadTestCache.getStatistics().getCurrentSize();
 			final float hitRate = loadTestCache.getStatistics().getHitRate();
@@ -190,7 +190,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 			final BufferedSerializableIndexedDiskCache loadTestCacheNew =
 					new BufferedSerializableIndexedDiskCache(
 							"serializableMetaFileCacheTest",
-							DateUtils.MILLIS_PER_SECOND,
+							Duration.seconds(1),
 							Cache.UNLIMITED_IDLE_TIME,
 							new LruRecyclingExpungeStrategy(100000, .1f),
 							this.baseDir,

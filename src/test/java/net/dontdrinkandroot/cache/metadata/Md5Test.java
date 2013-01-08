@@ -18,8 +18,8 @@
 package net.dontdrinkandroot.cache.metadata;
 
 import net.dontdrinkandroot.cache.impl.disk.file.Md5;
+import net.dontdrinkandroot.cache.impl.disk.file.Md5Exception;
 
-import org.apache.commons.codec.DecoderException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ import org.junit.Test;
 public class Md5Test {
 
 	@Test
-	public void testConstruction() throws DecoderException {
+	public void testConstruction() throws Md5Exception {
 
 		String testString = " asdfjkh akasdkfa sdf a";
 		Md5 md5_1 = new Md5(testString);

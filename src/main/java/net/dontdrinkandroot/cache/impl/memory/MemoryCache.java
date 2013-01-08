@@ -24,7 +24,7 @@ import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractMapBackedCustomTtlCache;
 import net.dontdrinkandroot.cache.metadata.impl.SimpleMetaData;
-import net.dontdrinkandroot.utils.lang.SerializationUtils;
+import net.dontdrinkandroot.cache.utils.Serializer;
 
 
 /**
@@ -99,7 +99,7 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 
 		if (data instanceof Serializable) {
 			Serializable serializable = (Serializable) data;
-			return (V) SerializationUtils.fastClone(serializable);
+			return (V) Serializer.clone(serializable);
 		}
 
 		this.getLogger().error(

@@ -28,9 +28,7 @@ import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractMapBackedCache;
 import net.dontdrinkandroot.cache.metadata.impl.SimpleMetaData;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.io.FileUtils;
+import net.dontdrinkandroot.cache.utils.FileUtils;
 
 
 /**
@@ -157,7 +155,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 
 		final Map<Md5, SimpleMetaData> itemMap = new HashMap<Md5, SimpleMetaData>();
 
-		final Collection<File> files = FileUtils.listFiles(this.getBaseDir(), null, true);
+		final Collection<File> files = FileUtils.listFilesRecursive(this.getBaseDir());
 
 		for (final File file : files) {
 			final String md5Hex = file.getName();
@@ -165,7 +163,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 				Md5 md5;
 				try {
 					md5 = Md5.fromMd5Hex(md5Hex);
-				} catch (final DecoderException e) {
+				} catch (final Md5Exception e) {
 					throw new CacheException("Couldn't add file " + file, e);
 				}
 				long lastModified = file.lastModified();

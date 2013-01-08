@@ -17,17 +17,23 @@
  */
 package net.dontdrinkandroot.cache.impl.disk.file;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.dontdrinkandroot.cache.AbstractCacheTest;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
-import net.dontdrinkandroot.utils.lang.time.DateUtils;
+import net.dontdrinkandroot.cache.utils.Duration;
+import net.dontdrinkandroot.cache.utils.FileUtils;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,7 +65,7 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 		FileCache cache =
 				new FileCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						FileCacheTest.baseDir,
@@ -75,7 +81,7 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 		FileCache cache =
 				new FileCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						FileCacheTest.baseDir,
@@ -91,7 +97,7 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 		cache =
 				new FileCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						FileCacheTest.baseDir,
@@ -125,9 +131,40 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 		File file = cache.get(this.translateKey(key));
 		Assert.assertNotNull(file);
 
-		final List<String> lines = FileUtils.readLines(file);
+		final List<String> lines = this.readLines(file);
 		Assert.assertEquals(1, lines.size());
 		Assert.assertEquals(this.translateKey(key).getHex(), lines.iterator().next());
+	}
+
+
+	private List<String> readLines(File file) throws IOException {
+
+		List<String> lines = new ArrayList<String>();
+		BufferedReader br = new BufferedReader(new FileReader(file));
+
+		String line;
+		do {
+			line = br.readLine();
+			if (line != null) {
+				lines.add(line);
+			}
+		} while (line != null);
+
+		br.close();
+
+		return lines;
+	}
+
+
+	private void writeLines(File file, Set<String> lines) throws IOException {
+
+		BufferedWriter bw;
+		bw = new BufferedWriter(new FileWriter(file));
+		for (String line : lines) {
+			bw.write(line + "\n");
+		}
+
+		bw.close();
 	}
 
 
@@ -136,7 +173,7 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 
 		File file = File.createTempFile("filecachetest", ".tmp");
 		file.deleteOnExit();
-		FileUtils.writeLines(file, Collections.singleton(this.translateKey(key).getHex()));
+		this.writeLines(file, Collections.singleton(this.translateKey(key).getHex()));
 
 		return file;
 	}

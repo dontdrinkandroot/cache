@@ -21,8 +21,7 @@ import java.util.Map.Entry;
 
 import net.dontdrinkandroot.cache.metadata.MetaData;
 import net.dontdrinkandroot.cache.metadata.comparator.MetaDataComparator;
-
-import org.apache.commons.lang3.ObjectUtils;
+import net.dontdrinkandroot.cache.utils.ObjectUtils;
 
 
 /**

@@ -21,12 +21,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.dontdrinkandroot.utils.lang.time.DateUtils;
+import net.dontdrinkandroot.cache.utils.Duration;
 
 import org.junit.Assert;
 
 
 public class TestUtils {
+
+	public static double PARETO_EIGHTY_PERCENT_UNDER_HUNDRED = .35;
+
+	public static double PARETO_EIGHTY_PERCENT_UNDER_THOUSAND = 0.24;
+
+	public static double PARETO_EIGHTY_PERCENT_UNDER_TENTHOUSAND = 0.18;
+
+	public static double PARETO_EIGHTY_PERCENT_UNDER_TWENTYTHOUSAND = 0.165;
+
+	public static double PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND = 0.14;
+
+	public static double PARETO_EIGHTY_PERCENT_UNDER_TWOHUNDREDTHOUSAND = 0.135;
+
 
 	public static <T> void assertContainsExactly(Collection<T> coll, T... objects) {
 
@@ -48,7 +61,13 @@ public class TestUtils {
 
 	public static long getFutureExpiry() {
 
-		return System.currentTimeMillis() + DateUtils.MILLIS_PER_DAY;
+		return System.currentTimeMillis() + Duration.days(1);
+	}
+
+
+	public static double pareto(double alpha) {
+
+		return Math.pow(1 - Math.random(), -1.0 / alpha) - 1.0;
 	}
 
 }

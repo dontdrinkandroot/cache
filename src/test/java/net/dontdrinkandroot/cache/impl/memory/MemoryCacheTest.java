@@ -22,8 +22,7 @@ import java.io.Serializable;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
-import net.dontdrinkandroot.cache.impl.memory.MemoryCache;
-import net.dontdrinkandroot.utils.lang.time.DateUtils;
+import net.dontdrinkandroot.cache.utils.Duration;
 
 import org.junit.Test;
 
@@ -36,7 +35,7 @@ public class MemoryCacheTest extends AbstractSerializableCustomTtlCacheTest {
 		final MemoryCache<Serializable, Serializable> cache =
 				new MemoryCache<Serializable, Serializable>(
 						"testCache",
-						DateUtils.MILLIS_PER_DAY,
+						Duration.days(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy());
 

@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.Assert;
-import net.dontdrinkandroot.cache.Cache;
-import net.dontdrinkandroot.utils.lang.math.RandomUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,9 +146,9 @@ public class SimulationRunner {
 
 				for (int i = 0; i < this.iterations; i++) {
 
-					long id = (int) Math.round(RandomUtils.pareto(this.alpha));
+					long id = (int) Math.round(TestUtils.pareto(this.alpha));
 					while (id < 0) {
-						id = (int) Math.round(RandomUtils.pareto(this.alpha));
+						id = (int) Math.round(TestUtils.pareto(this.alpha));
 					}
 					final int action = (int) Math.round(Math.random() * 10);
 
@@ -221,9 +219,9 @@ public class SimulationRunner {
 
 			for (int i = 0; i < this.iterations; i++) {
 
-				long id = (int) Math.round(RandomUtils.pareto(this.alpha));
+				long id = (int) Math.round(TestUtils.pareto(this.alpha));
 				while (id < 0) {
-					id = (int) Math.round(RandomUtils.pareto(this.alpha));
+					id = (int) Math.round(TestUtils.pareto(this.alpha));
 				}
 				final String key = SimulationRunner.this.longToKey(id);
 

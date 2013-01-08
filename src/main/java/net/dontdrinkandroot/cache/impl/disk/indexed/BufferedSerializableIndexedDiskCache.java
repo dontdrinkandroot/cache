@@ -29,7 +29,7 @@ import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.metadata.impl.BlockMetaData;
 import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
-import net.dontdrinkandroot.utils.lang.SerializationUtils;
+import net.dontdrinkandroot.cache.utils.Serializer;
 
 
 /**
@@ -188,7 +188,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	protected Serializable copyData(Serializable data) {
 
 		Serializable serializable = data;
-		return SerializationUtils.fastClone(serializable);
+		return Serializer.clone(serializable);
 	}
 
 

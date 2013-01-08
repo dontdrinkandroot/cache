@@ -33,9 +33,8 @@ import net.dontdrinkandroot.cache.impl.disk.indexed.storage.IndexData;
 import net.dontdrinkandroot.cache.impl.disk.indexed.storage.IndexFile;
 import net.dontdrinkandroot.cache.impl.disk.indexed.storage.KeyedMetaData;
 import net.dontdrinkandroot.cache.metadata.impl.BlockMetaData;
-import net.dontdrinkandroot.utils.lang.SerializationUtils;
-
-import org.apache.commons.lang3.SerializationException;
+import net.dontdrinkandroot.cache.utils.SerializationException;
+import net.dontdrinkandroot.cache.utils.Serializer;
 
 
 /**
@@ -163,7 +162,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 				this.dataFile.allocateSpace(keyMetaBlock);
 				byte[] keyMetaBytes = this.dataFile.read(keyMetaBlock);
 				@SuppressWarnings("unchecked")
-				KeyedMetaData<K> keyedMetaData = (KeyedMetaData<K>) SerializationUtils.deserialize(keyMetaBytes);
+				KeyedMetaData<K> keyedMetaData = (KeyedMetaData<K>) Serializer.deserialize(keyMetaBytes);
 				K key = keyedMetaData.getKey();
 				BlockMetaData blockMetaData = new BlockMetaData(indexData, keyedMetaData.getMetaData());
 				this.dataFile.allocateSpace(valueBlock);
@@ -233,7 +232,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 			final long expiry = System.currentTimeMillis() + timeToLive;
 
 			KeyedMetaData<K> keyedMetaData = new KeyedMetaData<K>(key, expiry, System.currentTimeMillis(), maxIdleTime);
-			byte[] keyedMetaDataBytes = SerializationUtils.serialize(keyedMetaData);
+			byte[] keyedMetaDataBytes = Serializer.serialize(keyedMetaData);
 
 			final DataBlock keyMetaBlock = this.dataFile.write(keyedMetaDataBytes);
 			final DataBlock valueBlock = this.dataFile.write(dataBytes);

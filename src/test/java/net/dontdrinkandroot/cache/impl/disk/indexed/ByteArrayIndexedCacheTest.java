@@ -24,9 +24,9 @@ import java.io.Serializable;
 import net.dontdrinkandroot.cache.AbstractCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
-import net.dontdrinkandroot.utils.lang.time.DateUtils;
+import net.dontdrinkandroot.cache.utils.Duration;
+import net.dontdrinkandroot.cache.utils.FileUtils;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,7 +59,7 @@ public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serial
 		ByteArrayIndexedDiskCache cache =
 				new ByteArrayIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir);

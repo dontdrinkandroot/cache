@@ -32,10 +32,9 @@ import net.dontdrinkandroot.cache.TestUtils;
 import net.dontdrinkandroot.cache.expungestrategy.impl.LruRecyclingExpungeStrategy;
 import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
-import net.dontdrinkandroot.utils.lang.math.RandomUtils;
-import net.dontdrinkandroot.utils.lang.time.DateUtils;
+import net.dontdrinkandroot.cache.utils.Duration;
+import net.dontdrinkandroot.cache.utils.FileUtils;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -71,7 +70,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		final AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir);
@@ -90,7 +89,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		final AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir);
@@ -149,7 +148,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		final SerializableIndexedDiskCache cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir);
@@ -172,7 +171,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 		new SerializableIndexedDiskCache(
 				"testCache",
-				DateUtils.MILLIS_PER_MINUTE,
+				Duration.minutes(1),
 				Cache.UNLIMITED_IDLE_TIME,
 				new NoopExpungeStrategy(),
 				this.baseDir);
@@ -180,7 +179,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		try {
 			new SerializableIndexedDiskCache(
 					"testCache",
-					DateUtils.MILLIS_PER_MINUTE,
+					Duration.minutes(1),
 					Cache.UNLIMITED_IDLE_TIME,
 					new NoopExpungeStrategy(),
 					this.baseDir);
@@ -198,7 +197,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir);
@@ -213,7 +212,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
-						DateUtils.MILLIS_PER_MINUTE,
+						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir);
@@ -244,7 +243,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 			final SerializableIndexedDiskCache loadTestCache =
 					new SerializableIndexedDiskCache(
 							"serializableMetaFileCacheTest",
-							DateUtils.MILLIS_PER_SECOND,
+							Duration.seconds(1),
 							Cache.UNLIMITED_IDLE_TIME,
 							new LruRecyclingExpungeStrategy(100000, .1f),
 							this.baseDir);
@@ -261,7 +260,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							loadTestCache.getDataFileNumAllocatedBlocks());
 				}
 			};
-			runner.runLoadTest(loadTestCache, 1, 100000, RandomUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
+			runner.runLoadTest(loadTestCache, 1, 100000, TestUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
 
 			final int size = loadTestCache.getStatistics().getCurrentSize();
 			final float hitRate = loadTestCache.getStatistics().getHitRate();
@@ -273,7 +272,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 			final SerializableIndexedDiskCache loadTestCacheNew =
 					new SerializableIndexedDiskCache(
 							"serializableMetaFileCacheTest",
-							DateUtils.MILLIS_PER_SECOND,
+							Duration.seconds(1),
 							Cache.UNLIMITED_IDLE_TIME,
 							new LruRecyclingExpungeStrategy(100000, .1f),
 							this.baseDir);
@@ -307,7 +306,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 			final SerializableIndexedDiskCache loadTestCache =
 					new SerializableIndexedDiskCache(
 							"serializableMetaFileCacheTest",
-							DateUtils.MILLIS_PER_DAY,
+							Duration.days(1),
 							Cache.UNLIMITED_IDLE_TIME,
 							new NoopExpungeStrategy(),
 							this.baseDir);
@@ -327,19 +326,14 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 				}
 			};
 			known =
-					runner.runKnownTest(
-							loadTestCache,
-							1,
-							100000,
-							RandomUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
-							known);
+					runner.runKnownTest(loadTestCache, 1, 100000, TestUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND, known);
 
 			loadTestCache.close();
 
 			final SerializableIndexedDiskCache loadTestCacheNew =
 					new SerializableIndexedDiskCache(
 							"serializableMetaFileCacheTest",
-							DateUtils.MILLIS_PER_DAY,
+							Duration.days(1),
 							Cache.UNLIMITED_IDLE_TIME,
 							new NoopExpungeStrategy(),
 							this.baseDir);
@@ -349,7 +343,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							loadTestCacheNew,
 							1,
 							100000,
-							RandomUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
+							TestUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
 							known);
 
 			this.getLogger().info(loadTestCacheNew.getStatistics().toString());

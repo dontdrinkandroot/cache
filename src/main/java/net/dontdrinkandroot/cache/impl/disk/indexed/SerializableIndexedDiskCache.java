@@ -24,10 +24,9 @@ import java.io.Serializable;
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.expungestrategy.impl.ExpiredOnlyExpungeStrategy;
-import net.dontdrinkandroot.utils.lang.SerializationUtils;
-import net.dontdrinkandroot.utils.lang.time.DateUtils;
-
-import org.apache.commons.lang3.SerializationException;
+import net.dontdrinkandroot.cache.utils.Duration;
+import net.dontdrinkandroot.cache.utils.SerializationException;
+import net.dontdrinkandroot.cache.utils.Serializer;
 
 
 /**
@@ -38,7 +37,7 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 	public SerializableIndexedDiskCache(final String name, final long defaultTimeToLive, final File baseDir)
 			throws IOException {
 
-		super(name, defaultTimeToLive, new ExpiredOnlyExpungeStrategy(DateUtils.MILLIS_PER_DAY), baseDir);
+		super(name, defaultTimeToLive, new ExpiredOnlyExpungeStrategy(Duration.days(1)), baseDir);
 	}
 
 
@@ -48,12 +47,7 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 			final long defaultMaxIdleTime,
 			final File baseDir) throws IOException {
 
-		super(
-				name,
-				defaultTimeToLive,
-				defaultMaxIdleTime,
-				new ExpiredOnlyExpungeStrategy(DateUtils.MILLIS_PER_DAY),
-				baseDir);
+		super(name, defaultTimeToLive, defaultMaxIdleTime, new ExpiredOnlyExpungeStrategy(Duration.days(1)), baseDir);
 	}
 
 
@@ -83,7 +77,7 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 
 		try {
 
-			return SerializationUtils.serialize(data);
+			return Serializer.serialize(data);
 
 		} catch (final SerializationException e) {
 			throw new CacheException(e);
@@ -96,7 +90,7 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 
 		try {
 
-			return (Serializable) SerializationUtils.deserialize(dataBytes);
+			return (Serializable) Serializer.deserialize(dataBytes);
 
 		} catch (final SerializationException e) {
 			throw new CacheException(e);
