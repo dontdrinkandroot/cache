@@ -1,4 +1,4 @@
-package net.dontdrinkandroot.cache.impl.disk.file;
+package net.dontdrinkandroot.cache.utils;
 
 public class Md5Exception extends Exception {
 

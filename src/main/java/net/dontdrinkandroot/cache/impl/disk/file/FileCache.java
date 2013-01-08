@@ -29,6 +29,8 @@ import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractMapBackedCache;
 import net.dontdrinkandroot.cache.metadata.impl.SimpleMetaData;
 import net.dontdrinkandroot.cache.utils.FileUtils;
+import net.dontdrinkandroot.cache.utils.Md5;
+import net.dontdrinkandroot.cache.utils.Md5Exception;
 
 
 /**

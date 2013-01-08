@@ -17,8 +17,8 @@
  */
 package net.dontdrinkandroot.cache.metadata;
 
-import net.dontdrinkandroot.cache.impl.disk.file.Md5;
-import net.dontdrinkandroot.cache.impl.disk.file.Md5Exception;
+import net.dontdrinkandroot.cache.utils.Md5;
+import net.dontdrinkandroot.cache.utils.Md5Exception;
 
 import org.junit.Assert;
 import org.junit.Test;

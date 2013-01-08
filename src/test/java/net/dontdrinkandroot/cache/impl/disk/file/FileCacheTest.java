@@ -33,6 +33,7 @@ import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
+import net.dontdrinkandroot.cache.utils.Md5;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
