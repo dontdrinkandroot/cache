@@ -35,8 +35,6 @@
 		<developerConnection>scm:git:https://github.com/dontdrinkandroot/cache.git</developerConnection>
 	</scm>
 
-
-
 	<build>
 		<plugins>
 
@@ -53,7 +51,6 @@
 			</plugin>
 
 			<plugin>
-				<!-- TODO: Remove with next parent version -->
 				<groupId>com.mycila.maven-license-plugin</groupId>
 				<artifactId>maven-license-plugin</artifactId>
 				<version>1.9.0</version>
@@ -67,18 +64,17 @@
 
 	<dependencies>
 
-		<!-- <dependency>
-			<groupId>net.dontdrinkandroot</groupId>
-			<artifactId>utils</artifactId>
-			<version>0.1.0</version>
-		</dependency> -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		
 	</dependencies>
 
 </project>
