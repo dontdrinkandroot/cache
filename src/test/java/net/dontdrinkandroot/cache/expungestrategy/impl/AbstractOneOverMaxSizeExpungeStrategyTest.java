@@ -22,7 +22,7 @@ import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
 import org.junit.Assert;
 
 
-public class OneOverMaxSizeExpungeStrategyTest {
+public abstract class AbstractOneOverMaxSizeExpungeStrategyTest {
 
 	public void testTriggers(AbstractOneOverMaxSizeExpungeStrategy strategy) {
 

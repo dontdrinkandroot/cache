@@ -30,7 +30,7 @@ import net.dontdrinkandroot.cache.metadata.impl.JUnitMetaData;
 import org.junit.Test;
 
 
-public class LruExpungeStrategyTest extends OneOverMaxSizeExpungeStrategyTest {
+public class LruExpungeStrategyTest extends AbstractOneOverMaxSizeExpungeStrategyTest {
 
 	@Test
 	public void testTriggers() {
