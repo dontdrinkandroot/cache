@@ -28,20 +28,6 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
-	<repositories>
-		<repository>
-			<id>public</id>
-			<url>http://maven.dontdrinkandroot.net/content/groups/public</url>
-		</repository>
-	</repositories>
-	
-	<pluginRepositories>
-		<pluginRepository>
-			<id>public</id>
-			<url>http://maven.dontdrinkandroot.net/content/groups/public</url>
-		</pluginRepository>
-	</pluginRepositories>
 	
 	<distributionManagement>
 		<repository>
