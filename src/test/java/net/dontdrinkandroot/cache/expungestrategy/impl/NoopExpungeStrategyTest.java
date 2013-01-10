@@ -20,8 +20,8 @@ package net.dontdrinkandroot.cache.expungestrategy.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.dontdrinkandroot.cache.TestUtils;
-import net.dontdrinkandroot.cache.metadata.impl.TestMetaData;
+import net.dontdrinkandroot.cache.JUnitUtils;
+import net.dontdrinkandroot.cache.metadata.impl.JUnitMetaData;
 import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
 
 import org.junit.Assert;
@@ -36,11 +36,11 @@ public class NoopExpungeStrategyTest {
 		NoopExpungeStrategy strategy = new NoopExpungeStrategy();
 		Assert.assertFalse(strategy.triggers(new SimpleCacheStatistics()));
 
-		Map<String, TestMetaData> metaData = new HashMap<String, TestMetaData>();
-		metaData.put("m1", new TestMetaData().setExpiry(TestUtils.getFutureExpiry()).setLastAccess(3));
-		metaData.put("m2", new TestMetaData().setExpiry(TestUtils.getFutureExpiry()).setLastAccess(2));
-		metaData.put("m3", new TestMetaData().setExpiry(TestUtils.getFutureExpiry()).setLastAccess(1));
-		metaData.put("m4", new TestMetaData().setExpiry(0).setHits(10));
+		Map<String, JUnitMetaData> metaData = new HashMap<String, JUnitMetaData>();
+		metaData.put("m1", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setLastAccess(3));
+		metaData.put("m2", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setLastAccess(2));
+		metaData.put("m3", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setLastAccess(1));
+		metaData.put("m4", new JUnitMetaData().setExpiry(0).setHits(10));
 
 		Assert.assertTrue(strategy.getToExpungeMetaData(metaData.entrySet()).isEmpty());
 	}

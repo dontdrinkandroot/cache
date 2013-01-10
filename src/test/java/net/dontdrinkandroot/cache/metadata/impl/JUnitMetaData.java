@@ -21,7 +21,7 @@ import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 
 
-public class TestMetaData implements MetaData {
+public class JUnitMetaData implements MetaData {
 
 	private long expiry;
 
@@ -34,7 +34,7 @@ public class TestMetaData implements MetaData {
 	private int hits;
 
 
-	public TestMetaData() {
+	public JUnitMetaData() {
 
 	}
 
@@ -82,28 +82,28 @@ public class TestMetaData implements MetaData {
 	}
 
 
-	public TestMetaData setCreated(long created) {
+	public JUnitMetaData setCreated(long created) {
 
 		this.created = created;
 		return this;
 	}
 
 
-	public TestMetaData setExpiry(long expiry) {
+	public JUnitMetaData setExpiry(long expiry) {
 
 		this.expiry = expiry;
 		return this;
 	}
 
 
-	public TestMetaData setHits(int hits) {
+	public JUnitMetaData setHits(int hits) {
 
 		this.hits = hits;
 		return this;
 	}
 
 
-	public TestMetaData setLastAccess(long lastAccess) {
+	public JUnitMetaData setLastAccess(long lastAccess) {
 
 		this.lastAccess = lastAccess;
 		return this;

@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.dontdrinkandroot.cache.metadata.impl.TestMetaData;
+import net.dontdrinkandroot.cache.metadata.impl.JUnitMetaData;
 import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
 import net.dontdrinkandroot.cache.utils.Duration;
 
@@ -47,14 +47,14 @@ public class ExpiredOnlyExpungeStrategyTest {
 
 		ExpiredOnlyExpungeStrategy strategy = new ExpiredOnlyExpungeStrategy(0);
 
-		TestMetaData m1 = new TestMetaData().setExpiry(0);
-		TestMetaData m2 = new TestMetaData().setExpiry(System.currentTimeMillis() + Duration.days(1));
+		JUnitMetaData m1 = new JUnitMetaData().setExpiry(0);
+		JUnitMetaData m2 = new JUnitMetaData().setExpiry(System.currentTimeMillis() + Duration.days(1));
 
-		Map<String, TestMetaData> map = new HashMap<String, TestMetaData>();
+		Map<String, JUnitMetaData> map = new HashMap<String, JUnitMetaData>();
 		map.put("m1", m1);
 		map.put("m2", m2);
 
-		Collection<Entry<String, TestMetaData>> toExpungeMetaData = strategy.getToExpungeMetaData(map.entrySet());
+		Collection<Entry<String, JUnitMetaData>> toExpungeMetaData = strategy.getToExpungeMetaData(map.entrySet());
 		Assert.assertEquals(1, toExpungeMetaData.size());
 		Assert.assertEquals("m1", toExpungeMetaData.iterator().next().getKey());
 	}

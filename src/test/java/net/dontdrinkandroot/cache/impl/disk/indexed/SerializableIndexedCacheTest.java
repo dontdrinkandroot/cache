@@ -28,7 +28,7 @@ import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.ExampleObject;
 import net.dontdrinkandroot.cache.SimulationRunner;
-import net.dontdrinkandroot.cache.TestUtils;
+import net.dontdrinkandroot.cache.JUnitUtils;
 import net.dontdrinkandroot.cache.expungestrategy.impl.LruRecyclingExpungeStrategy;
 import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
@@ -109,7 +109,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		final SerializableIndexedDiskCache cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
-						TestUtils.getFutureExpiry(),
+						JUnitUtils.getFutureExpiry(),
 						Cache.UNLIMITED_IDLE_TIME,
 						new NoopExpungeStrategy(),
 						this.baseDir);
@@ -260,7 +260,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							loadTestCache.getDataFileNumAllocatedBlocks());
 				}
 			};
-			runner.runLoadTest(loadTestCache, 1, 100000, TestUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
+			runner.runLoadTest(loadTestCache, 1, 100000, JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
 
 			final int size = loadTestCache.getStatistics().getCurrentSize();
 			final float hitRate = loadTestCache.getStatistics().getHitRate();
@@ -326,7 +326,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 				}
 			};
 			known =
-					runner.runKnownTest(loadTestCache, 1, 100000, TestUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND, known);
+					runner.runKnownTest(loadTestCache, 1, 100000, JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND, known);
 
 			loadTestCache.close();
 
@@ -343,7 +343,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							loadTestCacheNew,
 							1,
 							100000,
-							TestUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
+							JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
 							known);
 
 			this.getLogger().info(loadTestCacheNew.getStatistics().toString());

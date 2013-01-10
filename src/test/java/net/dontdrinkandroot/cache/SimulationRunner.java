@@ -146,9 +146,9 @@ public class SimulationRunner {
 
 				for (int i = 0; i < this.iterations; i++) {
 
-					long id = (int) Math.round(TestUtils.pareto(this.alpha));
+					long id = (int) Math.round(JUnitUtils.pareto(this.alpha));
 					while (id < 0) {
-						id = (int) Math.round(TestUtils.pareto(this.alpha));
+						id = (int) Math.round(JUnitUtils.pareto(this.alpha));
 					}
 					final int action = (int) Math.round(Math.random() * 10);
 
@@ -219,9 +219,9 @@ public class SimulationRunner {
 
 			for (int i = 0; i < this.iterations; i++) {
 
-				long id = (int) Math.round(TestUtils.pareto(this.alpha));
+				long id = (int) Math.round(JUnitUtils.pareto(this.alpha));
 				while (id < 0) {
-					id = (int) Math.round(TestUtils.pareto(this.alpha));
+					id = (int) Math.round(JUnitUtils.pareto(this.alpha));
 				}
 				final String key = SimulationRunner.this.longToKey(id);
 

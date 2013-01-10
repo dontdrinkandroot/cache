@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
-import net.dontdrinkandroot.cache.metadata.impl.TestMetaData;
+import net.dontdrinkandroot.cache.metadata.impl.JUnitMetaData;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,42 +34,42 @@ public class LfuComparatorTest {
 	@Test
 	public void test() {
 
-		Map<String, TestMetaData> map = new HashMap<String, TestMetaData>();
+		Map<String, JUnitMetaData> map = new HashMap<String, JUnitMetaData>();
 
-		TestMetaData m1 = new TestMetaData();
+		JUnitMetaData m1 = new JUnitMetaData();
 		m1.setExpiry(2);
 		m1.setHits(1);
 		m1.setLastAccess(1);
 		m1.setCreated(0);
 		map.put("one", m1);
 
-		TestMetaData m2 = new TestMetaData();
+		JUnitMetaData m2 = new JUnitMetaData();
 		m2.setExpiry(2);
 		m2.setHits(2);
 		m2.setLastAccess(2);
 		m2.setCreated(1);
 		map.put("two", m2);
 
-		TestMetaData m3 = new TestMetaData();
+		JUnitMetaData m3 = new JUnitMetaData();
 		m3.setExpiry(2);
 		m3.setHits(2);
 		m3.setLastAccess(1);
 		m3.setCreated(2);
 		map.put("three", m3);
 
-		TestMetaData m4 = new TestMetaData();
+		JUnitMetaData m4 = new JUnitMetaData();
 		m4.setExpiry(2);
 		m4.setLastAccess(2);
 		m4.setHits(2);
 		m4.setCreated(4);
 		map.put("four", m4);
 
-		LfuComparator<String, TestMetaData> comparator = new LfuComparator<String, TestMetaData>();
-		TreeSet<Entry<String, TestMetaData>> set = new TreeSet<Entry<String, TestMetaData>>(comparator);
+		LfuComparator<String, JUnitMetaData> comparator = new LfuComparator<String, JUnitMetaData>();
+		TreeSet<Entry<String, JUnitMetaData>> set = new TreeSet<Entry<String, JUnitMetaData>>(comparator);
 		set.addAll(map.entrySet());
 		Assert.assertEquals(4, set.size());
 
-		Iterator<Entry<String, TestMetaData>> iterator = set.iterator();
+		Iterator<Entry<String, JUnitMetaData>> iterator = set.iterator();
 		Assert.assertEquals("one", iterator.next().getKey());
 		Assert.assertEquals("three", iterator.next().getKey());
 		Assert.assertEquals("two", iterator.next().getKey());

@@ -26,7 +26,7 @@ import net.dontdrinkandroot.cache.utils.Duration;
 import org.junit.Assert;
 
 
-public class TestUtils {
+public class JUnitUtils {
 
 	public static double PARETO_EIGHTY_PERCENT_UNDER_HUNDRED = .35;
 

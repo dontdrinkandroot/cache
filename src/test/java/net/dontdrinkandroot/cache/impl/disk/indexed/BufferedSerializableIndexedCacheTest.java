@@ -25,7 +25,7 @@ import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.ExampleObject;
 import net.dontdrinkandroot.cache.SimulationRunner;
-import net.dontdrinkandroot.cache.TestUtils;
+import net.dontdrinkandroot.cache.JUnitUtils;
 import net.dontdrinkandroot.cache.expungestrategy.impl.LruRecyclingExpungeStrategy;
 import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
@@ -178,7 +178,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 							loadTestCache.getDataFileNumAllocatedBlocks());
 				}
 			};
-			runner.runLoadTest(loadTestCache, 10, 1000000, TestUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
+			runner.runLoadTest(loadTestCache, 10, 1000000, JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
 
 			final int size = loadTestCache.getStatistics().getCurrentSize();
 			final float hitRate = loadTestCache.getStatistics().getHitRate();

@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.dontdrinkandroot.cache.TestUtils;
-import net.dontdrinkandroot.cache.metadata.impl.TestMetaData;
+import net.dontdrinkandroot.cache.JUnitUtils;
+import net.dontdrinkandroot.cache.metadata.impl.JUnitMetaData;
 import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
 
 import org.junit.Assert;
@@ -65,20 +65,20 @@ public class LfuRecyclingExpungeStrategyTest {
 	@Test
 	public void testGetToExpungeMetaData() {
 
-		Map<String, TestMetaData> metaData = new HashMap<String, TestMetaData>();
-		metaData.put("m1", new TestMetaData().setExpiry(TestUtils.getFutureExpiry()).setHits(3));
-		metaData.put("m2", new TestMetaData().setExpiry(TestUtils.getFutureExpiry()).setHits(2));
-		metaData.put("m3", new TestMetaData().setExpiry(TestUtils.getFutureExpiry()).setHits(1));
-		metaData.put("m4", new TestMetaData().setExpiry(0).setHits(10));
+		Map<String, JUnitMetaData> metaData = new HashMap<String, JUnitMetaData>();
+		metaData.put("m1", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHits(3));
+		metaData.put("m2", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHits(2));
+		metaData.put("m3", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHits(1));
+		metaData.put("m4", new JUnitMetaData().setExpiry(0).setHits(10));
 
 		LfuRecyclingExpungeStrategy strategy = new LfuRecyclingExpungeStrategy(3, 1);
-		Collection<Entry<String, TestMetaData>> toExpungeMetaData = strategy.getToExpungeMetaData(metaData.entrySet());
+		Collection<Entry<String, JUnitMetaData>> toExpungeMetaData = strategy.getToExpungeMetaData(metaData.entrySet());
 		Set<String> keys = new HashSet<String>();
-		for (Entry<String, TestMetaData> entry : toExpungeMetaData) {
+		for (Entry<String, JUnitMetaData> entry : toExpungeMetaData) {
 			keys.add(entry.getKey());
 		}
 
-		TestUtils.assertContainsExactly(keys, "m3", "m4");
+		JUnitUtils.assertContainsExactly(keys, "m3", "m4");
 	}
 
 }
