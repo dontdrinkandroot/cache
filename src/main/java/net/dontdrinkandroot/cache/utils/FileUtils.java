@@ -19,8 +19,6 @@ import java.util.List;
  */
 public class FileUtils {
 
-	private static final char UNIX_SEPARATOR = '/';
-
 	private static final char WINDOWS_SEPARATOR = '\\';
 
 	private static final char SYSTEM_SEPARATOR = File.separatorChar;
@@ -209,7 +207,7 @@ public class FileUtils {
 				closeable.close();
 			}
 		} catch (IOException ioe) {
-			// ignore
+			/* Swallow */
 		}
 	}
 
