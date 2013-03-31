@@ -65,10 +65,10 @@ public abstract class AbstractCacheTest<K, V> {
 	protected void testDefaultExpiry(Cache<K, V> cache) throws Exception {
 
 		Assert.assertEquals(0L, cache.getDefaultTtl());
-		cache.put(this.translateKey(0), this.createInputObject(0));
+		cache.putWithErrors(this.translateKey(0), this.createInputObject(0));
 		Assert.assertEquals(1L, cache.getStatistics().getPutCount());
 		Thread.sleep(1);
-		Assert.assertNull(cache.get(this.translateKey(0)));
+		Assert.assertNull(cache.getWithErrors(this.translateKey(0)));
 		Assert.assertEquals(1L, cache.getStatistics().getGetCount());
 		Assert.assertEquals(1L, cache.getStatistics().getCacheMisses());
 		Assert.assertEquals(0L, cache.getStatistics().getCacheMissesNotFound());
@@ -79,7 +79,7 @@ public abstract class AbstractCacheTest<K, V> {
 
 	private void assertNotFound(int key, Cache<K, V> cache) throws Exception {
 
-		Assert.assertNull(cache.get(this.translateKey(key)));
+		Assert.assertNull(cache.getWithErrors(this.translateKey(key)));
 		this.getCount++;
 		this.notFoundCount++;
 		this.assertStatistics(cache);
@@ -111,7 +111,7 @@ public abstract class AbstractCacheTest<K, V> {
 
 	protected V put(int key, Cache<K, V> cache) throws Exception {
 
-		V object = cache.put(this.translateKey(key), this.createInputObject(key));
+		V object = cache.putWithErrors(this.translateKey(key), this.createInputObject(key));
 		this.putCount++;
 		this.size++;
 		this.assertStatistics(cache);

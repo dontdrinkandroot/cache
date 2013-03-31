@@ -48,6 +48,22 @@ public interface Cache<K, V> {
 
 
 	/**
+	 * Store an entry in the cache with the default time to live. Any errors are swallowed, use
+	 * {@link Cache#putWithErrors(Object, Object)} if you want to handle them.
+	 * 
+	 * @param key
+	 *            A unique identifier.
+	 * @param data
+	 *            The data to store. Make sure that you don't alter the data after it has been put
+	 *            to cache as (depending on the implementation) this might lead to altering the
+	 *            entry in the cache. Use the returned data instead.
+	 * @return The entry that has been stored in the cache. It is save to alter this as
+	 *         implementations as implementations make sure that this is always (at least) a copy.
+	 */
+	V put(K key, V data);
+
+
+	/**
 	 * Store an entry in the cache with the default time to live.
 	 * 
 	 * @param key
@@ -61,7 +77,18 @@ public interface Cache<K, V> {
 	 * @throws CacheException
 	 *             Thrown on any errors encountered, supposed to include the stacktrace (if any).
 	 */
-	V put(K key, V data) throws CacheException;
+	V putWithErrors(K key, V data) throws CacheException;
+
+
+	/**
+	 * Retrieve an entry from the cache if it is available. Any errors are swallowed, use
+	 * {@link Cache#getWithErrors(Object)} if you want to handle them.
+	 * 
+	 * @param key
+	 *            The unique key under which the entry was stored.
+	 * @return The cache entry if it is valid and not expired, null otherwise.
+	 */
+	V get(K key);
 
 
 	/**
@@ -73,7 +100,7 @@ public interface Cache<K, V> {
 	 * @throws CacheException
 	 *             Thrown on any errors encountered, supposed to include the stacktrace (if any).
 	 */
-	V get(K key) throws CacheException;
+	V getWithErrors(K key) throws CacheException;
 
 
 	/**

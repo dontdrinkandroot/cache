@@ -94,10 +94,10 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						new NoopExpungeStrategy(),
 						this.baseDir);
 
-		cache.put("12345", "12345");
+		cache.putWithErrors("12345", "12345");
 		final long dataFileSize = cache.dataFile.length();
 		final long metafileLength = cache.indexFile.length();
-		cache.put("12345", "12345");
+		cache.putWithErrors("12345", "12345");
 		Assert.assertEquals(dataFileSize, cache.dataFile.length());
 		Assert.assertEquals(metafileLength, cache.indexFile.length());
 	}
@@ -114,7 +114,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						new NoopExpungeStrategy(),
 						this.baseDir);
 
-		cache.put("1", new ExampleObject(3));
+		cache.putWithErrors("1", new ExampleObject(3));
 
 		final RandomAccessFile data = new RandomAccessFile(cache.dataFile.getFileName(), "rw");
 		data.seek(1);
@@ -124,16 +124,16 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		data.close();
 
 		try {
-			cache.get("1");
+			cache.getWithErrors("1");
 			throw new Exception("Exception expected");
 		} catch (final CacheException e) {
 			/* Expected */
 		}
 
-		Assert.assertNull(cache.get("1"));
+		Assert.assertNull(cache.getWithErrors("1"));
 
-		cache.put("1", new ExampleObject(3));
-		Assert.assertEquals(new ExampleObject(3), cache.get("1"));
+		cache.putWithErrors("1", new ExampleObject(3));
+		Assert.assertEquals(new ExampleObject(3), cache.getWithErrors("1"));
 		cache.delete("1");
 
 		Assert.assertEquals(0, cache.getStatistics().getCurrentSize());
@@ -153,14 +153,14 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						new NoopExpungeStrategy(),
 						this.baseDir);
 
-		cache.put("1", new ExampleObject(3));
+		cache.putWithErrors("1", new ExampleObject(3));
 
 		final long metaFileSize = cache.dataFile.length();
 		final long dataFileSize = cache.indexFile.length();
 
-		cache.put("1", new ExampleObject(3));
+		cache.putWithErrors("1", new ExampleObject(3));
 
-		Assert.assertEquals(new ExampleObject(3), cache.get("1"));
+		Assert.assertEquals(new ExampleObject(3), cache.getWithErrors("1"));
 		Assert.assertEquals(metaFileSize, cache.dataFile.length());
 		Assert.assertEquals(dataFileSize, cache.indexFile.length());
 	}
@@ -203,7 +203,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						this.baseDir);
 
 		for (int i = 0; i < 10; i++) {
-			cache.put(Integer.toString(i), new ExampleObject(i));
+			cache.putWithErrors(Integer.toString(i), new ExampleObject(i));
 		}
 		/* Invalidate one entry */
 		cache.delete(Integer.toString(0));
@@ -218,10 +218,10 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						this.baseDir);
 
 		/* Test invalidated not there */
-		Assert.assertNull(cache.get(Integer.toString(0)));
+		Assert.assertNull(cache.getWithErrors(Integer.toString(0)));
 
 		for (int i = 1; i < 10; i++) {
-			Assert.assertEquals(new ExampleObject(i), cache.get(Integer.toString(i)));
+			Assert.assertEquals(new ExampleObject(i), cache.getWithErrors(Integer.toString(i)));
 		}
 	}
 

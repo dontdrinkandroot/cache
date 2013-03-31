@@ -93,7 +93,19 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public final synchronized V put(final K key, final V data) throws CacheException {
+	public synchronized V put(K key, V data) {
+
+		try {
+			return this.putWithErrors(key, data);
+		} catch (CacheException e) {
+			this.getLogger().warn("Putting " + key + " to cache failed", e);
+			return data;
+		}
+	}
+
+
+	@Override
+	public final synchronized V putWithErrors(final K key, final V data) throws CacheException {
 
 		if (key == null) {
 			throw new CacheException("Key must not be null");
@@ -167,7 +179,19 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public final synchronized V get(final K key) throws CacheException {
+	public synchronized V get(K key) {
+
+		try {
+			return this.getWithErrors(key);
+		} catch (CacheException e) {
+			this.getLogger().error("Getting " + key + " from cache failed", e);
+			return null;
+		}
+	}
+
+
+	@Override
+	public final synchronized V getWithErrors(final K key) throws CacheException {
 
 		final M metaData = this.entriesMetaDataMap.get(key);
 

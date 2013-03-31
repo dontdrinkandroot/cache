@@ -77,7 +77,7 @@ public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serial
 	@Override
 	protected void doAssertGet(int key, Cache<Serializable, byte[]> cache) throws Exception {
 
-		byte[] bytes = cache.get(this.translateKey(key));
+		byte[] bytes = cache.getWithErrors(this.translateKey(key));
 		Assert.assertNotNull(bytes);
 		Assert.assertArrayEquals(this.createInputObject(key), bytes);
 	}

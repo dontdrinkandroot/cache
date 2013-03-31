@@ -88,11 +88,11 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 						FileCacheTest.baseDir,
 						2);
 
-		cache.put(this.translateKey(0), this.createInputObject(0));
+		cache.putWithErrors(this.translateKey(0), this.createInputObject(0));
 		this.doAssertGet(0, cache);
-		cache.put(this.translateKey(1), this.createInputObject(1));
+		cache.putWithErrors(this.translateKey(1), this.createInputObject(1));
 		this.doAssertGet(1, cache);
-		cache.put(this.translateKey(2), this.createInputObject(2));
+		cache.putWithErrors(this.translateKey(2), this.createInputObject(2));
 		this.doAssertGet(2, cache);
 
 		cache =
@@ -129,7 +129,7 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 	@Override
 	protected void doAssertGet(int key, Cache<Md5, File> cache) throws Exception {
 
-		File file = cache.get(this.translateKey(key));
+		File file = cache.getWithErrors(this.translateKey(key));
 		Assert.assertNotNull(file);
 
 		final List<String> lines = this.readLines(file);

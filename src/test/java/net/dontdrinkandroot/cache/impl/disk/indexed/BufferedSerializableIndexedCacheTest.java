@@ -93,10 +93,10 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 						this.baseDir,
 						new NoopExpungeStrategy());
 
-		cache.put("12345", "12345");
+		cache.putWithErrors("12345", "12345");
 		final long dataFileSize = cache.getDataFile().length();
 		final long metafileLength = cache.getIndexFile().length();
-		cache.put("12345", "12345");
+		cache.putWithErrors("12345", "12345");
 		Assert.assertEquals(dataFileSize, cache.getDataFile().length());
 		Assert.assertEquals(metafileLength, cache.getIndexFile().length());
 	}
@@ -119,7 +119,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 
 		/* Put 10 entries to cache */
 		for (int i = 0; i < 10; i++) {
-			cache.put(Integer.toString(i), new ExampleObject(i));
+			cache.putWithErrors(Integer.toString(i), new ExampleObject(i));
 		}
 		/* Invalidate one entry */
 		cache.delete(Integer.toString(0));
@@ -135,11 +135,11 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
 						new NoopExpungeStrategy());
 
 		/* Test invalidated not there */
-		Assert.assertNull(cache.get(Integer.toString(0)));
+		Assert.assertNull(cache.getWithErrors(Integer.toString(0)));
 
 		/* Test remaining still exist */
 		for (int i = 1; i < 10; i++) {
-			Assert.assertEquals(new ExampleObject(i), cache.get(Integer.toString(i)));
+			Assert.assertEquals(new ExampleObject(i), cache.getWithErrors(Integer.toString(i)));
 		}
 	}
 

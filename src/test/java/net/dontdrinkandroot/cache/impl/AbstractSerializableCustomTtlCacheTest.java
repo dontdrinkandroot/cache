@@ -32,7 +32,7 @@ public abstract class AbstractSerializableCustomTtlCacheTest
 	@Override
 	protected void doAssertGet(int key, Cache<Serializable, Serializable> cache) throws Exception {
 
-		Serializable ser = cache.get(this.translateKey(key));
+		Serializable ser = cache.getWithErrors(this.translateKey(key));
 		Assert.assertNotNull(ser);
 		Assert.assertEquals(new ExampleObject(key), ser);
 	}

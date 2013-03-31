@@ -41,14 +41,14 @@ public class NoopCache<K, V> implements CustomTtlCache<K, V> {
 
 
 	@Override
-	public V put(final K key, final V data) throws CacheException {
+	public V putWithErrors(final K key, final V data) throws CacheException {
 
 		return data;
 	}
 
 
 	@Override
-	public V get(final K key) throws CacheException {
+	public V getWithErrors(final K key) throws CacheException {
 
 		return null;
 	}
@@ -99,7 +99,7 @@ public class NoopCache<K, V> implements CustomTtlCache<K, V> {
 
 
 	@Override
-	public V put(final K key, final V data, final long timeToLive) throws CacheException {
+	public V putWithErrors(final K key, final V data, final long timeToLive) throws CacheException {
 
 		return data;
 	}
@@ -120,7 +120,35 @@ public class NoopCache<K, V> implements CustomTtlCache<K, V> {
 
 
 	@Override
-	public V put(K key, V data, long timeToLive, long maxIdleTime) throws CacheException {
+	public V putWithErrors(K key, V data, long timeToLive, long maxIdleTime) throws CacheException {
+
+		return data;
+	}
+
+
+	@Override
+	public V put(K key, V data) {
+
+		return data;
+	}
+
+
+	@Override
+	public V get(K key) {
+
+		return null;
+	}
+
+
+	@Override
+	public V put(K key, V data, long timeToLive) {
+
+		return data;
+	}
+
+
+	@Override
+	public V put(K key, V data, long timeToLive, long maxIdleTime) {
 
 		return data;
 	}

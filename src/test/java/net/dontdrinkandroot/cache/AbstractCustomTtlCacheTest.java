@@ -49,7 +49,7 @@ public abstract class AbstractCustomTtlCacheTest<K, V> extends AbstractCacheTest
 
 	protected V put(int key, CustomTtlCache<K, V> cache, long ttl) throws Exception {
 
-		V object = cache.put(this.translateKey(key), this.createInputObject(key), ttl);
+		V object = cache.putWithErrors(this.translateKey(key), this.createInputObject(key), ttl);
 		this.putCount++;
 		this.size++;
 		this.assertStatistics(cache);
@@ -60,7 +60,7 @@ public abstract class AbstractCustomTtlCacheTest<K, V> extends AbstractCacheTest
 
 	protected void assertExpired(int key, Cache<K, V> cache) throws Exception {
 
-		Assert.assertNull(cache.get(this.translateKey(key)));
+		Assert.assertNull(cache.getWithErrors(this.translateKey(key)));
 		this.getCount++;
 		this.expiredCount++;
 		this.assertStatistics(cache);

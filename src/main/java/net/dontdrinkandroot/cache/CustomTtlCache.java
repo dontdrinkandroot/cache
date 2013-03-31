@@ -26,6 +26,25 @@ package net.dontdrinkandroot.cache;
 public interface CustomTtlCache<K, V> extends Cache<K, V> {
 
 	/**
+	 * Store an entry in the cache with a specific time to live. Any errors are swallowed, use
+	 * {@link CustomTtlCache#put(Object, Object, long)} if you want to handle them.
+	 * 
+	 * 
+	 * @param id
+	 *            A unique identifier.
+	 * @param data
+	 *            The data to store, make sure that you don't alter the data after it has been put
+	 *            to cache as (depending on the implementation) this might lead to altering the
+	 *            entry in the cache. Use the returned entry instead.
+	 * @param timeToLive
+	 *            The time (in milliseconds) after which the entry expires.
+	 * @return The entry that has been stored in the cache. It is save to alter this as
+	 *         implementations as implmentations make sure that this is always a copy.
+	 */
+	V put(K key, V data, long timeToLive);
+
+
+	/**
 	 * Store an entry in the cache with a specific time to live.
 	 * 
 	 * 
@@ -42,7 +61,32 @@ public interface CustomTtlCache<K, V> extends Cache<K, V> {
 	 * @throws CacheException
 	 *             Thrown if the storage fails.
 	 */
-	V put(K key, V data, long timeToLive) throws CacheException;
+	V putWithErrors(K key, V data, long timeToLive) throws CacheException;
+
+
+	/**
+	 * Store an entry in the cache with a specific time to live and max idle time. Any errors are
+	 * swallowed, use {@link CustomTtlCache#putWithErrors(Object, Object, long)} if you want to
+	 * handle them.
+	 * 
+	 * 
+	 * @param id
+	 *            A unique identifier.
+	 * @param data
+	 *            The data to store, make sure that you don't alter the data after it has been put
+	 *            to cache as (depending on the implementation) this might lead to altering the
+	 *            entry in the cache. Use the returned entry instead.
+	 * @param timeToLive
+	 *            The time (in milliseconds) after which the entry expires.
+	 * @param maxIdleTime
+	 *            The time (in milliseconds) that an entry may idle (not being accessed) before
+	 *            being expunged.
+	 * @return The entry that has been stored in the cache. It is save to alter this as
+	 *         implementations as implmentations make sure that this is always a copy.
+	 * @throws CacheException
+	 *             Thrown if the storage fails.
+	 */
+	V put(K key, V data, long timeToLive, long maxIdleTime);
 
 
 	/**
@@ -65,6 +109,6 @@ public interface CustomTtlCache<K, V> extends Cache<K, V> {
 	 * @throws CacheException
 	 *             Thrown if the storage fails.
 	 */
-	V put(K key, V data, long timeToLive, long maxIdleTime) throws CacheException;
+	V putWithErrors(K key, V data, long timeToLive, long maxIdleTime) throws CacheException;
 
 }

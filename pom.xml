@@ -1,18 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.dontdrinkandroot</groupId>
+	<parent>
+		<groupId>net.dontdrinkandroot</groupId>
+		<artifactId>parent</artifactId>
+		<version>4</version>
+	</parent>
 	<artifactId>cache</artifactId>
-	<version>0.4.2-SNAPSHOT</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<description>Simple caching framework</description>
-
-	<organization>
-		<name>dontdrinkandroot</name>
-		<url>http://dontdrinkandroot.net</url>
-	</organization>
-
-	<prerequisites>
-		<maven>2.2.1</maven>
-	</prerequisites>
 
 	<developers>
 		<developer>
@@ -21,49 +16,14 @@
 		</developer>
 	</developers>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<url>https://maven.dontdrinkandroot.net/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<url>https://maven.dontdrinkandroot.net/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<scm>
 		<developerConnection>scm:git:https://github.com/dontdrinkandroot/cache.git</developerConnection>
 	</scm>
 	
-	<properties>
-		<plugin.maven-license.version>1.9.0</plugin.maven-license.version>
-		<plugin.emma-maven.version>1.0-alpha-3</plugin.emma-maven.version>
-		<plugin.versions-maven.version>2.0</plugin.versions-maven.version>
-		<org.slf4j.version>1.7.2</org.slf4j.version>
-		<junit.version>4.11</junit.version>
-	</properties>
-
 	<build>
+	
 		<plugins>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -75,52 +35,18 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<version>${plugin.maven-license.version}</version>
-				<configuration>
-					<header>license.txt</header>
-				</configuration>
-			</plugin>
-			
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>emma-maven-plugin</artifactId>
-				<version>${plugin.emma-maven.version}</version>
-			</plugin>
-			
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<version>${plugin.versions-maven.version}</version>
-			</plugin>
-
 		</plugins>
+		
 	</build>
 
 	<dependencies>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${org.slf4j.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>${org.slf4j.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		
 	</dependencies>
-
+	
 </project>

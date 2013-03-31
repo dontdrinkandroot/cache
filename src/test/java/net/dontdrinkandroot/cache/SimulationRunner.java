@@ -156,10 +156,10 @@ public class SimulationRunner {
 
 						SimulationRunner.this.logger.info(this.num + ":" + i + " Do get: " + id);
 						final String key = SimulationRunner.this.longToKey(id);
-						final ExampleObject eo = (ExampleObject) this.cache.get(key);
+						final ExampleObject eo = (ExampleObject) this.cache.getWithErrors(key);
 						if (eo == null) {
 							SimulationRunner.this.logger.info(this.num + ":" + i + " Do put: " + id);
-							this.cache.put(key, new ExampleObject(id));
+							this.cache.putWithErrors(key, new ExampleObject(id));
 						}
 
 					} else {
@@ -238,7 +238,7 @@ public class SimulationRunner {
 						} else {
 
 							SimulationRunner.this.logger.info(this.num + ":" + i + ": Getting " + id);
-							Assert.assertEquals(new ExampleObject(id), this.cache.get(key));
+							Assert.assertEquals(new ExampleObject(id), this.cache.getWithErrors(key));
 
 						}
 
@@ -247,7 +247,7 @@ public class SimulationRunner {
 						final ExampleObject eo = new ExampleObject(id);
 						SimulationRunner.this.logger.info(this.num + ":" + i + ": Putting " + id);
 						this.known.add(id);
-						this.cache.put(key, eo);
+						this.cache.putWithErrors(key, eo);
 
 					}
 

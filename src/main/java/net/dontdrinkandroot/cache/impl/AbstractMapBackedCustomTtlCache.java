@@ -65,7 +65,31 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 
 	@Override
-	public final synchronized V put(final K key, final V data, final long timeToLive, final long maxIdleTime)
+	public V put(K key, V data, long timeToLive) {
+
+		try {
+			return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
+		} catch (CacheException e) {
+			this.getLogger().warn("Putting " + key + " to cache failed", e);
+			return data;
+		}
+	}
+
+
+	@Override
+	public synchronized V put(K key, V data, long timeToLive, long maxIdleTime) {
+
+		try {
+			return this.putWithErrors(key, data, timeToLive, maxIdleTime);
+		} catch (CacheException e) {
+			this.getLogger().warn("Putting " + key + " to cache failed", e);
+			return data;
+		}
+	}
+
+
+	@Override
+	public final synchronized V putWithErrors(final K key, final V data, final long timeToLive, final long maxIdleTime)
 			throws CacheException {
 
 		if (key == null) {
@@ -95,9 +119,9 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 
 	@Override
-	public final synchronized V put(final K key, final V data, final long timeToLive) throws CacheException {
+	public final synchronized V putWithErrors(final K key, final V data, final long timeToLive) throws CacheException {
 
-		return this.put(key, data, timeToLive, this.getDefaultMaxIdleTime());
+		return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
 	}
 
 
