@@ -83,6 +83,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected File doGet(Md5 key, final SimpleMetaData metaData) throws CacheException {
 
@@ -91,6 +92,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected File doPut(final Md5 md5, final File data) throws CacheException {
 

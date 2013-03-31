@@ -147,11 +147,13 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	protected Map<K, BlockMetaData> buildIndex() throws IOException {
 
 		this.getLogger().info("{}: Reading index", this.getName());
+		long lastTimeLogged = System.currentTimeMillis();
 
 		long dataLength = 0;
 		final Map<K, BlockMetaData> entries = new HashMap<K, BlockMetaData>();
 		final Collection<IndexData> indexDataEntries = this.indexFile.initialize();
 
+		int numRead = 0;
 		for (IndexData indexData : indexDataEntries) {
 
 			DataBlock keyMetaBlock = indexData.getKeyMetaBlock();
@@ -176,6 +178,14 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 				this.getLogger().warn("Reading {} failed", keyMetaBlock);
 				this.indexFile.delete(indexData);
 				this.dataFile.delete(keyMetaBlock, false);
+			}
+
+			numRead++;
+
+			/* Log every 10 seconds if reading index takes a long time */
+			if (System.currentTimeMillis() > lastTimeLogged + 1000L * 10) {
+				this.getLogger().info("{} percent read", numRead * 100 / indexDataEntries.size());
+				lastTimeLogged = System.currentTimeMillis();
 			}
 		}
 
@@ -256,5 +266,5 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	protected abstract <T extends V> T dataFromBytes(final byte[] data) throws CacheException;
 
 
-	protected abstract byte[] dataToBytes(V data) throws CacheException;
+	protected abstract <T extends V> byte[] dataToBytes(T data) throws CacheException;
 }

@@ -118,11 +118,12 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
 
 	@Override
-	protected Serializable doGet(Serializable key, final BlockMetaData metaData) throws CacheException {
+	protected <T extends Serializable> T doGet(Serializable key, final BlockMetaData metaData) throws CacheException {
 
 		this.bufferStatistics.increaseGetCount();
 
-		Serializable bufferedValue = this.buffer.get(key);
+		@SuppressWarnings("unchecked")
+		T bufferedValue = (T) this.buffer.get(key);
 		if (bufferedValue != null) {
 
 			this.bufferStatistics.increaseCacheHits();
@@ -143,7 +144,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 		}
 
 		/* Get data from disk and store it in the buffer */
-		final Serializable data = super.doGet(key, metaData);
+		final T data = super.doGet(key, metaData);
 		this.addToBuffer(key, data);
 
 		return data;
@@ -151,14 +152,14 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
 
 	@Override
-	protected Serializable doPut(
+	protected <T extends Serializable> T doPut(
 			Serializable key,
-			final Serializable data,
+			final T data,
 			final long timeToLive,
 			final long maxIdleTime) throws CacheException {
 
 		/* Put data to disk and store it in the buffer */
-		Serializable putData = super.doPut(key, data, timeToLive, maxIdleTime);
+		T putData = super.doPut(key, data, timeToLive, maxIdleTime);
 		this.addToBuffer(key, putData);
 
 		/*
@@ -185,10 +186,11 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	/**
 	 * Creates a copy of the given data.
 	 */
-	protected Serializable copyData(Serializable data) {
+	@SuppressWarnings("unchecked")
+	protected <T extends Serializable> T copyData(T data) {
 
 		Serializable serializable = data;
-		return Serializer.clone(serializable);
+		return (T) Serializer.clone(serializable);
 	}
 
 

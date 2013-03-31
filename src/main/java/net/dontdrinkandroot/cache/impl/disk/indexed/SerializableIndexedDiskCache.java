@@ -73,7 +73,7 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 
 
 	@Override
-	public byte[] dataToBytes(final Serializable data) throws CacheException {
+	public <T extends Serializable> byte[] dataToBytes(final T data) throws CacheException {
 
 		try {
 
@@ -85,12 +85,13 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Serializable dataFromBytes(final byte[] dataBytes) throws CacheException {
+	public <T extends Serializable> T dataFromBytes(final byte[] dataBytes) throws CacheException {
 
 		try {
 
-			return (Serializable) Serializer.deserialize(dataBytes);
+			return (T) Serializer.deserialize(dataBytes);
 
 		} catch (final SerializationException e) {
 			throw new CacheException(e);
