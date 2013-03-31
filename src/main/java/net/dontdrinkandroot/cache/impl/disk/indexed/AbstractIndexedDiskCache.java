@@ -184,7 +184,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 			/* Log every 10 seconds if reading index takes a long time */
 			if (System.currentTimeMillis() > lastTimeLogged + 1000L * 10) {
-				this.getLogger().info("{} percent read", numRead * 100 / indexDataEntries.size());
+				this.getLogger().info("{}% read", numRead * 100 / indexDataEntries.size());
 				lastTimeLogged = System.currentTimeMillis();
 			}
 		}
