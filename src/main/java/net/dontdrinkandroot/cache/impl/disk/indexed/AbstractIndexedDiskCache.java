@@ -210,7 +210,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 
 	@Override
-	protected V doGet(K key, final BlockMetaData metaData) throws CacheException {
+	protected <T extends V> T doGet(K key, final BlockMetaData metaData) throws CacheException {
 
 		try {
 
@@ -224,7 +224,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 
 	@Override
-	protected V doPut(final K key, final V data, final long timeToLive, final long maxIdleTime) throws CacheException {
+	protected <T extends V> T doPut(final K key, final T data, final long timeToLive, final long maxIdleTime)
+			throws CacheException {
 
 		try {
 
@@ -252,7 +253,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	}
 
 
-	protected abstract V dataFromBytes(final byte[] data) throws CacheException;
+	protected abstract <T extends V> T dataFromBytes(final byte[] data) throws CacheException;
 
 
 	protected abstract byte[] dataToBytes(V data) throws CacheException;

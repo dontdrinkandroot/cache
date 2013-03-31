@@ -65,7 +65,7 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 
 	@Override
-	public V put(K key, V data, long timeToLive) {
+	public <T extends V> T put(K key, T data, long timeToLive) {
 
 		try {
 			return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
@@ -77,7 +77,7 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 
 	@Override
-	public synchronized V put(K key, V data, long timeToLive, long maxIdleTime) {
+	public synchronized <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime) {
 
 		try {
 			return this.putWithErrors(key, data, timeToLive, maxIdleTime);
@@ -89,8 +89,11 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 
 	@Override
-	public final synchronized V putWithErrors(final K key, final V data, final long timeToLive, final long maxIdleTime)
-			throws CacheException {
+	public final synchronized <T extends V> T putWithErrors(
+			final K key,
+			final T data,
+			final long timeToLive,
+			final long maxIdleTime) throws CacheException {
 
 		if (key == null) {
 			throw new CacheException("Key must not be null");
@@ -109,7 +112,7 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 			this.cleanUp();
 		}
 
-		final V result = this.doPut(key, data, timeToLive, maxIdleTime);
+		final T result = this.doPut(key, data, timeToLive, maxIdleTime);
 
 		this.getStatistics().increasePutCount();
 		this.getStatistics().setCurrentSize(this.getEntriesMetaDataMap().size());
@@ -119,14 +122,15 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 
 	@Override
-	public final synchronized V putWithErrors(final K key, final V data, final long timeToLive) throws CacheException {
+	public final synchronized <T extends V> T putWithErrors(final K key, final T data, final long timeToLive)
+			throws CacheException {
 
 		return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
 	}
 
 
 	@Override
-	protected V doPut(final K key, final V data) throws CacheException {
+	protected <T extends V> T doPut(final K key, final T data) throws CacheException {
 
 		return this.doPut(key, data, this.getDefaultTtl(), this.getDefaultMaxIdleTime());
 	};
@@ -135,6 +139,7 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 	/**
 	 * Performs storage of the given data and adds new metadata to the map.
 	 */
-	protected abstract V doPut(K key, V data, long timeToLive, long defaultMaxIdleTime) throws CacheException;
+	protected abstract <T extends V> T doPut(K key, T data, long timeToLive, long defaultMaxIdleTime)
+			throws CacheException;
 
 }

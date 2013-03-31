@@ -39,9 +39,9 @@ public interface CustomTtlCache<K, V> extends Cache<K, V> {
 	 * @param timeToLive
 	 *            The time (in milliseconds) after which the entry expires.
 	 * @return The entry that has been stored in the cache. It is save to alter this as
-	 *         implementations as implmentations make sure that this is always a copy.
+	 *         implementations as implementations make sure that this is always a copy.
 	 */
-	V put(K key, V data, long timeToLive);
+	<T extends V> T put(K key, T data, long timeToLive);
 
 
 	/**
@@ -57,11 +57,11 @@ public interface CustomTtlCache<K, V> extends Cache<K, V> {
 	 * @param timeToLive
 	 *            The time (in milliseconds) after which the entry expires.
 	 * @return The entry that has been stored in the cache. It is save to alter this as
-	 *         implementations as implmentations make sure that this is always a copy.
+	 *         implementations as implementations make sure that this is always a copy.
 	 * @throws CacheException
 	 *             Thrown if the storage fails.
 	 */
-	V putWithErrors(K key, V data, long timeToLive) throws CacheException;
+	<T extends V> T putWithErrors(K key, T data, long timeToLive) throws CacheException;
 
 
 	/**
@@ -82,11 +82,11 @@ public interface CustomTtlCache<K, V> extends Cache<K, V> {
 	 *            The time (in milliseconds) that an entry may idle (not being accessed) before
 	 *            being expunged.
 	 * @return The entry that has been stored in the cache. It is save to alter this as
-	 *         implementations as implmentations make sure that this is always a copy.
+	 *         implementations as implementations make sure that this is always a copy.
 	 * @throws CacheException
 	 *             Thrown if the storage fails.
 	 */
-	V put(K key, V data, long timeToLive, long maxIdleTime);
+	<T extends V> T put(K key, T data, long timeToLive, long maxIdleTime);
 
 
 	/**
@@ -105,10 +105,10 @@ public interface CustomTtlCache<K, V> extends Cache<K, V> {
 	 *            The time (in milliseconds) that an entry may idle (not being accessed) before
 	 *            being expunged.
 	 * @return The entry that has been stored in the cache. It is save to alter this as
-	 *         implementations as implmentations make sure that this is always a copy.
+	 *         implementations as implementations make sure that this is always a copy.
 	 * @throws CacheException
 	 *             Thrown if the storage fails.
 	 */
-	V putWithErrors(K key, V data, long timeToLive, long maxIdleTime) throws CacheException;
+	<T extends V> T putWithErrors(K key, T data, long timeToLive, long maxIdleTime) throws CacheException;
 
 }

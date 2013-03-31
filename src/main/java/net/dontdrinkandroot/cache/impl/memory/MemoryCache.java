@@ -58,7 +58,8 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 
 
 	@Override
-	protected V doPut(final K key, final V data, final long timeToLive, final long maxIdleTime) throws CacheException {
+	protected <T extends V> T doPut(final K key, final T data, final long timeToLive, final long maxIdleTime)
+			throws CacheException {
 
 		final SimpleMetaData metaData = new SimpleMetaData(System.currentTimeMillis() + timeToLive);
 		this.getEntriesMetaDataMap().put(key, metaData);
@@ -81,9 +82,10 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 
 
 	@Override
-	protected V doGet(K key, final SimpleMetaData metaData) throws CacheException {
+	protected <T extends V> T doGet(K key, final SimpleMetaData metaData) throws CacheException {
 
-		V data = this.dataMap.get(key);
+		@SuppressWarnings("unchecked")
+		T data = (T) this.dataMap.get(key);
 
 		/* Copy data if desired so changes after get are not reflected in cache */
 		if (this.copyOnRead) {
@@ -95,11 +97,11 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 
 
 	@SuppressWarnings("unchecked")
-	protected V copyData(V data) {
+	protected <T extends V> T copyData(T data) {
 
 		if (data instanceof Serializable) {
 			Serializable serializable = (Serializable) data;
-			return (V) Serializer.clone(serializable);
+			return (T) Serializer.clone(serializable);
 		}
 
 		this.getLogger().error(

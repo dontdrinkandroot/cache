@@ -60,7 +60,7 @@ public interface Cache<K, V> {
 	 * @return The entry that has been stored in the cache. It is save to alter this as
 	 *         implementations as implementations make sure that this is always (at least) a copy.
 	 */
-	V put(K key, V data);
+	<T extends V> T put(K key, T data);
 
 
 	/**
@@ -77,7 +77,7 @@ public interface Cache<K, V> {
 	 * @throws CacheException
 	 *             Thrown on any errors encountered, supposed to include the stacktrace (if any).
 	 */
-	V putWithErrors(K key, V data) throws CacheException;
+	<T extends V> T putWithErrors(K key, T data) throws CacheException;
 
 
 	/**
@@ -88,7 +88,7 @@ public interface Cache<K, V> {
 	 *            The unique key under which the entry was stored.
 	 * @return The cache entry if it is valid and not expired, null otherwise.
 	 */
-	V get(K key);
+	<T extends V> T get(K key);
 
 
 	/**
@@ -100,7 +100,7 @@ public interface Cache<K, V> {
 	 * @throws CacheException
 	 *             Thrown on any errors encountered, supposed to include the stacktrace (if any).
 	 */
-	V getWithErrors(K key) throws CacheException;
+	<T extends V> T getWithErrors(K key) throws CacheException;
 
 
 	/**

@@ -93,7 +93,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public synchronized V put(K key, V data) {
+	public synchronized <T extends V> T put(K key, T data) {
 
 		try {
 			return this.putWithErrors(key, data);
@@ -105,7 +105,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public final synchronized V putWithErrors(final K key, final V data) throws CacheException {
+	public final synchronized <T extends V> T putWithErrors(final K key, final T data) throws CacheException {
 
 		if (key == null) {
 			throw new CacheException("Key must not be null");
@@ -126,7 +126,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			this.cleanUp();
 		}
 
-		final V result = this.doPut(key, data);
+		final T result = this.doPut(key, data);
 
 		this.statistics.increasePutCount();
 		this.statistics.setCurrentSize(this.entriesMetaDataMap.size());
@@ -179,7 +179,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public synchronized V get(K key) {
+	public synchronized <T extends V> T get(K key) {
 
 		try {
 			return this.getWithErrors(key);
@@ -191,7 +191,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public final synchronized V getWithErrors(final K key) throws CacheException {
+	public final synchronized <T extends V> T getWithErrors(final K key) throws CacheException {
 
 		final M metaData = this.entriesMetaDataMap.get(key);
 
@@ -220,7 +220,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		/* Cache hit: return */
 		try {
 
-			final V result = this.doGet(key, metaData);
+			final T result = this.doGet(key, metaData);
 
 			this.statistics.increaseCacheHits();
 			this.statistics.increaseGetCount();
@@ -322,12 +322,12 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	/**
 	 * Performs retrieval of the data belonging to the metadata.
 	 */
-	protected abstract V doGet(K key, M metaData) throws CacheException;
+	protected abstract <T extends V> T doGet(K key, M metaData) throws CacheException;
 
 
 	/**
 	 * Performs storage of the given data and adds new metadata to the map.
 	 */
-	protected abstract V doPut(K key, V data) throws CacheException;
+	protected abstract <T extends V> T doPut(K key, T data) throws CacheException;
 
 }
