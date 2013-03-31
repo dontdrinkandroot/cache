@@ -20,6 +20,13 @@
 		<developerConnection>scm:git:https://github.com/dontdrinkandroot/cache.git</developerConnection>
 	</scm>
 	
+	<repositories>
+		<repository>
+			<id>public</id>
+			<url>http://maven.dontdrinkandroot.net/content/groups/public</url>
+		</repository>
+	</repositories>
+	
 	<build>
 	
 		<plugins>

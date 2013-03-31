@@ -44,7 +44,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
 	private final Map<Serializable, Serializable> buffer;
 
-	private final ExpungeStrategy bufferExpungeStrategy;
+	protected final ExpungeStrategy bufferExpungeStrategy;
 
 	private final SimpleCacheStatistics bufferStatistics;
 
