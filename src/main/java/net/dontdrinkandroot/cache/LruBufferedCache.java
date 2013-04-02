@@ -13,7 +13,7 @@ public interface LruBufferedCache extends LruCache {
 	void setBufferMaxSize(int maxSize);
 
 
-	int getBuferRecycleSize();
+	int getBufferRecycleSize();
 
 
 	void setBufferRecycleSize(int bufferRecycleSize);

@@ -123,7 +123,7 @@ public class LruBufferedSerializableIndexedDiskCache extends BufferedSerializabl
 
 
 	@Override
-	public int getBuferRecycleSize() {
+	public int getBufferRecycleSize() {
 
 		return ((LruRecyclingExpungeStrategy) this.bufferExpungeStrategy).getRecycleSize();
 	}
