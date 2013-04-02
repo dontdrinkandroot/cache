@@ -5,7 +5,7 @@ package net.dontdrinkandroot.cache;
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public interface LruBufferedCache extends LruCache {
+public interface LruBufferedCache<K, V> extends LruCache<K, V> {
 
 	int getBufferMaxSize();
 
