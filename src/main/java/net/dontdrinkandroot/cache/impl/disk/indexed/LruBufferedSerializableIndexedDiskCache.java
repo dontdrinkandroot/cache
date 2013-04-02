@@ -20,6 +20,7 @@ package net.dontdrinkandroot.cache.impl.disk.indexed;
 import java.io.File;
 import java.io.IOException;
 
+import net.dontdrinkandroot.cache.LruBufferedCache;
 import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.expungestrategy.impl.LruRecyclingExpungeStrategy;
 
@@ -31,7 +32,8 @@ import net.dontdrinkandroot.cache.expungestrategy.impl.LruRecyclingExpungeStrate
  * @author Philip W. Sorst <philip@sorst.net>
  * 
  */
-public class LruBufferedSerializableIndexedDiskCache extends BufferedSerializableIndexedDiskCache {
+public class LruBufferedSerializableIndexedDiskCache extends BufferedSerializableIndexedDiskCache
+		implements LruBufferedCache {
 
 	public LruBufferedSerializableIndexedDiskCache(
 			String name,
@@ -74,28 +76,60 @@ public class LruBufferedSerializableIndexedDiskCache extends BufferedSerializabl
 	@Override
 	public void setExpungeStrategy(ExpungeStrategy expungeStrategy) {
 
-		throw new IllegalArgumentException("Can't change expunge strategy");
+		throw new UnsupportedOperationException("Can't change expunge strategy, fixed to LruRecyclingExpungeStrategy");
 	}
 
 
+	@Override
+	public int getMaxSize() {
+
+		return ((LruRecyclingExpungeStrategy) this.getExpungeStrategy()).getMaxSize();
+	}
+
+
+	@Override
 	public void setMaxSize(int maxSize) {
 
 		((LruRecyclingExpungeStrategy) this.getExpungeStrategy()).setMaxSize(maxSize);
 	}
 
 
+	@Override
+	public int getRecycleSize() {
+
+		return ((LruRecyclingExpungeStrategy) this.getExpungeStrategy()).getRecycleSize();
+	}
+
+
+	@Override
 	public void setRecycleSize(int recycleSize) {
 
 		((LruRecyclingExpungeStrategy) this.getExpungeStrategy()).setRecycleSize(recycleSize);
 	}
 
 
+	@Override
+	public int getBufferMaxSize() {
+
+		return ((LruRecyclingExpungeStrategy) this.bufferExpungeStrategy).getMaxSize();
+	}
+
+
+	@Override
 	public void setBufferMaxSize(int maxSize) {
 
 		((LruRecyclingExpungeStrategy) this.bufferExpungeStrategy).setMaxSize(maxSize);
 	}
 
 
+	@Override
+	public int getBuferRecycleSize() {
+
+		return ((LruRecyclingExpungeStrategy) this.bufferExpungeStrategy).getRecycleSize();
+	}
+
+
+	@Override
 	public void setBufferRecycleSize(int bufferRecycleSize) {
 
 		((LruRecyclingExpungeStrategy) this.bufferExpungeStrategy).setRecycleSize(bufferRecycleSize);
