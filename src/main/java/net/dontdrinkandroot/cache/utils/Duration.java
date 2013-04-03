@@ -34,21 +34,27 @@ public class Duration {
 	public static final long MILLIS_PER_DAY = Duration.MILLIS_PER_HOUR * Duration.HOURS_PER_DAY;
 
 
-	public static long seconds(int i) {
+	public static long seconds(int seconds) {
 
-		return Duration.MILLIS_PER_SECOND * i;
+		return Duration.MILLIS_PER_SECOND * seconds;
 	}
 
 
-	public static long minutes(int i) {
+	public static long minutes(int minutes) {
 
-		return Duration.MILLIS_PER_MINUTE * i;
+		return Duration.MILLIS_PER_MINUTE * minutes;
 	}
 
 
-	public static long days(int i) {
+	public static long hours(int hours) {
 
-		return Duration.MILLIS_PER_DAY * i;
+		return Duration.MILLIS_PER_HOUR * hours;
+	}
+
+
+	public static long days(int days) {
+
+		return Duration.MILLIS_PER_DAY * days;
 	}
 
 }
