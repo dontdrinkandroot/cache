@@ -124,6 +124,15 @@ public interface Cache<K, V> {
 
 
 	/**
+	 * Sets the default time to live for cache entries.
+	 * 
+	 * @param defaultTTL
+	 *            The default time to live for a cache entry in milliseconds.
+	 */
+	void setDefaultTtl(long defaultTTL);
+
+
+	/**
 	 * Get the default max idle time for cache entries.
 	 * 
 	 * @return The default max idle time for cache entries in milliseconds.

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -178,7 +179,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	protected void doDelete(Serializable key, final BlockMetaData metaData) throws CacheException {
 
 		/* Remove entry from buffer and from disk */
-		this.buffer.remove(metaData);
+		this.buffer.remove(key);
 		super.doDelete(key, metaData);
 	}
 
@@ -235,17 +236,9 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
 		if (this.bufferExpungeStrategy.triggers(this.bufferStatistics)) {
 
-			/* Expunge buffer entries */
-			Map<Serializable, BlockMetaData> bufferEntries = new HashMap<Serializable, BlockMetaData>();
-			for (Serializable bufferKey : this.buffer.keySet()) {
-				BlockMetaData metaData = this.getEntriesMetaDataMap().get(bufferKey);
-				if (metaData == null) {
-					this.getLogger().error("Metadata for %s was null", bufferKey.toString());
-				} else {
-					bufferEntries.put(bufferKey, metaData);
-				}
-			}
+			/* Expunge buffer entries if necessary before actually adding the new entry */
 
+			Map<Serializable, BlockMetaData> bufferEntries = this.buildBufferMetaDataMap();
 			final Collection<Entry<Serializable, BlockMetaData>> toExpunge =
 					this.bufferExpungeStrategy.getToExpungeMetaData(bufferEntries.entrySet());
 			for (final Entry<Serializable, BlockMetaData> expunge : toExpunge) {
@@ -255,6 +248,35 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
 		this.bufferStatistics.increasePutCount();
 		this.buffer.put(key, data);
+	}
+
+
+	/**
+	 * Builds a map that holds the key metadata mapping of the buffer. Needed to run an expunge
+	 * strategy on the buffer.
+	 */
+	private Map<Serializable, BlockMetaData> buildBufferMetaDataMap() {
+
+		Map<Serializable, BlockMetaData> bufferEntries = new HashMap<Serializable, BlockMetaData>();
+		Iterator<Serializable> keyIterator = this.buffer.keySet().iterator();
+		while (keyIterator.hasNext()) {
+
+			Serializable key = keyIterator.next();
+			BlockMetaData metaData = this.getEntriesMetaDataMap().get(key);
+
+			if (metaData == null) {
+				/*
+				 * Strange, metadata was not found anymore, so entry does not exist on disk. Warn
+				 * and also delete in buffer
+				 */
+				this.getLogger().warn("{}: Metadata for {} was null", this.getName(), key.toString());
+				keyIterator.remove();
+			} else {
+				bufferEntries.put(key, metaData);
+			}
+		}
+
+		return bufferEntries;
 	}
 
 }
