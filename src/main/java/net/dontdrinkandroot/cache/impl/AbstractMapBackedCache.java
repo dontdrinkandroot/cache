@@ -96,7 +96,9 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	public synchronized <T extends V> T put(K key, T data) {
 
 		try {
+
 			return this.putWithErrors(key, data);
+
 		} catch (CacheException e) {
 			this.getLogger().warn("Putting " + key + " to cache failed", e);
 			return data;
@@ -152,6 +154,10 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		final Collection<Entry<K, M>> expungeEntriesMetaData =
 				this.expungeStrategy.getToExpungeMetaData(this.entriesMetaDataMap.entrySet());
 		this.expunge(expungeEntriesMetaData);
+
+		for (M metaData : this.entriesMetaDataMap.values()) {
+			metaData.decay();
+		}
 	}
 
 
@@ -182,7 +188,9 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	public synchronized <T extends V> T get(K key) {
 
 		try {
+
 			return this.getWithErrors(key);
+
 		} catch (CacheException e) {
 			this.getLogger().error("Getting " + key + " from cache failed", e);
 			return null;
@@ -235,9 +243,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			/* Delete entry on fail */
 			this.delete(key, metaData);
 			throw e;
-
 		}
-
 	}
 
 
@@ -273,7 +279,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	/**
-	 * Performs the actual expunging of entries with the given metadata. Can be subclasses as they
+	 * Performs the actual expunging of entries with the given metadata. Can be subclassed as they
 	 * might want to chain or do some other magic, by default the entries will simply be deleted.
 	 * 
 	 * @param expungeEntriesMetaData

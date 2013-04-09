@@ -36,6 +36,7 @@ public class JUnitMetaData implements MetaData {
 
 	public JUnitMetaData() {
 
+		/* Noop */
 	}
 
 
@@ -125,6 +126,15 @@ public class JUnitMetaData implements MetaData {
 	public long getMaxIdleTime() {
 
 		return this.maxIdleTime;
+	}
+
+
+	@Override
+	public void decay() {
+
+		if (this.hits > 0) {
+			this.hits--;
+		}
 	}
 
 }

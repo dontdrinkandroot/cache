@@ -72,4 +72,10 @@ public interface MetaData extends Serializable {
 	 * Get the timestamp when the entry was created.
 	 */
 	long getCreated();
+
+
+	/**
+	 * Decreases the hitcount for use with LRU based expunge strategies.
+	 */
+	void decay();
 }

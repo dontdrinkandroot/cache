@@ -125,6 +125,15 @@ public class SimpleMetaData implements MetaData {
 	}
 
 
+	@Override
+	public void decay() {
+
+		if (this.hitCount > 0) {
+			this.hitCount--;
+		}
+	}
+
+
 	public final void setCount(final int count) {
 
 		this.hitCount = count;

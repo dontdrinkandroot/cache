@@ -94,6 +94,13 @@ public class BlockMetaData implements MetaData {
 	}
 
 
+	@Override
+	public void decay() {
+
+		this.metaData.decay();
+	}
+
+
 	public SimpleMetaData getMetaData() {
 
 		return this.metaData;
