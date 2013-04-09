@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import net.dontdrinkandroot.cache.LruBufferedCache;
+import net.dontdrinkandroot.cache.BufferedRecyclingCache;
 import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.expungestrategy.impl.LfuRecyclingExpungeStrategy;
 
@@ -34,7 +34,7 @@ import net.dontdrinkandroot.cache.expungestrategy.impl.LfuRecyclingExpungeStrate
  * 
  */
 public class LfuBufferedSerializableIndexedDiskCache extends BufferedSerializableIndexedDiskCache
-		implements LruBufferedCache<Serializable, Serializable> {
+		implements BufferedRecyclingCache<Serializable, Serializable> {
 
 	public LfuBufferedSerializableIndexedDiskCache(
 			String name,

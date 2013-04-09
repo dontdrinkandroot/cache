@@ -59,7 +59,7 @@ public interface MetaData extends Serializable {
 	/**
 	 * Get the number of hits.
 	 */
-	long getHitCount();
+	int getHitCount();
 
 
 	/**

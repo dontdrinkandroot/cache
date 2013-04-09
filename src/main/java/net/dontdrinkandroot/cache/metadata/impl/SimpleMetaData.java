@@ -26,6 +26,8 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
  */
 public class SimpleMetaData implements MetaData {
 
+	public static final double DECAY_FACTOR = 0.9;
+
 	private final long expiry;
 
 	private final long created;
@@ -34,7 +36,7 @@ public class SimpleMetaData implements MetaData {
 
 	private long lastAccess;
 
-	private long hitCount = 0;
+	private int hitCount = 0;
 
 
 	public SimpleMetaData(final long expiry) {
@@ -74,7 +76,7 @@ public class SimpleMetaData implements MetaData {
 	@Override
 	public final void update() {
 
-		this.hitCount++;
+		this.increaseHitCount();
 		this.lastAccess = System.currentTimeMillis();
 	}
 
@@ -87,7 +89,7 @@ public class SimpleMetaData implements MetaData {
 
 
 	@Override
-	public final long getHitCount() {
+	public final int getHitCount() {
 
 		return this.hitCount;
 	}
@@ -129,20 +131,8 @@ public class SimpleMetaData implements MetaData {
 	public void decay() {
 
 		if (this.hitCount > 0) {
-			this.hitCount--;
+			this.hitCount = (int) Math.floor(this.hitCount * SimpleMetaData.DECAY_FACTOR);
 		}
-	}
-
-
-	public final void setCount(final int count) {
-
-		this.hitCount = count;
-	}
-
-
-	public final void setLastAccess(final long lastAccess) {
-
-		this.lastAccess = lastAccess;
 	}
 
 
@@ -152,9 +142,11 @@ public class SimpleMetaData implements MetaData {
 	}
 
 
-	public final void increaseCount() {
+	public final void increaseHitCount() {
 
-		this.hitCount++;
+		if (this.hitCount < Integer.MAX_VALUE) {
+			this.hitCount++;
+		}
 	}
 
 }

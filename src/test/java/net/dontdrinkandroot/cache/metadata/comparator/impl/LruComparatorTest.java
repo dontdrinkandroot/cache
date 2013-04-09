@@ -38,21 +38,21 @@ public class LruComparatorTest {
 
 		JUnitMetaData m1 = new JUnitMetaData();
 		m1.setExpiry(2);
-		m1.setHits(1);
+		m1.setHitCount(1);
 		m1.setLastAccess(1);
 		m1.setCreated(0);
 		map.put("one", m1);
 
 		JUnitMetaData m2 = new JUnitMetaData();
 		m2.setExpiry(2);
-		m2.setHits(2);
+		m2.setHitCount(2);
 		m2.setLastAccess(2);
 		m2.setCreated(1);
 		map.put("two", m2);
 
 		JUnitMetaData m3 = new JUnitMetaData();
 		m3.setExpiry(2);
-		m3.setHits(2);
+		m3.setHitCount(2);
 		m3.setLastAccess(1);
 		m3.setCreated(2);
 		map.put("three", m3);
@@ -60,7 +60,7 @@ public class LruComparatorTest {
 		JUnitMetaData m4 = new JUnitMetaData();
 		m4.setExpiry(2);
 		m4.setLastAccess(2);
-		m4.setHits(2);
+		m4.setHitCount(2);
 		m4.setCreated(4);
 		map.put("four", m4);
 

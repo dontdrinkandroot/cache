@@ -1,11 +1,11 @@
 package net.dontdrinkandroot.cache;
 
 /**
- * A Buffered Cache that has a LruRecyclingExpungeStrategy for both persistent storage and buffer.
+ * A Buffered Cache that has a recycling ExpungeStrategy for both persistent storage and buffer.
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public interface LruBufferedCache<K, V> extends LruCache<K, V> {
+public interface BufferedRecyclingCache<K, V> extends RecyclingCache<K, V> {
 
 	int getBufferMaxSize();
 

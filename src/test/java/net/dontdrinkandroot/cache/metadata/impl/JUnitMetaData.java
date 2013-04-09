@@ -23,6 +23,8 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
 
 public class JUnitMetaData implements MetaData {
 
+	public static final double DECAY_FACTOR = 0.9;
+
 	private long expiry;
 
 	private long lastAccess;
@@ -31,7 +33,7 @@ public class JUnitMetaData implements MetaData {
 
 	private long created;
 
-	private int hits;
+	private int hitCount;
 
 
 	public JUnitMetaData() {
@@ -57,15 +59,17 @@ public class JUnitMetaData implements MetaData {
 	@Override
 	public void update() {
 
-		this.hits++;
+		if (this.hitCount < Integer.MAX_VALUE) {
+			this.hitCount++;
+		}
 		this.lastAccess = System.currentTimeMillis();
 	}
 
 
 	@Override
-	public long getHitCount() {
+	public int getHitCount() {
 
-		return this.hits;
+		return this.hitCount;
 	}
 
 
@@ -97,9 +101,9 @@ public class JUnitMetaData implements MetaData {
 	}
 
 
-	public JUnitMetaData setHits(int hits) {
+	public JUnitMetaData setHitCount(int hits) {
 
-		this.hits = hits;
+		this.hitCount = hits;
 		return this;
 	}
 
@@ -132,8 +136,8 @@ public class JUnitMetaData implements MetaData {
 	@Override
 	public void decay() {
 
-		if (this.hits > 0) {
-			this.hits--;
+		if (this.hitCount > 0) {
+			this.hitCount = (int) Math.floor(this.hitCount * JUnitMetaData.DECAY_FACTOR);
 		}
 	}
 

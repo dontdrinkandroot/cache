@@ -44,10 +44,10 @@ public class LfuExpungeStrategyTest extends AbstractOneOverMaxSizeExpungeStrateg
 	public void testGetToExpungeMetaData() {
 
 		Map<String, JUnitMetaData> metaData = new HashMap<String, JUnitMetaData>();
-		metaData.put("m1", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHits(3));
-		metaData.put("m2", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHits(2));
-		metaData.put("m3", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHits(1));
-		metaData.put("m4", new JUnitMetaData().setExpiry(0).setHits(10));
+		metaData.put("m1", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHitCount(3));
+		metaData.put("m2", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHitCount(2));
+		metaData.put("m3", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setHitCount(1));
+		metaData.put("m4", new JUnitMetaData().setExpiry(0).setHitCount(10));
 
 		LfuExpungeStrategy strategy = new LfuExpungeStrategy(3);
 		Collection<Entry<String, JUnitMetaData>> toExpungeMetaData = strategy.getToExpungeMetaData(metaData.entrySet());

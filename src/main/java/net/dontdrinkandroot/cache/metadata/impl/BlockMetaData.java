@@ -74,7 +74,7 @@ public class BlockMetaData implements MetaData {
 
 
 	@Override
-	public long getHitCount() {
+	public int getHitCount() {
 
 		return this.metaData.getHitCount();
 	}

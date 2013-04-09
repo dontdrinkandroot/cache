@@ -40,7 +40,7 @@ public class NoopExpungeStrategyTest {
 		metaData.put("m1", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setLastAccess(3));
 		metaData.put("m2", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setLastAccess(2));
 		metaData.put("m3", new JUnitMetaData().setExpiry(JUnitUtils.getFutureExpiry()).setLastAccess(1));
-		metaData.put("m4", new JUnitMetaData().setExpiry(0).setHits(10));
+		metaData.put("m4", new JUnitMetaData().setExpiry(0).setHitCount(10));
 
 		Assert.assertTrue(strategy.getToExpungeMetaData(metaData.entrySet()).isEmpty());
 	}
