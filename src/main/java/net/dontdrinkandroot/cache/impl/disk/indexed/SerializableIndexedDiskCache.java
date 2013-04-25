@@ -22,9 +22,6 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import net.dontdrinkandroot.cache.CacheException;
-import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
-import net.dontdrinkandroot.cache.expungestrategy.impl.ExpiredOnlyExpungeStrategy;
-import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.SerializationException;
 import net.dontdrinkandroot.cache.utils.Serializer;
 
@@ -34,10 +31,14 @@ import net.dontdrinkandroot.cache.utils.Serializer;
  */
 public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Serializable, Serializable> {
 
-	public SerializableIndexedDiskCache(final String name, final long defaultTimeToLive, final File baseDir)
-			throws IOException {
+	public SerializableIndexedDiskCache(
+			final String name,
+			final long defaultTimeToLive,
+			final int maxSize,
+			final int recycleSize,
+			final File baseDir) throws IOException {
 
-		super(name, defaultTimeToLive, new ExpiredOnlyExpungeStrategy(Duration.days(1)), baseDir);
+		super(name, defaultTimeToLive, maxSize, recycleSize, baseDir);
 	}
 
 
@@ -45,30 +46,11 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 			final String name,
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
+			final int maxSize,
+			final int recycleSize,
 			final File baseDir) throws IOException {
 
-		super(name, defaultTimeToLive, defaultMaxIdleTime, new ExpiredOnlyExpungeStrategy(Duration.days(1)), baseDir);
-	}
-
-
-	public SerializableIndexedDiskCache(
-			final String name,
-			final long defaultTimeToLive,
-			final ExpungeStrategy expungeStrategy,
-			final File baseDir) throws IOException {
-
-		super(name, defaultTimeToLive, expungeStrategy, baseDir);
-	}
-
-
-	public SerializableIndexedDiskCache(
-			final String name,
-			final long defaultTimeToLive,
-			final long defaultMaxIdleTime,
-			final ExpungeStrategy expungeStrategy,
-			final File baseDir) throws IOException {
-
-		super(name, defaultTimeToLive, defaultMaxIdleTime, expungeStrategy, baseDir);
+		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
 	}
 
 

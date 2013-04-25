@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.dontdrinkandroot.cache.CacheException;
-import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractMapBackedCustomTtlCache;
 import net.dontdrinkandroot.cache.impl.disk.indexed.storage.DataBlock;
 import net.dontdrinkandroot.cache.impl.disk.indexed.storage.DataFile;
@@ -53,10 +52,11 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	public AbstractIndexedDiskCache(
 			final String name,
 			final long defaultTimeToLive,
-			final ExpungeStrategy expungeStrategy,
+			final int maxSize,
+			final int recycleSize,
 			final File baseDir) throws IOException {
 
-		super(name, defaultTimeToLive, expungeStrategy);
+		super(name, defaultTimeToLive, maxSize, recycleSize);
 
 		baseDir.mkdirs();
 		/* Check lock file does not exist */
@@ -83,10 +83,11 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 			final String name,
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
-			final ExpungeStrategy expungeStrategy,
+			final int maxSize,
+			final int recycleSize,
 			final File baseDir) throws IOException {
 
-		super(name, defaultTimeToLive, defaultMaxIdleTime, expungeStrategy);
+		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
 
 		baseDir.mkdirs();
 		/* Check lock file does not exist */

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import net.dontdrinkandroot.cache.CacheException;
-import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 
 
 /**
@@ -33,10 +32,11 @@ public class ByteArrayIndexedDiskCache extends AbstractIndexedDiskCache<Serializ
 	public ByteArrayIndexedDiskCache(
 			final String name,
 			final long defaultTimeToLive,
-			final ExpungeStrategy expungeStrategy,
+			final int maxSize,
+			final int recycleSize,
 			final File baseDir) throws IOException {
 
-		super(name, defaultTimeToLive, expungeStrategy, baseDir);
+		super(name, defaultTimeToLive, maxSize, recycleSize, baseDir);
 	}
 
 
@@ -44,10 +44,11 @@ public class ByteArrayIndexedDiskCache extends AbstractIndexedDiskCache<Serializ
 			final String name,
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
-			final ExpungeStrategy expungeStrategy,
+			final int maxSize,
+			final int recycleSize,
 			final File baseDir) throws IOException {
 
-		super(name, defaultTimeToLive, defaultMaxIdleTime, expungeStrategy, baseDir);
+		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
 	}
 
 

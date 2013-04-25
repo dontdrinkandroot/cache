@@ -19,7 +19,6 @@ package net.dontdrinkandroot.cache.impl;
 
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.CustomTtlCache;
-import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 
 
@@ -37,12 +36,9 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 	 * @param defaultTimeToLive
 	 *            The default Time to Live for Cache entries.
 	 */
-	public AbstractMapBackedCustomTtlCache(
-			final String name,
-			final long defaultTimeToLive,
-			final ExpungeStrategy expungeStrategy) {
+	public AbstractMapBackedCustomTtlCache(final String name, final long defaultTimeToLive, int maxSize, int recycleSize) {
 
-		super(name, defaultTimeToLive, expungeStrategy);
+		super(name, defaultTimeToLive, maxSize, recycleSize);
 	}
 
 
@@ -58,9 +54,10 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 			final String name,
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
-			final ExpungeStrategy expungeStrategy) {
+			int maxSize,
+			int recycleSize) {
 
-		super(name, defaultTimeToLive, defaultMaxIdleTime, expungeStrategy);
+		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
 	}
 
 
@@ -108,7 +105,7 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 			this.delete(key, metaData);
 		}
 
-		if (this.getExpungeStrategy().triggers(this.getStatistics())) {
+		if (this.triggerExpunge()) {
 			this.expunge();
 		}
 

@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import net.dontdrinkandroot.cache.CacheException;
-import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractMapBackedCustomTtlCache;
 import net.dontdrinkandroot.cache.metadata.impl.SimpleMetaData;
 import net.dontdrinkandroot.cache.utils.Serializer;
@@ -39,9 +38,9 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 	private boolean copyOnWrite = true;
 
 
-	public MemoryCache(final String name, final long defaultTimeToLive, final ExpungeStrategy expungeStrategy) {
+	public MemoryCache(final String name, final long defaultTimeToLive, int maxSize, int recycleSize) {
 
-		super(name, defaultTimeToLive, expungeStrategy);
+		super(name, defaultTimeToLive, maxSize, recycleSize);
 		this.dataMap = new HashMap<K, V>();
 	}
 
@@ -50,9 +49,10 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 			final String name,
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
-			final ExpungeStrategy expungeStrategy) {
+			int maxSize,
+			int recycleSize) {
 
-		super(name, defaultTimeToLive, defaultMaxIdleTime, expungeStrategy);
+		super(name, defaultTimeToLive, maxSize, recycleSize);
 		this.dataMap = new HashMap<K, V>();
 	}
 

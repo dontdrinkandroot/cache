@@ -19,16 +19,21 @@ package net.dontdrinkandroot.cache.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.metadata.MetaData;
+import net.dontdrinkandroot.cache.metadata.comparator.MetaDataComparator;
+import net.dontdrinkandroot.cache.metadata.comparator.impl.LfuComparator;
 import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
 import net.dontdrinkandroot.cache.utils.Duration;
 
@@ -42,18 +47,21 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	/** Statistics for this cache (e.g hit rate) */
 	private final SimpleCacheStatistics statistics;
 
-	/** The expunge strategy of this cache */
-	private ExpungeStrategy expungeStrategy;
-
 	private Map<K, M> entriesMetaDataMap;
 
 	private long lastCleanUp = System.currentTimeMillis();
 
 	private long cleanUpInterval = Duration.hours(1);
 
+	private final MetaDataComparator<K, M> comparator = new LfuComparator<K, M>();
+
+	private int maxSize;
+
+	private int recycleSize;
+
 
 	/**
-	 * Construct a new AbstractCache.
+	 * Construct a new {@link AbstractMapBackedCache}.
 	 * 
 	 * @param name
 	 *            The name of the cache.
@@ -62,21 +70,19 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	 * @param expungeStrategy
 	 *            The {@link ExpungeStrategy} to use.
 	 */
-	public AbstractMapBackedCache(final String name, final long defaultTimeToLive, final ExpungeStrategy expungeStrategy) {
+	public AbstractMapBackedCache(
+			final String name,
+			final long defaultTimeToLive,
+			final int maxSize,
+			final int recycleSize) {
 
 		super(name, defaultTimeToLive);
 
-		this.expungeStrategy = expungeStrategy;
 		this.entriesMetaDataMap = new HashMap<K, M>();
+		this.statistics = new SimpleCacheStatistics();
 
-		this.statistics = new SimpleCacheStatistics() {
-
-			@Override
-			public int getCurrentSize() {
-
-				return AbstractMapBackedCache.this.entriesMetaDataMap.size();
-			};
-		};
+		this.maxSize = maxSize;
+		this.recycleSize = recycleSize;
 	}
 
 
@@ -96,33 +102,16 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			final String name,
 			final long defaultTimeToLive,
 			long defaultMaxIdleTime,
-			final ExpungeStrategy expungeStrategy) {
+			final int maxSize,
+			final int recycleSize) {
 
 		super(name, defaultTimeToLive, defaultMaxIdleTime);
 
-		this.expungeStrategy = expungeStrategy;
 		this.entriesMetaDataMap = new HashMap<K, M>();
+		this.statistics = new SimpleCacheStatistics();
 
-		this.statistics = new SimpleCacheStatistics() {
-
-			@Override
-			public int getCurrentSize() {
-
-				return AbstractMapBackedCache.this.entriesMetaDataMap.size();
-			};
-		};
-	}
-
-
-	public long getCleanUpInterval() {
-
-		return this.cleanUpInterval;
-	}
-
-
-	public void setCleanUpInterval(long cleanUpInterval) {
-
-		this.cleanUpInterval = cleanUpInterval;
+		this.maxSize = maxSize;
+		this.recycleSize = recycleSize;
 	}
 
 
@@ -158,7 +147,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			this.delete(key, metaData);
 		}
 
-		if (this.expungeStrategy.triggers(this.statistics)) {
+		if (this.triggerExpunge()) {
 			this.expunge();
 		}
 
@@ -184,9 +173,36 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	@Override
 	public final synchronized void expunge() throws CacheException {
 
-		final Collection<Entry<K, M>> expungeEntriesMetaData =
-				this.expungeStrategy.getToExpungeMetaData(this.entriesMetaDataMap.entrySet());
-		this.expunge(expungeEntriesMetaData);
+		Set<Entry<K, M>> entrySet = this.entriesMetaDataMap.entrySet();
+
+		List<Entry<K, M>> toExpunge = new ArrayList<Entry<K, M>>();
+		Comparator<Entry<K, M>> comparator = this.comparator;
+		TreeSet<Entry<K, M>> orderedSet = new TreeSet<Entry<K, M>>(comparator);
+
+		/* Select expired and idled away */
+		for (final Entry<K, M> entry : entrySet) {
+
+			MetaData metaData = entry.getValue();
+
+			if (metaData.isExpired() || metaData.isIdledAway()) {
+				toExpunge.add(entry);
+			} else {
+				orderedSet.add(entry);
+			}
+		}
+
+		/* Select from remaining */
+		final int numToDelete = entrySet.size() - toExpunge.size() + 1 - this.maxSize;
+		final Iterator<Entry<K, M>> iterator = orderedSet.iterator();
+
+		int numDeleted = 0;
+		while (iterator.hasNext() && numDeleted < numToDelete) {
+			Entry<K, M> entry = iterator.next();
+			toExpunge.add(entry);
+			numDeleted++;
+		}
+
+		this.expunge(toExpunge);
 
 		for (M metaData : this.entriesMetaDataMap.values()) {
 			metaData.decay();
@@ -320,21 +336,46 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public SimpleCacheStatistics getStatistics() {
+	public synchronized SimpleCacheStatistics getStatistics() {
 
+		this.statistics.setCurrentSize(this.entriesMetaDataMap.size());
 		return this.statistics;
 	}
 
 
-	public ExpungeStrategy getExpungeStrategy() {
+	public int getMaxSize() {
 
-		return this.expungeStrategy;
+		return this.maxSize;
 	}
 
 
-	public void setExpungeStrategy(final ExpungeStrategy expungeStrategy) {
+	public void setMaxSize(int maxSize) {
 
-		this.expungeStrategy = expungeStrategy;
+		this.maxSize = maxSize;
+	}
+
+
+	public int getRecycleSize() {
+
+		return this.recycleSize;
+	}
+
+
+	public void setRecycleSize(int recycleSize) {
+
+		this.recycleSize = recycleSize;
+	}
+
+
+	public long getCleanUpInterval() {
+
+		return this.cleanUpInterval;
+	}
+
+
+	public void setCleanUpInterval(long cleanUpInterval) {
+
+		this.cleanUpInterval = cleanUpInterval;
 	}
 
 
@@ -387,6 +428,12 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	public synchronized List<M> getEntriesMetaData() {
 
 		return new ArrayList<M>(this.entriesMetaDataMap.values());
+	}
+
+
+	protected boolean triggerExpunge() {
+
+		return this.entriesMetaDataMap.size() >= this.maxSize + this.recycleSize;
 	}
 
 

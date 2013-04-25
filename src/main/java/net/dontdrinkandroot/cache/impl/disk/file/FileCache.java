@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.dontdrinkandroot.cache.CacheException;
-import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractMapBackedCache;
 import net.dontdrinkandroot.cache.metadata.impl.SimpleMetaData;
 import net.dontdrinkandroot.cache.utils.FileUtils;
@@ -51,11 +50,12 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 			final String name,
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
-			final ExpungeStrategy expungeStrategy,
+			final int maxSize,
+			final int recycleSize,
 			final File baseDir,
 			final int directoryDepth) throws IOException, CacheException {
 
-		super(name, defaultTimeToLive, defaultMaxIdleTime, expungeStrategy);
+		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
 
 		this.baseDir = baseDir;
 		this.directoryDepth = directoryDepth;

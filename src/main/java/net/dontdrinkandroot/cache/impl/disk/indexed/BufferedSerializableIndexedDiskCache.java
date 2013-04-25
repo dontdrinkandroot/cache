@@ -57,25 +57,16 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	public BufferedSerializableIndexedDiskCache(
 			final String name,
 			final long defaultTimeToLive,
-			final ExpungeStrategy expungeStrategy,
+			final int maxSize,
+			final int recycleSize,
 			final File baseDir,
 			final ExpungeStrategy bufferExpungeStrategy) throws IOException {
 
-		super(name, defaultTimeToLive, expungeStrategy, baseDir);
+		super(name, defaultTimeToLive, maxSize, recycleSize, baseDir);
 
 		this.bufferExpungeStrategy = bufferExpungeStrategy;
 		this.buffer = new HashMap<Serializable, Serializable>();
-		this.bufferStatistics = new SimpleCacheStatistics() {
-
-			private static final long serialVersionUID = 1L;
-
-
-			@Override
-			public int getCurrentSize() {
-
-				return BufferedSerializableIndexedDiskCache.this.buffer.size();
-			};
-		};
+		this.bufferStatistics = new SimpleCacheStatistics();
 	}
 
 
@@ -83,25 +74,16 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 			final String name,
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
-			final ExpungeStrategy expungeStrategy,
+			final int maxSize,
+			final int recycleSize,
 			final File baseDir,
 			final ExpungeStrategy bufferExpungeStrategy) throws IOException {
 
-		super(name, defaultTimeToLive, defaultMaxIdleTime, expungeStrategy, baseDir);
+		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
 
 		this.bufferExpungeStrategy = bufferExpungeStrategy;
 		this.buffer = new HashMap<Serializable, Serializable>();
-		this.bufferStatistics = new SimpleCacheStatistics() {
-
-			private static final long serialVersionUID = 1L;
-
-
-			@Override
-			public int getCurrentSize() {
-
-				return BufferedSerializableIndexedDiskCache.this.buffer.size();
-			};
-		};
+		this.bufferStatistics = new SimpleCacheStatistics();
 	}
 
 
@@ -112,8 +94,9 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	 * reflects gets and puts to the buffer, not the cache itself, the size is the current size of
 	 * the buffer.
 	 */
-	public SimpleCacheStatistics getBufferStatistics() {
+	public synchronized SimpleCacheStatistics getBufferStatistics() {
 
+		this.bufferStatistics.setCurrentSize(this.buffer.size());
 		return this.bufferStatistics;
 	}
 
