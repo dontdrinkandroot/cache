@@ -80,7 +80,7 @@ public class NoopCache<K, V> implements CustomTtlCache<K, V> {
 
 
 	@Override
-	public void cleanUp() {
+	public void expunge() {
 
 	}
 

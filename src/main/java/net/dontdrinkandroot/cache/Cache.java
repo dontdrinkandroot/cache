@@ -158,7 +158,7 @@ public interface Cache<K, V> {
 	 * @throws CacheException
 	 *             Thrown on any errors encountered, supposed to include the stacktrace (if any).
 	 */
-	void cleanUp() throws CacheException;
+	void expunge() throws CacheException;
 
 
 	/**

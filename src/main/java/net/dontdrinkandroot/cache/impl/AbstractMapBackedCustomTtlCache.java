@@ -109,7 +109,7 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 		}
 
 		if (this.getExpungeStrategy().triggers(this.getStatistics())) {
-			this.cleanUp();
+			this.expunge();
 		}
 
 		final T result = this.doPut(key, data, timeToLive, maxIdleTime);

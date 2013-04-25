@@ -66,7 +66,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 
 		this.setEntriesMetaDataMap(this.readInitialMap());
 
-		this.cleanUp();
+		this.expunge();
 
 		this.getLogger().info("{}: Loaded {} entries", this.getName(), this.getEntriesMetaDataMap().size());
 		this.getStatistics().setCurrentSize(this.getEntriesMetaDataMap().size());

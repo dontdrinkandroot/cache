@@ -20,6 +20,7 @@ package net.dontdrinkandroot.cache.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,6 +30,7 @@ import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
+import net.dontdrinkandroot.cache.utils.Duration;
 
 
 /**
@@ -44,6 +46,10 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	private ExpungeStrategy expungeStrategy;
 
 	private Map<K, M> entriesMetaDataMap;
+
+	private long lastCleanUp = System.currentTimeMillis();
+
+	private long cleanUpInterval = Duration.hours(1);
 
 
 	/**
@@ -61,8 +67,16 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		super(name, defaultTimeToLive);
 
 		this.expungeStrategy = expungeStrategy;
-		this.statistics = new SimpleCacheStatistics();
 		this.entriesMetaDataMap = new HashMap<K, M>();
+
+		this.statistics = new SimpleCacheStatistics() {
+
+			@Override
+			public int getCurrentSize() {
+
+				return AbstractMapBackedCache.this.entriesMetaDataMap.size();
+			};
+		};
 	}
 
 
@@ -87,8 +101,28 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		super(name, defaultTimeToLive, defaultMaxIdleTime);
 
 		this.expungeStrategy = expungeStrategy;
-		this.statistics = new SimpleCacheStatistics();
 		this.entriesMetaDataMap = new HashMap<K, M>();
+
+		this.statistics = new SimpleCacheStatistics() {
+
+			@Override
+			public int getCurrentSize() {
+
+				return AbstractMapBackedCache.this.entriesMetaDataMap.size();
+			};
+		};
+	}
+
+
+	public long getCleanUpInterval() {
+
+		return this.cleanUpInterval;
+	}
+
+
+	public void setCleanUpInterval(long cleanUpInterval) {
+
+		this.cleanUpInterval = cleanUpInterval;
 	}
 
 
@@ -125,13 +159,12 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		}
 
 		if (this.expungeStrategy.triggers(this.statistics)) {
-			this.cleanUp();
+			this.expunge();
 		}
 
 		final T result = this.doPut(key, data);
 
 		this.statistics.increasePutCount();
-		this.statistics.setCurrentSize(this.entriesMetaDataMap.size());
 
 		return result;
 	};
@@ -149,7 +182,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public final synchronized void cleanUp() throws CacheException {
+	public final synchronized void expunge() throws CacheException {
 
 		final Collection<Entry<K, M>> expungeEntriesMetaData =
 				this.expungeStrategy.getToExpungeMetaData(this.entriesMetaDataMap.entrySet());
@@ -158,6 +191,39 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		for (M metaData : this.entriesMetaDataMap.values()) {
 			metaData.decay();
 		}
+	}
+
+
+	public synchronized void cleanUp() throws CacheException {
+
+		Iterator<Entry<K, M>> entriesIterator = this.entriesMetaDataMap.entrySet().iterator();
+		long numExpired = 0;
+		long numStale = 0;
+		while (entriesIterator.hasNext()) {
+
+			Entry<K, M> entry = entriesIterator.next();
+			M metaData = entry.getValue();
+
+			if (metaData.isExpired()) {
+				numExpired++;
+				this.doDelete(entry.getKey(), metaData);
+				entriesIterator.remove();
+			}
+
+			if (metaData.isIdledAway()) {
+				numStale++;
+				this.doDelete(entry.getKey(), metaData);
+			}
+		}
+
+		this.getLogger().info("{}: Cleaned up {} expired and {} stale entries", this.getName(), numExpired, numStale);
+		this.getCleanUpLogger().info(
+				"{}: Cleaned up {} expired and {} stale entries",
+				this.getName(),
+				numExpired,
+				numStale);
+
+		this.lastCleanUp = System.currentTimeMillis();
 	}
 
 
@@ -200,6 +266,10 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 	@Override
 	public final synchronized <T extends V> T getWithErrors(final K key) throws CacheException {
+
+		if (this.lastCleanUp + this.cleanUpInterval < System.currentTimeMillis()) {
+			this.cleanUp();
+		}
 
 		final M metaData = this.entriesMetaDataMap.get(key);
 
