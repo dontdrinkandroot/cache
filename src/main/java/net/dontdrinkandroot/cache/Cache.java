@@ -175,4 +175,13 @@ public interface Cache<K, V> {
 	 * @return Statistics of the cache.
 	 */
 	CacheStatistics getStatistics();
+
+
+	/**
+	 * Removes expired and stale entries.
+	 * 
+	 * @throws CacheException
+	 *             Thrown if the cleanup failed.
+	 */
+	void cleanUp() throws CacheException;
 }

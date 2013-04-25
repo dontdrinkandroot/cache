@@ -194,6 +194,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	}
 
 
+	@Override
 	public synchronized void cleanUp() throws CacheException {
 
 		Iterator<Entry<K, M>> entriesIterator = this.entriesMetaDataMap.entrySet().iterator();
@@ -213,6 +214,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			if (metaData.isIdledAway()) {
 				numStale++;
 				this.doDelete(entry.getKey(), metaData);
+				entriesIterator.remove();
 			}
 		}
 

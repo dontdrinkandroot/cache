@@ -61,6 +61,7 @@ public class NoopCache<K, V> implements CustomTtlCache<K, V> {
 	}
 
 
+	@Override
 	public void setDefaultTtl(final long defaultTTL) {
 
 	}
@@ -151,5 +152,12 @@ public class NoopCache<K, V> implements CustomTtlCache<K, V> {
 	public <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime) {
 
 		return data;
+	}
+
+
+	@Override
+	public void cleanUp() throws CacheException {
+
+		/* Noop */
 	}
 }
