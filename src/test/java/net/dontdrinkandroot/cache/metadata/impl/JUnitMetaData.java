@@ -116,7 +116,7 @@ public class JUnitMetaData implements MetaData {
 
 
 	@Override
-	public boolean isIdledAway() {
+	public boolean isStale() {
 
 		if (this.maxIdleTime == Cache.UNLIMITED_IDLE_TIME) {
 			return false;

@@ -34,7 +34,7 @@ public interface MetaData extends Serializable {
 	/**
 	 * Check if the entry has not been accessed within the idle period.
 	 */
-	boolean isIdledAway();
+	boolean isStale();
 
 
 	/**

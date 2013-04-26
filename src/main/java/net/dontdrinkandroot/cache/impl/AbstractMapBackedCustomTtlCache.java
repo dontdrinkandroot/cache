@@ -98,7 +98,7 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 		this.getLogger().trace("Putting '{}' to cache", key);
 
-		final M metaData = this.getEntriesMetaDataMap().get(key);
+		final M metaData = this.getEntry(key);
 
 		/* If the key is already known, delete entry first */
 		if (metaData != null) {
@@ -112,7 +112,6 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 		final T result = this.doPut(key, data, timeToLive, maxIdleTime);
 
 		this.getStatistics().increasePutCount();
-		this.getStatistics().setCurrentSize(this.getEntriesMetaDataMap().size());
 
 		return result;
 	}

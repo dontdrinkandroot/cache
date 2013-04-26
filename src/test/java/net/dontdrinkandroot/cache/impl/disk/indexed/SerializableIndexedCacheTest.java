@@ -27,10 +27,8 @@ import java.util.Set;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.ExampleObject;
-import net.dontdrinkandroot.cache.SimulationRunner;
 import net.dontdrinkandroot.cache.JUnitUtils;
-import net.dontdrinkandroot.cache.expungestrategy.impl.LruRecyclingExpungeStrategy;
-import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
+import net.dontdrinkandroot.cache.SimulationRunner;
 import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
@@ -72,7 +70,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						this.baseDir);
 
 		this.testCustomGetPutDelete(cache);
@@ -91,7 +90,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						this.baseDir);
 
 		cache.putWithErrors("12345", "12345");
@@ -111,7 +111,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						JUnitUtils.getFutureExpiry(),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						this.baseDir);
 
 		cache.putWithErrors("1", new ExampleObject(3));
@@ -150,7 +151,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						this.baseDir);
 
 		cache.putWithErrors("1", new ExampleObject(3));
@@ -173,7 +175,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 				"testCache",
 				Duration.minutes(1),
 				Cache.UNLIMITED_IDLE_TIME,
-				new NoopExpungeStrategy(),
+				Integer.MAX_VALUE,
+				Integer.MAX_VALUE,
 				this.baseDir);
 
 		try {
@@ -181,7 +184,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 					"testCache",
 					Duration.minutes(1),
 					Cache.UNLIMITED_IDLE_TIME,
-					new NoopExpungeStrategy(),
+					Integer.MAX_VALUE,
+					Integer.MAX_VALUE,
 					this.baseDir);
 			Assert.fail("IOException expected");
 		} catch (IOException e) {
@@ -199,7 +203,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						this.baseDir);
 
 		for (int i = 0; i < 10; i++) {
@@ -214,7 +219,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						this.baseDir);
 
 		/* Test invalidated not there */
@@ -245,7 +251,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							"serializableMetaFileCacheTest",
 							Duration.seconds(1),
 							Cache.UNLIMITED_IDLE_TIME,
-							new LruRecyclingExpungeStrategy(100000, .1f),
+							100000,
+							1000,
 							this.baseDir);
 			final SimulationRunner runner = new SimulationRunner() {
 
@@ -274,7 +281,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							"serializableMetaFileCacheTest",
 							Duration.seconds(1),
 							Cache.UNLIMITED_IDLE_TIME,
-							new LruRecyclingExpungeStrategy(100000, .1f),
+							100000,
+							1000,
 							this.baseDir);
 
 			Logger.getRootLogger().setLevel(Level.DEBUG);
@@ -308,7 +316,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							"serializableMetaFileCacheTest",
 							Duration.days(1),
 							Cache.UNLIMITED_IDLE_TIME,
-							new NoopExpungeStrategy(),
+							Integer.MAX_VALUE,
+							Integer.MAX_VALUE,
 							this.baseDir);
 
 			Set<Long> known = new HashSet<Long>();
@@ -326,7 +335,12 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 				}
 			};
 			known =
-					runner.runKnownTest(loadTestCache, 1, 100000, JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND, known);
+					runner.runKnownTest(
+							loadTestCache,
+							1,
+							100000,
+							JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
+							known);
 
 			loadTestCache.close();
 
@@ -335,7 +349,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							"serializableMetaFileCacheTest",
 							Duration.days(1),
 							Cache.UNLIMITED_IDLE_TIME,
-							new NoopExpungeStrategy(),
+							Integer.MAX_VALUE,
+							Integer.MAX_VALUE,
 							this.baseDir);
 
 			known =

@@ -19,7 +19,6 @@ package net.dontdrinkandroot.cache.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +29,6 @@ import java.util.TreeSet;
 
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
-import net.dontdrinkandroot.cache.expungestrategy.ExpungeStrategy;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 import net.dontdrinkandroot.cache.metadata.comparator.MetaDataComparator;
 import net.dontdrinkandroot.cache.metadata.comparator.impl.LfuComparator;
@@ -47,7 +45,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	/** Statistics for this cache (e.g hit rate) */
 	private final SimpleCacheStatistics statistics;
 
-	private Map<K, M> entriesMetaDataMap;
+	private final Map<K, M> entriesMetaDataMap;
 
 	private long lastCleanUp = System.currentTimeMillis();
 
@@ -76,13 +74,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			final int maxSize,
 			final int recycleSize) {
 
-		super(name, defaultTimeToLive);
-
-		this.entriesMetaDataMap = new HashMap<K, M>();
-		this.statistics = new SimpleCacheStatistics();
-
-		this.maxSize = maxSize;
-		this.recycleSize = recycleSize;
+		this(name, defaultTimeToLive, Cache.UNLIMITED_IDLE_TIME, maxSize, recycleSize);
 	}
 
 
@@ -142,7 +134,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		 * If key is already known, delete old entry before inserting new one (instead of
 		 * overwriting, e.g. for disk based implementations)
 		 */
-		final M metaData = this.getEntriesMetaDataMap().get(key);
+		final M metaData = this.getEntry(key);
 		if (metaData != null) {
 			this.delete(key, metaData);
 		}
@@ -176,15 +168,14 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		Set<Entry<K, M>> entrySet = this.entriesMetaDataMap.entrySet();
 
 		List<Entry<K, M>> toExpunge = new ArrayList<Entry<K, M>>();
-		Comparator<Entry<K, M>> comparator = this.comparator;
-		TreeSet<Entry<K, M>> orderedSet = new TreeSet<Entry<K, M>>(comparator);
+		TreeSet<Entry<K, M>> orderedSet = new TreeSet<Entry<K, M>>(this.comparator);
 
 		/* Select expired and idled away */
 		for (final Entry<K, M> entry : entrySet) {
 
 			MetaData metaData = entry.getValue();
 
-			if (metaData.isExpired() || metaData.isIdledAway()) {
+			if (metaData.isExpired() || metaData.isStale()) {
 				toExpunge.add(entry);
 			} else {
 				orderedSet.add(entry);
@@ -227,7 +218,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 				entriesIterator.remove();
 			}
 
-			if (metaData.isIdledAway()) {
+			if (metaData.isStale()) {
 				numStale++;
 				this.doDelete(entry.getKey(), metaData);
 				entriesIterator.remove();
@@ -343,6 +334,12 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	}
 
 
+	public MetaDataComparator<K, M> getComparator() {
+
+		return this.comparator;
+	}
+
+
 	public int getMaxSize() {
 
 		return this.maxSize;
@@ -379,15 +376,15 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	}
 
 
-	protected void setEntriesMetaDataMap(final Map<K, M> map) {
+	protected void putEntry(K key, M metaData) {
 
-		this.entriesMetaDataMap = map;
+		this.entriesMetaDataMap.put(key, metaData);
 	}
 
 
-	protected Map<K, M> getEntriesMetaDataMap() {
+	protected M getEntry(K key) {
 
-		return this.entriesMetaDataMap;
+		return this.entriesMetaDataMap.get(key);
 	}
 
 

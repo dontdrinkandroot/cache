@@ -30,7 +30,6 @@ import java.util.Set;
 
 import net.dontdrinkandroot.cache.AbstractCacheTest;
 import net.dontdrinkandroot.cache.Cache;
-import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
 import net.dontdrinkandroot.cache.utils.Md5;
@@ -68,7 +67,8 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						FileCacheTest.baseDir,
 						2);
 
@@ -84,7 +84,8 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						FileCacheTest.baseDir,
 						2);
 
@@ -100,7 +101,8 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						FileCacheTest.baseDir,
 						2);
 
@@ -118,7 +120,8 @@ public class FileCacheTest extends AbstractCacheTest<Md5, File> {
 						"testCache",
 						0L,
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						FileCacheTest.baseDir,
 						2);
 

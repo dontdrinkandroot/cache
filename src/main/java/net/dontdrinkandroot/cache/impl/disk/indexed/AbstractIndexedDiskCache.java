@@ -21,8 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.impl.AbstractMapBackedCustomTtlCache;
@@ -42,11 +40,17 @@ import net.dontdrinkandroot.cache.utils.Serializer;
 public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends Serializable>
 		extends AbstractMapBackedCustomTtlCache<K, V, BlockMetaData> {
 
+	protected Object indexFileLock = new Object();
+
+	protected Object dataFileLock = new Object();
+
 	protected final IndexFile indexFile;
 
 	protected final DataFile dataFile;
 
 	protected final File lockFile;
+
+	private final File baseDir;
 
 
 	public AbstractIndexedDiskCache(
@@ -58,24 +62,16 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 		super(name, defaultTimeToLive, maxSize, recycleSize);
 
+		this.baseDir = baseDir;
 		baseDir.mkdirs();
-		/* Check lock file does not exist */
-		this.lockFile = new File(baseDir, name + ".lock");
-		if (this.lockFile.exists()) {
-			throw new IOException(
-					String.format(
-							"Lock file found, this usually means that another cache was already instantiated under the same name or was not shut down correctly. In the latter case you can delete the lock file at %s and reinstantiate the cache.",
-							this.lockFile.getPath()));
-		}
-		this.lockFile.createNewFile();
+		this.lockFile = this.createLockFile();
 
 		/* Open block files */
 		this.indexFile = new IndexFile(new File(baseDir, name + ".index"));
 		this.dataFile = new DataFile(new File(baseDir, name + ".data"));
 
 		/* Read index */
-		this.setEntriesMetaDataMap(this.buildIndex());
-		this.getStatistics().setCurrentSize(this.getEntriesMetaDataMap().size());
+		this.buildIndex();
 	}
 
 
@@ -89,24 +85,16 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
 
+		this.baseDir = baseDir;
 		baseDir.mkdirs();
-		/* Check lock file does not exist */
-		this.lockFile = new File(baseDir, name + ".lock");
-		if (this.lockFile.exists()) {
-			throw new IOException(
-					String.format(
-							"Lock file found, this usually means that another cache was already instantiated under the same name or was not shut down correctly. In the latter case you can delete the lock file at %s and reinstantiate the cache.",
-							this.lockFile.getPath()));
-		}
-		this.lockFile.createNewFile();
+		this.lockFile = this.createLockFile();
 
 		/* Open block files */
 		this.indexFile = new IndexFile(new File(baseDir, name + ".index"));
 		this.dataFile = new DataFile(new File(baseDir, name + ".data"));
 
 		/* Read index */
-		this.setEntriesMetaDataMap(this.buildIndex());
-		this.getStatistics().setCurrentSize(this.getEntriesMetaDataMap().size());
+		this.buildIndex();
 	}
 
 
@@ -115,8 +103,12 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	 */
 	public synchronized void close() throws IOException {
 
-		this.indexFile.close();
-		this.dataFile.close();
+		synchronized (this.indexFileLock) {
+			synchronized (this.dataFileLock) {
+				this.indexFile.close();
+				this.dataFile.close();
+			}
+		}
 		if (!this.lockFile.delete()) {
 			throw new IOException(String.format("Could not delete lock file at %s", this.lockFile.getPath()));
 		}
@@ -145,16 +137,16 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	}
 
 
-	protected Map<K, BlockMetaData> buildIndex() throws IOException {
+	protected void buildIndex() throws IOException {
 
 		this.getLogger().info("{}: Reading index", this.getName());
 		long lastTimeLogged = System.currentTimeMillis();
 
 		long dataLength = 0;
-		final Map<K, BlockMetaData> entries = new HashMap<K, BlockMetaData>();
 		final Collection<IndexData> indexDataEntries = this.indexFile.initialize();
 
 		int numRead = 0;
+		int numSuccessfullyRead = 0;
 		for (IndexData indexData : indexDataEntries) {
 
 			DataBlock keyMetaBlock = indexData.getKeyMetaBlock();
@@ -169,9 +161,10 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 				K key = keyedMetaData.getKey();
 				BlockMetaData blockMetaData = new BlockMetaData(indexData, keyedMetaData.getMetaData());
 				this.dataFile.allocateSpace(valueBlock);
-				entries.put(key, blockMetaData);
+				this.putEntry(key, blockMetaData);
 
 				dataLength += keyMetaBlock.getLength() + valueBlock.getLength();
+				numSuccessfullyRead++;
 
 			} catch (SerializationException e) {
 
@@ -200,9 +193,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 		this.getLogger().info(
 				"{}: Read index: {} entries, {}% dataSpace utilization",
-				new Object[] { this.getName(), entries.size(), dataSpaceUsedPercent });
-
-		return entries;
+				new Object[] { this.getName(), numSuccessfullyRead, dataSpaceUsedPercent });
 	}
 
 
@@ -212,9 +203,13 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		try {
 
 			IndexData indexData = metaData.getIndexData();
-			this.indexFile.delete(indexData);
-			this.dataFile.delete(indexData.getKeyMetaBlock(), true);
-			this.dataFile.delete(indexData.getValueBlock(), true);
+			synchronized (this.indexFileLock) {
+				synchronized (this.dataFileLock) {
+					this.indexFile.delete(indexData);
+					this.dataFile.delete(indexData.getKeyMetaBlock(), true);
+					this.dataFile.delete(indexData.getValueBlock(), true);
+				}
+			}
 
 		} catch (final IOException e) {
 			throw new CacheException(e);
@@ -227,8 +222,10 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 		try {
 
-			final byte[] data = this.dataFile.read(metaData.getIndexData().getValueBlock());
-			return this.dataFromBytes(data);
+			synchronized (this.dataFileLock) {
+				final byte[] data = this.dataFile.read(metaData.getIndexData().getValueBlock());
+				return this.dataFromBytes(data);
+			}
 
 		} catch (final IOException e) {
 			throw new CacheException(e);
@@ -248,21 +245,48 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 			KeyedMetaData<K> keyedMetaData = new KeyedMetaData<K>(key, expiry, System.currentTimeMillis(), maxIdleTime);
 			byte[] keyedMetaDataBytes = Serializer.serialize(keyedMetaData);
 
-			final DataBlock keyMetaBlock = this.dataFile.write(keyedMetaDataBytes);
-			final DataBlock valueBlock = this.dataFile.write(dataBytes);
+			synchronized (this.indexFileLock) {
+				synchronized (this.dataFileLock) {
+					final DataBlock keyMetaBlock = this.dataFile.write(keyedMetaDataBytes);
+					final DataBlock valueBlock = this.dataFile.write(dataBytes);
 
-			IndexData indexData = new IndexData(keyMetaBlock, valueBlock);
-			indexData = this.indexFile.write(indexData);
+					IndexData indexData = new IndexData(keyMetaBlock, valueBlock);
+					indexData = this.indexFile.write(indexData);
 
-			BlockMetaData metaData = new BlockMetaData(indexData, keyedMetaData.getMetaData());
+					BlockMetaData metaData = new BlockMetaData(indexData, keyedMetaData.getMetaData());
 
-			this.getEntriesMetaDataMap().put(key, metaData);
+					this.putEntry(key, metaData);
+				}
+			}
 
 		} catch (final IOException e) {
 			throw new CacheException(e);
 		}
 
 		return data;
+	}
+
+
+	/**
+	 * Creates the lock file or throws an exception if it already exists.
+	 * 
+	 * @return The created lock file.
+	 * @throws IOException
+	 *             Throwns if lock file already exists.
+	 */
+	private File createLockFile() throws IOException {
+
+		File newLockFile = new File(this.baseDir, this.getName() + ".lock");
+
+		if (newLockFile.exists()) {
+			throw new IOException(
+					String.format(
+							"Lock file found, this usually means that another cache was already instantiated under the same name or was not shut down correctly. In the latter case you can delete the lock file at %s and reinstantiate the cache.",
+							newLockFile.getPath()));
+		}
+		newLockFile.createNewFile();
+
+		return newLockFile;
 	}
 
 

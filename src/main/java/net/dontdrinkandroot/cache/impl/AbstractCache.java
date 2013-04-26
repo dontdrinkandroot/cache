@@ -40,13 +40,12 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 	private long defaultTimeToLive;
 
 	/** Default max idle time for cache entries */
-	private long defaultMaxIdleTime = Cache.UNLIMITED_IDLE_TIME;
+	private long defaultMaxIdleTime;
 
 
 	public AbstractCache(final String name, long defaultTimeToLive) {
 
-		this.name = name;
-		this.defaultTimeToLive = defaultTimeToLive;
+		this(name, defaultTimeToLive, Cache.UNLIMITED_IDLE_TIME);
 	}
 
 
@@ -91,6 +90,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 	}
 
 
+	@Override
 	public final void setDefaultTtl(final long defaultTTL) {
 
 		this.defaultTimeToLive = defaultTTL;

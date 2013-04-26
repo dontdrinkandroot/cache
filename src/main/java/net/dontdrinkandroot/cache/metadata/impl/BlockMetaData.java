@@ -46,9 +46,9 @@ public class BlockMetaData implements MetaData {
 
 
 	@Override
-	public boolean isIdledAway() {
+	public boolean isStale() {
 
-		return this.metaData.isIdledAway();
+		return this.metaData.isStale();
 	}
 
 

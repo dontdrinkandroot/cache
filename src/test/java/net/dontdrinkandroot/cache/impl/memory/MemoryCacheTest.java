@@ -21,8 +21,6 @@ import java.io.Serializable;
 
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
-import net.dontdrinkandroot.cache.expungestrategy.impl.LfuRecyclingExpungeStrategy;
-import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 import net.dontdrinkandroot.cache.utils.Duration;
@@ -41,7 +39,8 @@ public class MemoryCacheTest extends AbstractSerializableCustomTtlCacheTest {
 						"testCache",
 						Duration.days(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy());
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE);
 
 		this.testCustomGetPutDelete(cache);
 	}
@@ -67,7 +66,8 @@ public class MemoryCacheTest extends AbstractSerializableCustomTtlCacheTest {
 						"testCache",
 						Duration.days(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new LfuRecyclingExpungeStrategy(3, 2));
+						3,
+						2);
 
 		cache.put("1", "1");
 		Assert.assertEquals(1, cache.getStatistics().getCurrentSize());

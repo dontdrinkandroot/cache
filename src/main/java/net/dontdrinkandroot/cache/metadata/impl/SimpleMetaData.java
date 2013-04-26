@@ -36,7 +36,8 @@ public class SimpleMetaData implements MetaData {
 
 	private long lastAccess;
 
-	private int hitCount = 0;
+	/** How often the corresponding entry has been accessed. */
+	private int hitCount = 1;
 
 
 	public SimpleMetaData(final long expiry) {
@@ -110,7 +111,7 @@ public class SimpleMetaData implements MetaData {
 
 
 	@Override
-	public boolean isIdledAway() {
+	public boolean isStale() {
 
 		if (this.maxIdleTime == Cache.UNLIMITED_IDLE_TIME) {
 			return false;
@@ -130,15 +131,7 @@ public class SimpleMetaData implements MetaData {
 	@Override
 	public void decay() {
 
-		if (this.hitCount > 0) {
-			this.hitCount = (int) Math.floor(this.hitCount * SimpleMetaData.DECAY_FACTOR);
-		}
-	}
-
-
-	public final void resetCount() {
-
-		this.hitCount = 0;
+		this.hitCount = (int) Math.floor(this.hitCount * SimpleMetaData.DECAY_FACTOR);
 	}
 
 

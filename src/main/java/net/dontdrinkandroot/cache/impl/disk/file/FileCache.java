@@ -20,8 +20,6 @@ package net.dontdrinkandroot.cache.impl.disk.file;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.dontdrinkandroot.cache.CacheException;
@@ -64,12 +62,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 		}
 		this.createDirStructure(baseDir, directoryDepth);
 
-		this.setEntriesMetaDataMap(this.readInitialMap());
-
-		this.expunge();
-
-		this.getLogger().info("{}: Loaded {} entries", this.getName(), this.getEntriesMetaDataMap().size());
-		this.getStatistics().setCurrentSize(this.getEntriesMetaDataMap().size());
+		this.initialize();
 	}
 
 
@@ -106,7 +99,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 			throw new CacheException("Couldn't copy file", e);
 		}
 
-		this.getEntriesMetaDataMap().put(md5, metaData);
+		this.putEntry(md5, metaData);
 
 		return targetFile;
 	}
@@ -153,14 +146,13 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 	}
 
 
-	protected Map<Md5, SimpleMetaData> readInitialMap() throws CacheException {
+	protected void initialize() throws CacheException {
 
 		// TODO Check correct directory structure
 
-		final Map<Md5, SimpleMetaData> itemMap = new HashMap<Md5, SimpleMetaData>();
-
 		final Collection<File> files = FileUtils.listFilesRecursive(this.getBaseDir());
 
+		int numSuccessfullyRead = 0;
 		for (final File file : files) {
 			final String md5Hex = file.getName();
 			if (FileCache.MD5_PATTERN.matcher(md5Hex).matches()) {
@@ -173,11 +165,14 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 				long lastModified = file.lastModified();
 				final long expiration = lastModified + this.getDefaultTtl();
 				final SimpleMetaData entry = new SimpleMetaData(lastModified, expiration);
-				itemMap.put(md5, entry);
+				if (!entry.isExpired() && !entry.isStale()) {
+					this.putEntry(md5, entry);
+					numSuccessfullyRead++;
+				}
 			}
 		}
 
-		return itemMap;
+		this.getLogger().info("{}: Loaded {} entries", this.getName(), numSuccessfullyRead);
 	}
 
 }

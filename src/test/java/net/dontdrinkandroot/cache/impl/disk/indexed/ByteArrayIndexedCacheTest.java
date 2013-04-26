@@ -23,7 +23,6 @@ import java.io.Serializable;
 
 import net.dontdrinkandroot.cache.AbstractCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.Cache;
-import net.dontdrinkandroot.cache.expungestrategy.impl.NoopExpungeStrategy;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
 
@@ -61,7 +60,8 @@ public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serial
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						new NoopExpungeStrategy(),
+						Integer.MAX_VALUE,
+						Integer.MAX_VALUE,
 						this.baseDir);
 
 		Assert.assertEquals(0, cache.getDataFileNumAllocatedBlocks());
