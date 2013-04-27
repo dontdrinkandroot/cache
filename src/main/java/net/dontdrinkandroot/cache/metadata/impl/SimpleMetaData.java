@@ -28,7 +28,7 @@ public class SimpleMetaData implements MetaData {
 
 	public static final double DECAY_FACTOR = 0.9;
 
-	private final long expiry;
+	private final long timeToLive;
 
 	private final long created;
 
@@ -40,37 +40,44 @@ public class SimpleMetaData implements MetaData {
 	private int hitCount = 1;
 
 
-	public SimpleMetaData(final long expiry) {
+	public SimpleMetaData(final long timeToLive) {
 
-		this.expiry = expiry;
 		this.created = System.currentTimeMillis();
+		this.timeToLive = timeToLive;
 		this.lastAccess = System.currentTimeMillis();
 		this.maxIdleTime = Cache.UNLIMITED_IDLE_TIME;
 	}
 
 
-	public SimpleMetaData(long created, final long expiry) {
+	public SimpleMetaData(long created, final long timeToLive) {
 
-		this.expiry = expiry;
 		this.created = created;
+		this.timeToLive = timeToLive;
 		this.lastAccess = System.currentTimeMillis();
 		this.maxIdleTime = Cache.UNLIMITED_IDLE_TIME;
 	}
 
 
-	public SimpleMetaData(long created, final long expiry, long maxIdleTime) {
+	public SimpleMetaData(long created, final long timeToLive, long maxIdleTime) {
 
-		this.expiry = expiry;
 		this.created = created;
+		this.timeToLive = timeToLive;
 		this.lastAccess = System.currentTimeMillis();
 		this.maxIdleTime = maxIdleTime;
 	}
 
 
 	@Override
+	public long getTimeToLive() {
+
+		return this.timeToLive;
+	}
+
+
+	@Override
 	public final long getExpiry() {
 
-		return this.expiry;
+		return this.created + this.timeToLive;
 	}
 
 
@@ -99,7 +106,7 @@ public class SimpleMetaData implements MetaData {
 	@Override
 	public boolean isExpired() {
 
-		return this.expiry < System.currentTimeMillis();
+		return this.created + this.timeToLive < System.currentTimeMillis();
 	}
 
 

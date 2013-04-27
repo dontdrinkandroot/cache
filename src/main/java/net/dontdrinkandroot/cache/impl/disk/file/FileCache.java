@@ -89,8 +89,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 	@Override
 	protected File doPut(final Md5 md5, final File data) throws CacheException {
 
-		long now = System.currentTimeMillis();
-		final SimpleMetaData metaData = new SimpleMetaData(now, now + this.getDefaultTtl());
+		final SimpleMetaData metaData = new SimpleMetaData(this.getDefaultTtl());
 
 		final File targetFile = new File(this.getFileName(md5));
 		try {
@@ -163,8 +162,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 					throw new CacheException("Couldn't add file " + file, e);
 				}
 				long lastModified = file.lastModified();
-				final long expiration = lastModified + this.getDefaultTtl();
-				final SimpleMetaData entry = new SimpleMetaData(lastModified, expiration);
+				final SimpleMetaData entry = new SimpleMetaData(lastModified, this.getDefaultTtl());
 				if (!entry.isExpired() && !entry.isStale()) {
 					this.putEntry(md5, entry);
 					numSuccessfullyRead++;

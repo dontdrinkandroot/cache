@@ -27,27 +27,18 @@ public class KeyedMetaData<K extends Serializable> implements Serializable {
 
 	private final K key;
 
-	private final long expiry;
-
 	private final long created;
 
 	private final long maxIdleTime;
 
-
-	public KeyedMetaData(K key, long expiry, long created, long maxIdleTime) {
-
-		this.key = key;
-		this.expiry = expiry;
-		this.created = created;
-		this.maxIdleTime = maxIdleTime;
-	}
+	private final long timeToLive;
 
 
 	public KeyedMetaData(K key, MetaData metaData) {
 
 		this.key = key;
-		this.expiry = metaData.getExpiry();
 		this.created = metaData.getCreated();
+		this.timeToLive = metaData.getTimeToLive();
 		this.maxIdleTime = metaData.getMaxIdleTime();
 	}
 
@@ -55,12 +46,6 @@ public class KeyedMetaData<K extends Serializable> implements Serializable {
 	public K getKey() {
 
 		return this.key;
-	}
-
-
-	public long getExpiry() {
-
-		return this.expiry;
 	}
 
 
@@ -78,7 +63,7 @@ public class KeyedMetaData<K extends Serializable> implements Serializable {
 
 	public SimpleMetaData getMetaData() {
 
-		return new SimpleMetaData(this.created, this.expiry, this.maxIdleTime);
+		return new SimpleMetaData(this.created, this.timeToLive, this.maxIdleTime);
 	}
 
 }

@@ -61,7 +61,7 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 	protected <T extends V> T doPut(final K key, final T data, final long timeToLive, final long maxIdleTime)
 			throws CacheException {
 
-		final SimpleMetaData metaData = new SimpleMetaData(System.currentTimeMillis() + timeToLive);
+		final SimpleMetaData metaData = new SimpleMetaData(timeToLive);
 		this.putEntry(key, metaData);
 		this.dataMap.put(key, data);
 

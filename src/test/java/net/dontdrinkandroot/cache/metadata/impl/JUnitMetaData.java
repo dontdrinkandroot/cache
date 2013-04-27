@@ -25,7 +25,7 @@ public class JUnitMetaData implements MetaData {
 
 	public static final double DECAY_FACTOR = 0.9;
 
-	private long expiry;
+	private long timeToLive;
 
 	private long lastAccess;
 
@@ -45,14 +45,14 @@ public class JUnitMetaData implements MetaData {
 	@Override
 	public boolean isExpired() {
 
-		return this.expiry < System.currentTimeMillis();
+		return this.created + this.timeToLive < System.currentTimeMillis();
 	}
 
 
 	@Override
 	public long getExpiry() {
 
-		return this.expiry;
+		return this.created + this.timeToLive;
 	}
 
 
@@ -87,6 +87,13 @@ public class JUnitMetaData implements MetaData {
 	}
 
 
+	@Override
+	public long getTimeToLive() {
+
+		return this.timeToLive;
+	}
+
+
 	public JUnitMetaData setCreated(long created) {
 
 		this.created = created;
@@ -96,7 +103,7 @@ public class JUnitMetaData implements MetaData {
 
 	public JUnitMetaData setExpiry(long expiry) {
 
-		this.expiry = expiry;
+		this.timeToLive = expiry - this.created;
 		return this;
 	}
 

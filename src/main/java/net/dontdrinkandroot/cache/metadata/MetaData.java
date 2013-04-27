@@ -78,4 +78,10 @@ public interface MetaData extends Serializable {
 	 * Decreases the hitcount for use with LRU based expunge strategies.
 	 */
 	void decay();
+
+
+	/**
+	 * Gets the time to live of this entry (in milliseconds).
+	 */
+	long getTimeToLive();
 }

@@ -268,8 +268,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	protected <T extends V> T doPut(final K key, final T data, final long timeToLive, final long maxIdleTime)
 			throws CacheException {
 
-		SimpleMetaData simpleMetaData =
-				new SimpleMetaData(System.currentTimeMillis(), System.currentTimeMillis() + timeToLive, maxIdleTime);
+		SimpleMetaData simpleMetaData = new SimpleMetaData(System.currentTimeMillis(), timeToLive, maxIdleTime);
 		final byte[] dataBytes = this.dataToBytes(data);
 		BlockMetaData metaData = new BlockMetaData(simpleMetaData);
 		this.writerThread.queue(key, metaData, dataBytes);

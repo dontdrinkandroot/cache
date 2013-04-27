@@ -107,6 +107,13 @@ public class BlockMetaData implements MetaData {
 	}
 
 
+	@Override
+	public long getTimeToLive() {
+
+		return this.metaData.getTimeToLive();
+	}
+
+
 	public SimpleMetaData getMetaData() {
 
 		return this.metaData;

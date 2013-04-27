@@ -76,7 +76,7 @@ public class MemoryCacheTest extends AbstractSerializableCustomTtlCacheTest {
 		Assert.assertEquals("1", cache.get("1"));
 		Assert.assertEquals(1, cache.getStatistics().getCurrentSize());
 		Assert.assertEquals(1, cache.getStatistics().getCacheHits());
-		Assert.assertEquals(1, cache.getMetaData("1").getHitCount());
+		Assert.assertEquals(2, cache.getMetaData("1").getHitCount());
 		Thread.sleep(1);
 
 		cache.put("2", "2");
@@ -100,7 +100,7 @@ public class MemoryCacheTest extends AbstractSerializableCustomTtlCacheTest {
 		Thread.sleep(1);
 
 		MetaData metaData = cache.getMetaData("1");
-		Assert.assertEquals(0, metaData.getHitCount());
+		Assert.assertEquals(1, metaData.getHitCount());
 
 		Assert.assertNull(cache.get("2"));
 		Assert.assertNull(cache.get("3"));
@@ -118,7 +118,7 @@ public class MemoryCacheTest extends AbstractSerializableCustomTtlCacheTest {
 		Assert.assertEquals(3, cache.getStatistics().getCurrentSize());
 		Thread.sleep(1);
 
-		/* "1" should now be expunged as it is the oldest entry with hit count 0 */
+		/* "1" should now be expunged as it is the oldest entry with hit count 1 */
 		Assert.assertNull(cache.get("1"));
 		Assert.assertNull(cache.get("5"));
 		Assert.assertNull(cache.get("6"));
