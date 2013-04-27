@@ -240,6 +240,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 			int numDeleted = 0;
 			while (iterator.hasNext() && numDeleted < toDelete) {
 				this.buffer.remove(iterator.next().getKey());
+				numDeleted++;
 			}
 		}
 
