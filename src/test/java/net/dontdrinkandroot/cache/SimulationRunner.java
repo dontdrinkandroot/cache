@@ -52,7 +52,6 @@ public class SimulationRunner {
 				throw thread.getError();
 			}
 		}
-
 	}
 
 
@@ -87,7 +86,6 @@ public class SimulationRunner {
 		}
 
 		return known;
-
 	}
 
 
@@ -98,15 +96,17 @@ public class SimulationRunner {
 
 	private String longToKey(final long l) {
 
-		final StringBuffer s = new StringBuffer();
+		return Long.toString(l);
 
-		s.append(Long.toString(l));
-
-		for (int i = 0; i < l % 10; i++) {
-			s.append(Long.toString(l));
-		}
-
-		return s.toString();
+		// final StringBuffer s = new StringBuffer();
+		//
+		// s.append(Long.toString(l));
+		//
+		// for (int i = 0; i < l % 10; i++) {
+		// s.append(Long.toString(l));
+		// }
+		//
+		// return s.toString();
 	}
 
 
@@ -189,7 +189,7 @@ public class SimulationRunner {
 
 		private final double alpha;
 
-		private Throwable t;
+		private Throwable error;
 
 
 		public KnownTestThread(
@@ -209,7 +209,7 @@ public class SimulationRunner {
 
 		Throwable getError() {
 
-			return this.t;
+			return this.error;
 		}
 
 
@@ -228,7 +228,7 @@ public class SimulationRunner {
 
 					if (this.known.contains(id)) {
 
-						if (Math.random() < .33) {
+						if (Math.random() < .25) {
 
 							SimulationRunner.this.logger.info(this.num + ":" + i + ": Deleting " + id);
 							this.known.remove(id);
@@ -238,7 +238,6 @@ public class SimulationRunner {
 
 							SimulationRunner.this.logger.info(this.num + ":" + i + ": Getting " + id);
 							Assert.assertEquals(new ExampleObject(id), this.cache.getWithErrors(key));
-
 						}
 
 					} else {
@@ -247,13 +246,12 @@ public class SimulationRunner {
 						SimulationRunner.this.logger.info(this.num + ":" + i + ": Putting " + id);
 						this.known.add(id);
 						this.cache.putWithErrors(key, eo);
-
 					}
 
 					SimulationRunner.this.knownTestpostIterationHook(this.cache);
 
 				} catch (final Throwable t) {
-					this.t = t;
+					this.error = t;
 					return;
 				}
 			}

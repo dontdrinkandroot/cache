@@ -33,8 +33,6 @@ import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -70,11 +68,13 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
+						1000,
+						1000,
 						this.baseDir);
 
 		this.testCustomGetPutDelete(cache);
+
+		// cache.close();
 	}
 
 
@@ -95,11 +95,18 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						this.baseDir);
 
 		cache.putWithErrors("12345", "12345");
+		cache.flush();
+
 		final long dataFileSize = cache.dataFile.length();
 		final long metafileLength = cache.indexFile.length();
+
 		cache.putWithErrors("12345", "12345");
+		cache.flush();
+
 		Assert.assertEquals(dataFileSize, cache.dataFile.length());
 		Assert.assertEquals(metafileLength, cache.indexFile.length());
+
+		cache.close();
 	}
 
 
@@ -111,11 +118,13 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						JUnitUtils.getFutureExpiry(),
 						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
+						1000,
+						1000,
 						this.baseDir);
 
 		cache.putWithErrors("1", new ExampleObject(3));
+
+		cache.flush();
 
 		final RandomAccessFile data = new RandomAccessFile(cache.dataFile.getFileName(), "rw");
 		data.seek(1);
@@ -140,6 +149,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		Assert.assertEquals(0, cache.getStatistics().getCurrentSize());
 		Assert.assertEquals(0, cache.dataFile.length());
 		// Assert.assertEquals(0, SerializableIndexedCacheTest.metaDataFile.length());
+
+		// cache.close();
 	}
 
 
@@ -157,14 +168,21 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 		cache.putWithErrors("1", new ExampleObject(3));
 
+		cache.flush();
+
 		final long metaFileSize = cache.dataFile.length();
 		final long dataFileSize = cache.indexFile.length();
 
 		cache.putWithErrors("1", new ExampleObject(3));
-
 		Assert.assertEquals(new ExampleObject(3), cache.getWithErrors("1"));
+
+		cache.flush();
+
 		Assert.assertEquals(metaFileSize, cache.dataFile.length());
 		Assert.assertEquals(dataFileSize, cache.indexFile.length());
+
+		cache.close();
+
 	}
 
 
@@ -180,6 +198,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 				this.baseDir);
 
 		try {
+
 			new SerializableIndexedDiskCache(
 					"testCache",
 					Duration.minutes(1),
@@ -188,6 +207,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 					Integer.MAX_VALUE,
 					this.baseDir);
 			Assert.fail("IOException expected");
+
 		} catch (IOException e) {
 			/* Expected */
 			Assert.assertTrue(e.getMessage().startsWith("Lock file found"));
@@ -203,8 +223,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
+						1000,
+						1000,
 						this.baseDir);
 
 		for (int i = 0; i < 10; i++) {
@@ -219,8 +239,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 						"testCache",
 						Duration.minutes(1),
 						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
+						1000,
+						1000,
 						this.baseDir);
 
 		/* Test invalidated not there */
@@ -229,6 +249,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		for (int i = 1; i < 10; i++) {
 			Assert.assertEquals(new ExampleObject(i), cache.getWithErrors(Integer.toString(i)));
 		}
+		cache.close();
 	}
 
 
@@ -239,10 +260,10 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 		final File ramDiskDir = new File(System.getProperty("cache.test.ramdisk"));
 		Assume.assumeTrue(ramDiskDir.exists());
 
-		Logger.getRootLogger().setLevel(Level.DEBUG);
+		// Logger.getRootLogger().setLevel(Level.DEBUG);
 
-		final File dataFile = new File(ramDiskDir, "dataFile");
-		final File metaFile = new File(ramDiskDir, "metaFile");
+		File dataFile = new File(ramDiskDir, "serializableMetaFileCacheTest.data");
+		File metaFile = new File(ramDiskDir, "serializableMetaFileCacheTest.index");
 
 		try {
 
@@ -250,64 +271,67 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 					new SerializableIndexedDiskCache(
 							"serializableMetaFileCacheTest",
 							Duration.seconds(1),
-							Cache.UNLIMITED_IDLE_TIME,
-							100000,
 							1000,
-							this.baseDir);
+							100,
+							ramDiskDir);
 			final SimulationRunner runner = new SimulationRunner() {
 
 				@Override
 				protected void loadTestPostIterationHook(final Cache<Serializable, Serializable> cache) {
 
-					Assert.assertEquals(
-							loadTestCache.getEntriesMetaData().size(),
-							loadTestCache.getIndexFileNumAllocatedBlocks());
-					Assert.assertEquals(
-							loadTestCache.getEntriesMetaData().size() * 2,
-							loadTestCache.getDataFileNumAllocatedBlocks());
 				}
 			};
-			runner.runLoadTest(loadTestCache, 1, 100000, JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
+			runner.runLoadTest(loadTestCache, 10, 10000, JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
 
 			final int size = loadTestCache.getStatistics().getCurrentSize();
 			final float hitRate = loadTestCache.getStatistics().getHitRate();
 
+			loadTestCache.flush();
+			Assert.assertEquals(
+					loadTestCache.getEntriesMetaData().size(),
+					loadTestCache.getIndexFileNumAllocatedBlocks());
+			Assert.assertEquals(
+					loadTestCache.getEntriesMetaData().size() * 2,
+					loadTestCache.getDataFileNumAllocatedBlocks());
+
 			loadTestCache.close();
 
-			Logger.getRootLogger().setLevel(Level.INFO);
+			// Logger.getRootLogger().setLevel(Level.INFO);
 
 			final SerializableIndexedDiskCache loadTestCacheNew =
 					new SerializableIndexedDiskCache(
 							"serializableMetaFileCacheTest",
 							Duration.seconds(1),
-							Cache.UNLIMITED_IDLE_TIME,
-							100000,
 							1000,
-							this.baseDir);
+							100,
+							ramDiskDir);
 
-			Logger.getRootLogger().setLevel(Level.DEBUG);
+			// Logger.getRootLogger().setLevel(Level.DEBUG);
 
 			this.getLogger().info("Hitrate: " + hitRate);
 
 			Assert.assertEquals(size, loadTestCacheNew.getStatistics().getCurrentSize());
 
+			loadTestCache.close();
+
 		} finally {
-			metaFile.delete();
 			dataFile.delete();
+			metaFile.delete();
 		}
 	}
 
 
 	@Test
-	public void runKnownTest() throws Throwable {
+	public void runKnownLoadTest() throws Throwable {
 
 		// Logger.getRootLogger().setLevel(Level.INFO);
 
 		Assume.assumeNotNull(System.getProperty("cache.test.runloadtest"));
 		final File ramDiskDir = new File(System.getProperty("cache.test.ramdisk"));
 		Assume.assumeTrue(ramDiskDir.exists());
-		final File dataFile = new File(ramDiskDir, "dataFile");
-		final File metaFile = new File(ramDiskDir, "metaFile");
+
+		File dataFile = new File(ramDiskDir, "serializableMetaFileCacheTest.data");
+		File metaFile = new File(ramDiskDir, "serializableMetaFileCacheTest.index");
 
 		try {
 
@@ -316,9 +340,9 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							"serializableMetaFileCacheTest",
 							Duration.days(1),
 							Cache.UNLIMITED_IDLE_TIME,
-							Integer.MAX_VALUE,
-							Integer.MAX_VALUE,
-							this.baseDir);
+							100000,
+							100000,
+							ramDiskDir);
 
 			Set<Long> known = new HashSet<Long>();
 			final SimulationRunner runner = new SimulationRunner() {
@@ -326,21 +350,19 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 				@Override
 				protected void knownTestpostIterationHook(final Cache<Serializable, Serializable> cache) {
 
-					Assert.assertEquals(
-							loadTestCache.getEntriesMetaData().size(),
-							loadTestCache.getIndexFileNumAllocatedBlocks());
-					Assert.assertEquals(
-							loadTestCache.getEntriesMetaData().size() * 2,
-							loadTestCache.getDataFileNumAllocatedBlocks());
 				}
 			};
 			known =
-					runner.runKnownTest(
-							loadTestCache,
-							1,
-							100000,
-							JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
-							known);
+					runner.runKnownTest(loadTestCache, 1, 10000, JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND, known);
+
+			loadTestCache.flush();
+
+			Assert.assertEquals(
+					loadTestCache.getEntriesMetaData().size(),
+					loadTestCache.getIndexFileNumAllocatedBlocks());
+			Assert.assertEquals(
+					loadTestCache.getEntriesMetaData().size() * 2,
+					loadTestCache.getDataFileNumAllocatedBlocks());
 
 			loadTestCache.close();
 
@@ -349,23 +371,71 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 							"serializableMetaFileCacheTest",
 							Duration.days(1),
 							Cache.UNLIMITED_IDLE_TIME,
-							Integer.MAX_VALUE,
-							Integer.MAX_VALUE,
-							this.baseDir);
+							100000,
+							100000,
+							ramDiskDir);
 
 			known =
 					runner.runKnownTest(
 							loadTestCacheNew,
 							1,
-							100000,
+							10000,
 							JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
 							known);
 
+			loadTestCache.flush();
+
 			this.getLogger().info(loadTestCacheNew.getStatistics().toString());
 
+			Assert.assertEquals(
+					loadTestCacheNew.getEntriesMetaData().size(),
+					loadTestCacheNew.getIndexFileNumAllocatedBlocks());
+			Assert.assertEquals(
+					loadTestCacheNew.getEntriesMetaData().size() * 2,
+					loadTestCacheNew.getDataFileNumAllocatedBlocks());
+
+			loadTestCache.close();
+
 		} finally {
-			metaFile.delete();
 			dataFile.delete();
+			metaFile.delete();
+		}
+	}
+
+
+	@Test
+	public void sameObjectMultipleTimes() throws IOException, CacheException {
+
+		SerializableIndexedDiskCache cache = null;
+		try {
+
+			cache =
+					new SerializableIndexedDiskCache(
+							"serializableMetaFileCacheTest",
+							Duration.days(1),
+							Cache.UNLIMITED_IDLE_TIME,
+							1000000,
+							1000000,
+							this.baseDir);
+
+			Serializable key = this.translateKey(1);
+			ExampleObject ex = new ExampleObject(1);
+			for (int i = 0; i < 1000; i++) {
+				this.getLogger().info("put");
+				Assert.assertEquals(ex, cache.put(key, ex));
+				this.getLogger().info("put");
+				Assert.assertEquals(ex, cache.put(key, ex));
+				this.getLogger().info("get");
+				Assert.assertEquals(ex, cache.get(key));
+				this.getLogger().info("delete");
+				cache.delete(key);
+			}
+
+		} finally {
+
+			if (cache != null) {
+				cache.close();
+			}
 		}
 	}
 

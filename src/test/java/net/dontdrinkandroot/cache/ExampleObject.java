@@ -26,19 +26,19 @@ public class ExampleObject implements Serializable {
 
 	private final String string;
 
-	private long l;
+	private long id;
 
 
 	public ExampleObject(final long l) {
 
-		this.l = l;
+		this.id = l;
 		this.string = this.createString(l);
 	}
 
 
 	public ExampleObject(final long l, final String string) {
 
-		this.l = l;
+		this.id = l;
 		this.string = string;
 	}
 
@@ -54,9 +54,9 @@ public class ExampleObject implements Serializable {
 	}
 
 
-	public void setL(final long l) {
+	public void setId(final long id) {
 
-		this.l = l;
+		this.id = id;
 	}
 
 
@@ -65,7 +65,7 @@ public class ExampleObject implements Serializable {
 
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (this.l ^ this.l >>> 32);
+		result = prime * result + (int) (this.id ^ this.id >>> 32);
 		result = prime * result + (this.string == null ? 0 : this.string.hashCode());
 		return result;
 	}
@@ -84,7 +84,7 @@ public class ExampleObject implements Serializable {
 			return false;
 		}
 		final ExampleObject other = (ExampleObject) obj;
-		if (this.l != other.l) {
+		if (this.id != other.id) {
 			return false;
 		}
 		if (this.string == null) {
@@ -95,6 +95,13 @@ public class ExampleObject implements Serializable {
 			return false;
 		}
 		return true;
+	}
+
+
+	@Override
+	public String toString() {
+
+		return "ExampleObject[id=" + this.id + "]";
 	}
 
 }

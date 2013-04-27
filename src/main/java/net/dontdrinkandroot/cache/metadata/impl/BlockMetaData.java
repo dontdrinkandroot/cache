@@ -26,7 +26,7 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
  */
 public class BlockMetaData implements MetaData {
 
-	private final IndexData indexData;
+	private IndexData indexData;
 
 	private final SimpleMetaData metaData;
 
@@ -34,6 +34,12 @@ public class BlockMetaData implements MetaData {
 	public BlockMetaData(IndexData indexData, SimpleMetaData metaData) {
 
 		this.indexData = indexData;
+		this.metaData = metaData;
+	}
+
+
+	public BlockMetaData(SimpleMetaData metaData) {
+
 		this.metaData = metaData;
 	}
 
@@ -110,6 +116,12 @@ public class BlockMetaData implements MetaData {
 	public IndexData getIndexData() {
 
 		return this.indexData;
+	}
+
+
+	public void setIndexData(IndexData indexData) {
+
+		this.indexData = indexData;
 	}
 
 }
