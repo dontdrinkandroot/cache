@@ -7,15 +7,9 @@ package net.dontdrinkandroot.cache;
  */
 public interface BufferedRecyclingCache<K, V> extends RecyclingCache<K, V> {
 
-	int getBufferMaxSize();
+	int getBufferSize();
 
 
-	void setBufferMaxSize(int maxSize);
-
-
-	int getBufferRecycleSize();
-
-
-	void setBufferRecycleSize(int bufferRecycleSize);
+	void setBufferSize(int bufferSize);
 
 }
