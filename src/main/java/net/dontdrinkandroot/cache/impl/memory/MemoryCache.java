@@ -99,6 +99,10 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 	@SuppressWarnings("unchecked")
 	protected <T extends V> T copyData(T data) {
 
+		if (data == null) {
+			return null;
+		}
+
 		if (data instanceof Serializable) {
 			Serializable serializable = (Serializable) data;
 			return (T) Serializer.clone(serializable);
