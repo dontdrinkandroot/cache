@@ -48,6 +48,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		extends AbstractMapBackedCustomTtlCache<K, V, BlockMetaData>
 {
 
+	private static final int DEFAULT_QUEUE_SIZE_WARNING_LIMIT = 1000;
+
 	protected Object indexFileLock = new Object();
 
 	protected Object dataFileLock = new Object();
@@ -57,6 +59,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	protected final DataFile dataFile;
 
 	protected final File lockFile;
+
+	protected int queueSizeWarningLimit = AbstractIndexedDiskCache.DEFAULT_QUEUE_SIZE_WARNING_LIMIT;
 
 	private final File baseDir;
 
@@ -115,6 +119,29 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 
 	/**
+	 * Set the limit when the writer thread is warning for an excess queue length.
+	 * 
+	 * @param limit
+	 *            The limit.
+	 */
+	public void setQueueSizeWarningLimit(int limit)
+	{
+		this.queueSizeWarningLimit = limit;
+	}
+
+
+	/**
+	 * Get the length of the writer thread queue.
+	 * 
+	 * @return The length of the writer thread queue.
+	 */
+	public int getWriteQueueLength()
+	{
+		return this.writerThread.getQueueLength();
+	}
+
+
+	/**
 	 * Closes the cache.
 	 */
 	protected synchronized void close() throws IOException
@@ -142,8 +169,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 
 	/**
-	 * Get the {@link DataFile} of this cache. Only perform altering operations if you know what you
-	 * are doing.
+	 * Get the {@link DataFile} of this cache. Only perform altering operations if you know what you are doing.
 	 */
 	DataFile getDataFile()
 	{
@@ -152,8 +178,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 
 	/**
-	 * Get the {@link IndexFile} of this cache. Only perform altering operations if you know what
-	 * you are doing.
+	 * Get the {@link IndexFile} of this cache. Only perform altering operations if you know what you are doing.
 	 */
 	IndexFile getIndexFile()
 	{
@@ -226,7 +251,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	{
 		try {
 
-			if (!this.writerThread.removeFromQueue(key)) {
+			if (!this.writerThread.remove(key)) {
 				IndexData indexData = metaData.getIndexData();
 				synchronized (this.indexFileLock) {
 					synchronized (this.dataFileLock) {
@@ -274,7 +299,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		SimpleMetaData simpleMetaData = new SimpleMetaData(System.currentTimeMillis(), timeToLive, maxIdleTime);
 		final byte[] dataBytes = this.dataToBytes(data);
 		BlockMetaData metaData = new BlockMetaData(simpleMetaData);
-		this.writerThread.queue(key, metaData, dataBytes);
+		this.writerThread.add(key, metaData, dataBytes);
 		this.putEntry(key, metaData);
 
 		return data;
@@ -327,16 +352,34 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		 */
 		private final Object queueLock = new Object();
 
+		/**
+		 * Locks the write process.
+		 */
 		private final Object processingLock = new Object();
 
+		/**
+		 * Indicates if the thread is about to be shut down.
+		 */
 		private boolean stopRequested = false;
 
+		/**
+		 * The key of the currently processed entry.
+		 */
 		private K currentKey = null;
 
+		/**
+		 * The currently processed entry.
+		 */
 		private QueueEntry currentQueueEntry = null;
 
+		/**
+		 * If the processing of the current entry is completed.
+		 */
 		private boolean entryWasProcessed = false;
 
+		/**
+		 * Skip the processing of the current entry.
+		 */
 		private boolean skipWrite = false;
 
 
@@ -344,6 +387,14 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		{
 			super(AbstractIndexedDiskCache.this.getName() + ".writer");
 			this.setPriority(Thread.MIN_PRIORITY);
+		}
+
+
+		public int getQueueLength()
+		{
+			synchronized (this.queueLock) {
+				return this.queue.size();
+			}
 		}
 
 
@@ -399,55 +450,79 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		}
 
 
-		public void queue(K key, BlockMetaData metaData, byte[] dataBytes)
+		/**
+		 * Adds the cache entry to the writer thread.
+		 * 
+		 * @param key
+		 *            The key of the entry.
+		 * @param metaData
+		 *            The MetaData of the entry.
+		 * @param dataBytes
+		 *            The Data of the entry.
+		 */
+		public void add(K key, BlockMetaData metaData, byte[] dataBytes)
 		{
 			synchronized (this.queueLock) {
+
 				/*
-				 * Add queue entry, put does always delete before so we do not need to check for the
-				 * current entry
+				 * Add queue entry, put does always delete before so we do not need to check for the current entry, if
+				 * it was written to disk it is already deleted, if not it doesn't appear in the queue anymore. In other
+				 * words:
 				 */
+				// if (key == currentKey && !this.entryWasProcessed) {
+				// throw new RuntimeException("Can not happen");
+				// }
+
 				QueueEntry queueEntry = new QueueEntry();
 				queueEntry.metaData = metaData;
 				queueEntry.dataBytes = dataBytes;
 				this.queue.put(key, queueEntry);
+
+				if (this.queue.size() > this.getCache().queueSizeWarningLimit) {
+					this.getCacheLogger().warn(this.getCacheName() + ": Write queue is large: " + this.queue.size());
+				}
 			}
 
 			this.interrupt();
 		}
 
 
-		public boolean removeFromQueue(K key)
+		/**
+		 * Removes the given key from the writer thread.
+		 * 
+		 * @param key
+		 *            The key of the entry.
+		 * @return True if the entry was part of the writer thread and it was removed, false otherwise.
+		 */
+		public boolean remove(K key)
 		{
 			synchronized (this.queueLock) {
 
+				/* If it is in queue, remove it, it cannot be the current unprocessed entry */
+				if (this.queue.containsKey(key)) {
+					this.queue.remove(key);
+					return true;
+				}
+
+				/* Check if entry is about to being processed */
 				if (key.equals(this.currentKey)) {
 
 					synchronized (this.processingLock) {
 
-						if (this.queue.containsKey(key)) {
-							if (!this.entryWasProcessed) {
-								/* Entry is still queued, skip */
-								this.skipWrite = true;
-							}
-							this.queue.remove(key);
-							return true;
-						}
-
 						if (this.entryWasProcessed) {
-							/* Entry is already complete, delete on disk */
+
+							/* Entry was already written, so it is not part of the writer process anymore */
 							return false;
+
 						} else {
-							/* Entry is still queued, skip */
+
+							/* Entry was not written make sure it doen't */
 							this.skipWrite = true;
 							return true;
 						}
 					}
 				}
 
-				if (this.queue.containsKey(key)) {
-					this.queue.remove(key);
-					return true;
-				}
 			}
 
 			return false;
@@ -459,8 +534,10 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		{
 			while (!this.stopRequested) {
 
-				this.entryWasProcessed = false;
-				this.skipWrite = false;
+				synchronized (this.processingLock) {
+					this.entryWasProcessed = false;
+					this.skipWrite = false;
+				}
 
 				synchronized (this) {
 
@@ -543,7 +620,6 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 					IndexData indexData = new IndexData(keyMetaBlock, valueBlock);
 					indexData = this.getCache().indexFile.write(indexData);
 					queueEntry.metaData.setIndexData(indexData);
-					// this.currentQueueEntry.metaData.setIndexData(indexData);
 				}
 			}
 		}
@@ -562,6 +638,13 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 			BlockMetaData metaData;
 
 			byte[] dataBytes;
+
+
+			@Override
+			public String toString()
+			{
+				return "QueueEntry[" + this.metaData.toString() + "]";
+			}
 		}
 
 	}

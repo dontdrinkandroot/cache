@@ -150,4 +150,21 @@ public class SimpleMetaData implements MetaData
 		}
 	}
 
+
+	@Override
+	public String toString()
+	{
+		StringBuffer sb = new StringBuffer("SimpleMetaData[");
+		sb.append("timeToLive=" + this.timeToLive);
+		sb.append(",");
+		sb.append("created=" + this.timeToLive);
+		sb.append(",");
+		sb.append("maxIdleTime=" + this.maxIdleTime);
+		sb.append(",");
+		sb.append("lastAccess=" + this.lastAccess);
+		sb.append("]");
+
+		return sb.toString();
+	}
+
 }

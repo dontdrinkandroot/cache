@@ -29,10 +29,10 @@ public class ExampleObject implements Serializable {
 	private long id;
 
 
-	public ExampleObject(final long l) {
+	public ExampleObject(final long id) {
 
-		this.id = l;
-		this.string = this.createString(l);
+		this.id = id;
+		this.string = this.createString(id);
 	}
 
 

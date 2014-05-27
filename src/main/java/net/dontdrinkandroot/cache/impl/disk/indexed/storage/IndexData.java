@@ -111,4 +111,19 @@ public class IndexData
 		return this;
 	}
 
+
+	@Override
+	public String toString()
+	{
+		StringBuffer sb = new StringBuffer("IndexData[");
+		sb.append("blockNum=" + this.blockNum);
+		sb.append(",");
+		sb.append("keyMetaBlock=" + this.keyMetaBlock);
+		sb.append(",");
+		sb.append("valueBlock=" + this.valueBlock);
+		sb.append("]");
+
+		return sb.toString();
+	}
+
 }
