@@ -136,7 +136,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	/**
 	 * Flushes the writer thread.
 	 */
-	public void flushWriteQueue()
+	public synchronized void flush()
 	{
 		this.writerThread.flush();
 	}
@@ -328,12 +328,6 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		newLockFile.createNewFile();
 
 		return newLockFile;
-	}
-
-
-	public synchronized void flush()
-	{
-		this.writerThread.flush();
 	}
 
 

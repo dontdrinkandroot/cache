@@ -12,9 +12,14 @@ import net.dontdrinkandroot.cache.impl.disk.indexed.storage.KeyedMetaData;
 import net.dontdrinkandroot.cache.metadata.impl.BlockMetaData;
 import net.dontdrinkandroot.cache.utils.Serializer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 class WriterThread<K extends Serializable, V extends Serializable> extends Thread
 {
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * The cache this thread belongs to.
@@ -85,7 +90,7 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
 	{
 		synchronized (this) {
 
-			this.cache.getLogger().info(this.cache.getName() + ": Flushing " + this.queue.size() + " entries");
+			this.logger.info(this.getName() + ": Flushing " + this.queue.size() + " entries");
 
 			Iterator<Entry<K, QueueEntry>> iterator = this.queue.entrySet().iterator();
 			while (iterator.hasNext()) {
@@ -93,12 +98,12 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
 				try {
 					this.write(entry.getKey(), entry.getValue());
 				} catch (IOException e) {
-					this.cache.getLogger().error(this.cache.getName() + ": Writing " + entry.getKey() + " failed", e);
+					this.logger.error(this.getName() + ": Writing " + entry.getKey() + " failed", e);
 				}
 				iterator.remove();
 			}
 
-			this.cache.getLogger().info(this.cache.getName() + ": Flushing done");
+			this.logger.info(this.getName() + ": Flushing done");
 		}
 	}
 
@@ -158,7 +163,7 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
 			this.queue.put(key, queueEntry);
 
 			if (this.queue.size() > this.cache.queueSizeWarningLimit) {
-				this.cache.getLogger().warn(this.cache.getName() + ": Write queue is large: " + this.queue.size());
+				this.logger.warn(this.getName() + ": Write queue is large: " + this.queue.size());
 			}
 		}
 
@@ -211,6 +216,8 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
 	@Override
 	public void run()
 	{
+		int queueSize = 0;
+
 		while (!this.stopRequested) {
 
 			synchronized (this.processingLock) {
@@ -232,6 +239,7 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
 						this.currentKey = key;
 						this.currentQueueEntry = queueEntry;
 						iterator.remove();
+						queueSize = this.queue.size();
 					}
 				}
 
@@ -240,9 +248,10 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
 					synchronized (this.processingLock) {
 						if (!this.skipWrite) {
 							try {
+								this.logger.debug(this.getName() + ": Writing {}, {} left", key, queueSize);
 								this.write(key, queueEntry);
 							} catch (IOException e) {
-								this.cache.getLogger().error(this.cache.getName() + ": Writing entry failed", e);
+								this.logger.error(this.getName() + ": Writing entry failed", e);
 							} finally {
 								this.entryWasProcessed = true;
 							}
@@ -265,7 +274,7 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
 			}
 		}
 
-		this.cache.getLogger().info(this.getName() + " stopped");
+		this.logger.info(this.getName() + " stopped");
 	}
 
 
