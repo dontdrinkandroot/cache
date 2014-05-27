@@ -33,7 +33,8 @@ import net.dontdrinkandroot.cache.utils.Md5Exception;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData> {
+public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
+{
 
 	public static Pattern MD5_PATTERN = Pattern.compile("[a-fA-F\\d]{32}");
 
@@ -51,8 +52,8 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 			final int maxSize,
 			final int recycleSize,
 			final File baseDir,
-			final int directoryDepth) throws IOException, CacheException {
-
+			final int directoryDepth) throws IOException, CacheException
+	{
 		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
 
 		this.baseDir = baseDir;
@@ -67,8 +68,8 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 
 
 	@Override
-	protected void doDelete(Md5 key, final SimpleMetaData metaData) throws CacheException {
-
+	protected void doDelete(Md5 key, final SimpleMetaData metaData) throws CacheException
+	{
 		final File file = new File(this.getFileName(key));
 		if (!file.delete()) {
 			throw new CacheException("Couldn't delete file");
@@ -78,8 +79,8 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected File doGet(Md5 key, final SimpleMetaData metaData) throws CacheException {
-
+	protected File doGet(Md5 key, final SimpleMetaData metaData) throws CacheException
+	{
 		final File file = new File(this.getFileName(key));
 		return file;
 	}
@@ -87,8 +88,8 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected File doPut(final Md5 md5, final File data) throws CacheException {
-
+	protected File doPut(final Md5 md5, final File data) throws CacheException
+	{
 		final SimpleMetaData metaData = new SimpleMetaData(this.getDefaultTtl());
 
 		final File targetFile = new File(this.getFileName(md5));
@@ -104,8 +105,8 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 	}
 
 
-	public final File getBaseDir() {
-
+	public final File getBaseDir()
+	{
 		return this.baseDir;
 	}
 
@@ -118,8 +119,8 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 	 * @param directoryDepth
 	 *            The level of nesting [0,...].
 	 */
-	protected void createDirStructure(final File dir, final int directoryDepth) throws IOException {
-
+	protected void createDirStructure(final File dir, final int directoryDepth) throws IOException
+	{
 		if (directoryDepth > 0) {
 			for (int i = 0; i < FileCache.hexLength; i++) {
 				final File newDir = new File(dir.getAbsolutePath() + File.separator + Integer.toHexString(i));
@@ -132,8 +133,8 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 	}
 
 
-	protected String getFileName(final Md5 md5) {
-
+	protected String getFileName(final Md5 md5)
+	{
 		final String md5Hex = md5.getHex();
 		final StringBuffer fileName = new StringBuffer(this.getBaseDir().getAbsolutePath() + File.separator);
 		for (int i = 0; i < this.directoryDepth; i++) {
@@ -145,8 +146,8 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
 	}
 
 
-	protected void initialize() throws CacheException {
-
+	protected void initialize() throws CacheException
+	{
 		// TODO Check correct directory structure
 
 		final Collection<File> files = FileUtils.listFilesRecursive(this.getBaseDir());

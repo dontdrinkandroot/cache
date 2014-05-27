@@ -38,12 +38,15 @@ import net.dontdrinkandroot.cache.metadata.impl.SimpleMetaData;
 import net.dontdrinkandroot.cache.utils.SerializationException;
 import net.dontdrinkandroot.cache.utils.Serializer;
 
+import org.slf4j.Logger;
+
 
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
 public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends Serializable>
-		extends AbstractMapBackedCustomTtlCache<K, V, BlockMetaData> {
+		extends AbstractMapBackedCustomTtlCache<K, V, BlockMetaData>
+{
 
 	protected Object indexFileLock = new Object();
 
@@ -65,8 +68,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 			final long defaultTimeToLive,
 			final int maxSize,
 			final int recycleSize,
-			final File baseDir) throws IOException {
-
+			final File baseDir) throws IOException
+	{
 		this(name, defaultTimeToLive, Cache.UNLIMITED_IDLE_TIME, maxSize, recycleSize, baseDir);
 	}
 
@@ -77,8 +80,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 			final long defaultMaxIdleTime,
 			final int maxSize,
 			final int recycleSize,
-			final File baseDir) throws IOException {
-
+			final File baseDir) throws IOException
+	{
 		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
 
 		this.baseDir = baseDir;
@@ -114,8 +117,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	/**
 	 * Closes the cache.
 	 */
-	protected synchronized void close() throws IOException {
-
+	protected synchronized void close() throws IOException
+	{
 		this.flush();
 
 		this.writerThread.requestStop();
@@ -142,8 +145,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	 * Get the {@link DataFile} of this cache. Only perform altering operations if you know what you
 	 * are doing.
 	 */
-	DataFile getDataFile() {
-
+	DataFile getDataFile()
+	{
 		return this.dataFile;
 	}
 
@@ -152,14 +155,14 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	 * Get the {@link IndexFile} of this cache. Only perform altering operations if you know what
 	 * you are doing.
 	 */
-	IndexFile getIndexFile() {
-
+	IndexFile getIndexFile()
+	{
 		return this.indexFile;
 	}
 
 
-	protected void buildIndex() throws IOException {
-
+	protected void buildIndex() throws IOException
+	{
 		this.getLogger().info("{}: Reading index", this.getName());
 		long lastTimeLogged = System.currentTimeMillis();
 
@@ -219,8 +222,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 
 	@Override
-	protected void doDelete(K key, final BlockMetaData metaData) throws CacheException {
-
+	protected void doDelete(K key, final BlockMetaData metaData) throws CacheException
+	{
 		try {
 
 			if (!this.writerThread.removeFromQueue(key)) {
@@ -241,15 +244,15 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 
 	@Override
-	protected <T extends V> T doGet(K key, final BlockMetaData metaData) throws CacheException {
-
+	protected <T extends V> T doGet(K key, final BlockMetaData metaData) throws CacheException
+	{
 		try {
 
 			byte[] data = this.writerThread.findDataBytes(key);
 
 			if (data == null) {
 				if (metaData.getIndexData() == null) {
-					throw new CacheException("Incositent data");
+					throw new CacheException("Inconsistent data");
 				}
 				synchronized (this.dataFileLock) {
 					data = this.dataFile.read(metaData.getIndexData().getValueBlock());
@@ -266,8 +269,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 	@Override
 	protected <T extends V> T doPut(final K key, final T data, final long timeToLive, final long maxIdleTime)
-			throws CacheException {
-
+			throws CacheException
+	{
 		SimpleMetaData simpleMetaData = new SimpleMetaData(System.currentTimeMillis(), timeToLive, maxIdleTime);
 		final byte[] dataBytes = this.dataToBytes(data);
 		BlockMetaData metaData = new BlockMetaData(simpleMetaData);
@@ -285,8 +288,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	 * @throws IOException
 	 *             Thrown if lock file already exists.
 	 */
-	private File createLockFile() throws IOException {
-
+	private File createLockFile() throws IOException
+	{
 		File newLockFile = new File(this.baseDir, this.getName() + ".lock");
 
 		if (newLockFile.exists()) {
@@ -302,8 +305,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	}
 
 
-	public synchronized void flush() {
-
+	public synchronized void flush()
+	{
 		this.writerThread.flush();
 	}
 
@@ -314,10 +317,14 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 	protected abstract <T extends V> byte[] dataToBytes(T data) throws CacheException;
 
 
-	class WriterThread extends Thread {
+	class WriterThread extends Thread
+	{
 
 		private final LinkedHashMap<K, QueueEntry> queue = new LinkedHashMap<K, QueueEntry>();
 
+		/**
+		 * Locks access on the queue.
+		 */
 		private final Object queueLock = new Object();
 
 		private final Object processingLock = new Object();
@@ -333,38 +340,50 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		private boolean skipWrite = false;
 
 
-		public WriterThread() {
-
+		public WriterThread()
+		{
 			super(AbstractIndexedDiskCache.this.getName() + ".writer");
 			this.setPriority(Thread.MIN_PRIORITY);
 		}
 
 
-		public void flush() {
-
+		/**
+		 * Flush all entries to disk.
+		 */
+		public void flush()
+		{
 			synchronized (this) {
-				AbstractIndexedDiskCache.this.getLogger().info("Flushing " + this.queue.size() + " entries");
+
+				this.getCacheLogger().info(this.getCacheName() + ": Flushing " + this.queue.size() + " entries");
+
 				Iterator<Entry<K, QueueEntry>> iterator = this.queue.entrySet().iterator();
 				while (iterator.hasNext()) {
 					Entry<K, QueueEntry> entry = iterator.next();
 					try {
 						this.write(entry.getKey(), entry.getValue());
 					} catch (IOException e) {
-						AbstractIndexedDiskCache.this.getLogger().error("Writing " + entry.getKey() + " failed", e);
+						this.getCacheLogger().error(this.getCacheName() + ": Writing " + entry.getKey() + " failed", e);
 					}
 					iterator.remove();
 				}
-				AbstractIndexedDiskCache.this.getLogger().info("Flushing done");
-			}
 
+				this.getCacheLogger().info(this.getCacheName() + ": Flushing done");
+			}
 		}
 
 
-		public byte[] findDataBytes(K key) {
-
+		/**
+		 * Checks if the key is part of the writer thread and returns the data if found.
+		 * 
+		 * @param key
+		 *            The key to search for.
+		 * @return The data if part of the writer thread or null.
+		 */
+		public byte[] findDataBytes(K key)
+		{
 			synchronized (this.queueLock) {
 
-				/* Return dataBytes from currently being processed entry */
+				/* Return dataBytes from entry currently being processed */
 				if (key.equals(this.currentKey)) {
 					return this.currentQueueEntry.dataBytes;
 				}
@@ -380,8 +399,8 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		}
 
 
-		public void queue(K key, BlockMetaData metaData, byte[] dataBytes) {
-
+		public void queue(K key, BlockMetaData metaData, byte[] dataBytes)
+		{
 			synchronized (this.queueLock) {
 				/*
 				 * Add queue entry, put does always delete before so we do not need to check for the
@@ -397,12 +416,14 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		}
 
 
-		public boolean removeFromQueue(K key) {
-
+		public boolean removeFromQueue(K key)
+		{
 			synchronized (this.queueLock) {
 
 				if (key.equals(this.currentKey)) {
+
 					synchronized (this.processingLock) {
+
 						if (this.queue.containsKey(key)) {
 							if (!this.entryWasProcessed) {
 								/* Entry is still queued, skip */
@@ -434,12 +455,13 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 
 
 		@Override
-		public void run() {
-
+		public void run()
+		{
 			while (!this.stopRequested) {
 
 				this.entryWasProcessed = false;
 				this.skipWrite = false;
+
 				synchronized (this) {
 
 					K key = null;
@@ -464,7 +486,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 								try {
 									this.write(key, queueEntry);
 								} catch (IOException e) {
-									AbstractIndexedDiskCache.this.getLogger().error("Writing entry failed", e);
+									this.getCacheLogger().error(this.getCacheName() + ": Writing entry failed", e);
 								} finally {
 									this.entryWasProcessed = true;
 								}
@@ -487,21 +509,39 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 				}
 			}
 
-			AbstractIndexedDiskCache.this.getLogger().info(this.getName() + " stopped");
+			this.getCacheLogger().info(this.getName() + " stopped");
 		}
 
 
-		private void write(K key, QueueEntry queueEntry) throws IOException {
+		protected AbstractIndexedDiskCache<K, V> getCache()
+		{
+			return AbstractIndexedDiskCache.this;
+		}
 
+
+		protected String getCacheName()
+		{
+			return this.getCache().getName();
+		}
+
+
+		protected Logger getCacheLogger()
+		{
+			return this.getCache().getLogger();
+		}
+
+
+		private void write(K key, QueueEntry queueEntry) throws IOException
+		{
 			KeyedMetaData<K> keyedMetaData = new KeyedMetaData<K>(key, queueEntry.metaData);
 			byte[] keyedMetaDataBytes = Serializer.serialize(keyedMetaData);
 
-			synchronized (AbstractIndexedDiskCache.this.indexFileLock) {
-				synchronized (AbstractIndexedDiskCache.this.dataFileLock) {
-					final DataBlock keyMetaBlock = AbstractIndexedDiskCache.this.dataFile.write(keyedMetaDataBytes);
-					final DataBlock valueBlock = AbstractIndexedDiskCache.this.dataFile.write(queueEntry.dataBytes);
+			synchronized (this.getCache().indexFileLock) {
+				synchronized (this.getCache().dataFileLock) {
+					final DataBlock keyMetaBlock = this.getCache().dataFile.write(keyedMetaDataBytes);
+					final DataBlock valueBlock = this.getCache().dataFile.write(queueEntry.dataBytes);
 					IndexData indexData = new IndexData(keyMetaBlock, valueBlock);
-					indexData = AbstractIndexedDiskCache.this.indexFile.write(indexData);
+					indexData = this.getCache().indexFile.write(indexData);
 					queueEntry.metaData.setIndexData(indexData);
 					// this.currentQueueEntry.metaData.setIndexData(indexData);
 				}
@@ -509,14 +549,15 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 		}
 
 
-		public void requestStop() {
-
+		public void requestStop()
+		{
 			this.stopRequested = true;
 			this.interrupt();
 		}
 
 
-		class QueueEntry {
+		class QueueEntry
+		{
 
 			BlockMetaData metaData;
 

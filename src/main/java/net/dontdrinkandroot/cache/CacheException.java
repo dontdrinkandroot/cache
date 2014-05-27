@@ -18,38 +18,40 @@
 package net.dontdrinkandroot.cache;
 
 /**
- * Exception that denotes that something went wrong while accessing the cache (while storing, retrieving or
- * constructing). Although this exception must be caught most applications can simply ignore this exception as caching
- * is not meant to be a reliable storage, still this might lead to significant and undetected performance issues, so at
- * least some kind of logging should be implemented.
+ * Exception that denotes that something went wrong while accessing the cache (while storing,
+ * retrieving or constructing). Although this exception must be caught most applications can simply
+ * ignore this exception as caching is not meant to be a reliable storage, still this might lead to
+ * significant and undetected performance issues, so at least some kind of logging should be
+ * implemented.
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class CacheException extends Exception {
+public class CacheException extends Exception
+{
 
 	private static final long serialVersionUID = -7471725780904149067L;
 
 
-	public CacheException() {
-
+	public CacheException()
+	{
 		super();
 	}
 
 
-	public CacheException(final String msg) {
-
+	public CacheException(final String msg)
+	{
 		super(msg);
 	}
 
 
-	public CacheException(final Throwable t) {
-
+	public CacheException(final Throwable t)
+	{
 		super(t);
 	}
 
 
-	public CacheException(final String msg, final Throwable t) {
-
+	public CacheException(final String msg, final Throwable t)
+	{
 		super(msg, t);
 	}
 

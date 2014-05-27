@@ -32,18 +32,19 @@ import java.io.Serializable;
  * 
  * @author Apache Commons Lang
  */
-public class Serializer {
+public class Serializer
+{
 
-	public static byte[] serialize(Serializable obj) {
-
+	public static byte[] serialize(Serializable obj)
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
 		Serializer.serialize(obj, baos);
 		return baos.toByteArray();
 	}
 
 
-	public static void serialize(Serializable obj, OutputStream outputStream) {
-
+	public static void serialize(Serializable obj, OutputStream outputStream)
+	{
 		if (outputStream == null) {
 			throw new IllegalArgumentException("The OutputStream must not be null");
 		}
@@ -67,8 +68,8 @@ public class Serializer {
 	}
 
 
-	public static Object deserialize(byte[] objectData) {
-
+	public static Object deserialize(byte[] objectData)
+	{
 		if (objectData == null) {
 			throw new IllegalArgumentException("The byte[] must not be null");
 		}
@@ -77,8 +78,8 @@ public class Serializer {
 	}
 
 
-	public static Object deserialize(InputStream inputStream) {
-
+	public static Object deserialize(InputStream inputStream)
+	{
 		if (inputStream == null) {
 			throw new IllegalArgumentException("The InputStream must not be null");
 		}
@@ -109,8 +110,8 @@ public class Serializer {
 	 * href="http://javatechniques.com/blog/faster-deep-copies-of-java-objects/">here</a>.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Serializable> T clone(T object) {
-
+	public static <T extends Serializable> T clone(T object)
+	{
 		Object obj = null;
 		try {
 
@@ -136,7 +137,8 @@ public class Serializer {
 
 }
 
-class FastByteArrayOutputStream extends OutputStream {
+class FastByteArrayOutputStream extends OutputStream
+{
 
 	/**
 	 * Buffer and size
@@ -149,8 +151,8 @@ class FastByteArrayOutputStream extends OutputStream {
 	/**
 	 * Constructs a stream with buffer capacity size 5K
 	 */
-	public FastByteArrayOutputStream() {
-
+	public FastByteArrayOutputStream()
+	{
 		this(5 * 1024);
 	}
 
@@ -158,8 +160,8 @@ class FastByteArrayOutputStream extends OutputStream {
 	/**
 	 * Constructs a stream with the given initial size
 	 */
-	public FastByteArrayOutputStream(int initSize) {
-
+	public FastByteArrayOutputStream(int initSize)
+	{
 		this.size = 0;
 		this.buf = new byte[initSize];
 	}
@@ -168,8 +170,8 @@ class FastByteArrayOutputStream extends OutputStream {
 	/**
 	 * Ensures that we have a large enough buffer for the given size.
 	 */
-	private void verifyBufferSize(int sz) {
-
+	private void verifyBufferSize(int sz)
+	{
 		if (sz > this.buf.length) {
 			byte[] old = this.buf;
 			this.buf = new byte[Math.max(sz, 2 * this.buf.length)];
@@ -179,8 +181,8 @@ class FastByteArrayOutputStream extends OutputStream {
 	}
 
 
-	public int getSize() {
-
+	public int getSize()
+	{
 		return this.size;
 	}
 
@@ -189,15 +191,15 @@ class FastByteArrayOutputStream extends OutputStream {
 	 * Returns the byte array containing the written data. Note that this array will almost always
 	 * be larger than the amount of data actually written.
 	 */
-	public byte[] getByteArray() {
-
+	public byte[] getByteArray()
+	{
 		return this.buf;
 	}
 
 
 	@Override
-	public final void write(byte b[]) {
-
+	public final void write(byte b[])
+	{
 		this.verifyBufferSize(this.size + b.length);
 		System.arraycopy(b, 0, this.buf, this.size, b.length);
 		this.size += b.length;
@@ -205,8 +207,8 @@ class FastByteArrayOutputStream extends OutputStream {
 
 
 	@Override
-	public final void write(byte b[], int off, int len) {
-
+	public final void write(byte b[], int off, int len)
+	{
 		this.verifyBufferSize(this.size + len);
 		System.arraycopy(b, off, this.buf, this.size, len);
 		this.size += len;
@@ -214,15 +216,15 @@ class FastByteArrayOutputStream extends OutputStream {
 
 
 	@Override
-	public final void write(int b) {
-
+	public final void write(int b)
+	{
 		this.verifyBufferSize(this.size + 1);
 		this.buf[this.size++] = (byte) b;
 	}
 
 
-	public void reset() {
-
+	public void reset()
+	{
 		this.size = 0;
 	}
 
@@ -230,13 +232,14 @@ class FastByteArrayOutputStream extends OutputStream {
 	/**
 	 * Returns a ByteArrayInputStream for reading back the written data
 	 */
-	public InputStream getInputStream() {
-
+	public InputStream getInputStream()
+	{
 		return new FastByteArrayInputStream(this.buf, this.size);
 	}
 
 
-	public class FastByteArrayInputStream extends InputStream {
+	public class FastByteArrayInputStream extends InputStream
+	{
 
 		/**
 		 * Our byte buffer
@@ -254,30 +257,30 @@ class FastByteArrayOutputStream extends OutputStream {
 		protected int pos = 0;
 
 
-		public FastByteArrayInputStream(byte[] buf, int count) {
-
+		public FastByteArrayInputStream(byte[] buf, int count)
+		{
 			this.buf = buf;
 			this.count = count;
 		}
 
 
 		@Override
-		public final int available() {
-
+		public final int available()
+		{
 			return this.count - this.pos;
 		}
 
 
 		@Override
-		public final int read() {
-
+		public final int read()
+		{
 			return this.pos < this.count ? this.buf[this.pos++] & 0xff : -1;
 		}
 
 
 		@Override
-		public final int read(byte[] b, int off, int len) {
-
+		public final int read(byte[] b, int off, int len)
+		{
 			if (this.pos >= this.count) {
 				return -1;
 			}
@@ -293,8 +296,8 @@ class FastByteArrayOutputStream extends OutputStream {
 
 
 		@Override
-		public final long skip(long n) {
-
+		public final long skip(long n)
+		{
 			if (this.pos + n > this.count) {
 				n = this.count - this.pos;
 			}

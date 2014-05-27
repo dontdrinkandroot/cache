@@ -32,29 +32,30 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serializable, byte[]> {
+public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serializable, byte[]>
+{
 
 	private File baseDir;
 
 
 	@Before
-	public void before() throws IOException {
-
+	public void before() throws IOException
+	{
 		this.baseDir = File.createTempFile("cachetest", null);
 		this.baseDir.delete();
 	}
 
 
 	@After
-	public void after() throws IOException {
-
+	public void after() throws IOException
+	{
 		FileUtils.deleteDirectory(this.baseDir);
 	}
 
 
 	@Test
-	public void testPutGetDelete() throws Exception {
-
+	public void testPutGetDelete() throws Exception
+	{
 		ByteArrayIndexedDiskCache cache =
 				new ByteArrayIndexedDiskCache(
 						"testCache",
@@ -75,8 +76,8 @@ public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serial
 
 
 	@Override
-	protected void doAssertGet(int key, Cache<Serializable, byte[]> cache) throws Exception {
-
+	protected void doAssertGet(int key, Cache<Serializable, byte[]> cache) throws Exception
+	{
 		byte[] bytes = cache.getWithErrors(this.translateKey(key));
 		Assert.assertNotNull(bytes);
 		Assert.assertArrayEquals(this.createInputObject(key), bytes);
@@ -84,8 +85,8 @@ public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serial
 
 
 	@Override
-	protected byte[] createInputObject(int key) throws Exception {
-
+	protected byte[] createInputObject(int key) throws Exception
+	{
 		final StringBuffer s = new StringBuffer();
 		for (int i = -1; i < key % 100; i++) {
 			s.append(Long.toString(key));
@@ -96,8 +97,8 @@ public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serial
 
 
 	@Override
-	protected String translateKey(int key) {
-
+	protected String translateKey(int key)
+	{
 		final StringBuffer sb = new StringBuffer();
 		for (int i = -1; i < key % 100; i++) {
 			sb.append(Long.toString(key));

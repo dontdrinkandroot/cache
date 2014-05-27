@@ -24,110 +24,111 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class BlockMetaData implements MetaData {
+public class BlockMetaData implements MetaData
+{
 
 	private IndexData indexData;
 
 	private final SimpleMetaData metaData;
 
 
-	public BlockMetaData(IndexData indexData, SimpleMetaData metaData) {
-
+	public BlockMetaData(IndexData indexData, SimpleMetaData metaData)
+	{
 		this.indexData = indexData;
 		this.metaData = metaData;
 	}
 
 
-	public BlockMetaData(SimpleMetaData metaData) {
-
+	public BlockMetaData(SimpleMetaData metaData)
+	{
 		this.metaData = metaData;
 	}
 
 
 	@Override
-	public boolean isExpired() {
-
+	public boolean isExpired()
+	{
 		return this.metaData.isExpired();
 	}
 
 
 	@Override
-	public boolean isStale() {
-
+	public boolean isStale()
+	{
 		return this.metaData.isStale();
 	}
 
 
 	@Override
-	public long getExpiry() {
-
+	public long getExpiry()
+	{
 		return this.metaData.getExpiry();
 	}
 
 
 	@Override
-	public long getMaxIdleTime() {
-
+	public long getMaxIdleTime()
+	{
 		return this.metaData.getMaxIdleTime();
 	}
 
 
 	@Override
-	public void update() {
-
+	public void update()
+	{
 		this.metaData.update();
 	}
 
 
 	@Override
-	public int getHitCount() {
-
+	public int getHitCount()
+	{
 		return this.metaData.getHitCount();
 	}
 
 
 	@Override
-	public long getLastAccess() {
-
+	public long getLastAccess()
+	{
 		return this.metaData.getLastAccess();
 	}
 
 
 	@Override
-	public long getCreated() {
-
+	public long getCreated()
+	{
 		return this.metaData.getCreated();
 	}
 
 
 	@Override
-	public void decay() {
-
+	public void decay()
+	{
 		this.metaData.decay();
 	}
 
 
 	@Override
-	public long getTimeToLive() {
-
+	public long getTimeToLive()
+	{
 		return this.metaData.getTimeToLive();
 	}
 
 
-	public SimpleMetaData getMetaData() {
-
+	public SimpleMetaData getMetaData()
+	{
 		return this.metaData;
 	}
 
 
-	public IndexData getIndexData() {
-
+	public IndexData getIndexData()
+	{
 		return this.indexData;
 	}
 
 
-	public void setIndexData(IndexData indexData) {
-
+	public void setIndexData(IndexData indexData)
+	{
 		this.indexData = indexData;
 	}
 

@@ -23,7 +23,8 @@ import java.io.Serializable;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public interface MetaData extends Serializable {
+public interface MetaData extends Serializable
+{
 
 	/**
 	 * Check if the entry is expired.

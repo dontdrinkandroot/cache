@@ -26,6 +26,7 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public interface MetaDataComparator<K, M extends MetaData> extends Comparator<Entry<K, M>> {
+public interface MetaDataComparator<K, M extends MetaData> extends Comparator<Entry<K, M>>
+{
 
 }

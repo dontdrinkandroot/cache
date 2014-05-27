@@ -29,135 +29,137 @@ import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class NoopCache<K, V> implements CustomTtlCache<K, V> {
+public class NoopCache<K, V> implements CustomTtlCache<K, V>
+{
 
 	private String name;
 
 
-	public NoopCache(final String name) {
+	public NoopCache(final String name)
+	{
 
 		this.name = name;
 	}
 
 
 	@Override
-	public <T extends V> T putWithErrors(final K key, final T data) throws CacheException {
-
+	public <T extends V> T putWithErrors(final K key, final T data) throws CacheException
+	{
 		return data;
 	}
 
 
 	@Override
-	public <T extends V> T getWithErrors(final K key) throws CacheException {
-
+	public <T extends V> T getWithErrors(final K key) throws CacheException
+	{
 		return null;
 	}
 
 
 	@Override
-	public MetaData getMetaData(K key) throws CacheException {
-
+	public MetaData getMetaData(K key) throws CacheException
+	{
 		return null;
 	}
 
 
 	@Override
-	public void setDefaultTtl(final long defaultTTL) {
-
+	public void setDefaultTtl(final long defaultTTL)
+	{
 	}
 
 
 	@Override
-	public long getDefaultTtl() {
-
+	public long getDefaultTtl()
+	{
 		return 0;
 	}
 
 
 	@Override
-	public void delete(final K key) throws CacheException {
-
+	public void delete(final K key) throws CacheException
+	{
 	}
 
 
 	@Override
-	public void expunge() {
-
+	public void expunge()
+	{
 	}
 
 
-	public void setName(final String name) {
-
+	public void setName(final String name)
+	{
 		this.name = name;
 	}
 
 
 	@Override
-	public String getName() {
-
+	public String getName()
+	{
 		return this.name;
 	}
 
 
 	@Override
-	public <T extends V> T putWithErrors(final K key, final T data, final long timeToLive) throws CacheException {
-
+	public <T extends V> T putWithErrors(final K key, final T data, final long timeToLive) throws CacheException
+	{
 		return data;
 	}
 
 
 	@Override
-	public CacheStatistics getStatistics() {
-
+	public CacheStatistics getStatistics()
+	{
 		return new SimpleCacheStatistics();
 	}
 
 
 	@Override
-	public long getDefaultMaxIdleTime() {
-
+	public long getDefaultMaxIdleTime()
+	{
 		return 0;
 	}
 
 
 	@Override
-	public <T extends V> T putWithErrors(K key, T data, long timeToLive, long maxIdleTime) throws CacheException {
-
+	public <T extends V> T putWithErrors(K key, T data, long timeToLive, long maxIdleTime) throws CacheException
+	{
 		return data;
 	}
 
 
 	@Override
-	public <T extends V> T put(K key, T data) {
-
+	public <T extends V> T put(K key, T data)
+	{
 		return data;
 	}
 
 
 	@Override
-	public <T extends V> T get(K key) {
-
+	public <T extends V> T get(K key)
+	{
 		return null;
 	}
 
 
 	@Override
-	public <T extends V> T put(K key, T data, long timeToLive) {
-
+	public <T extends V> T put(K key, T data, long timeToLive)
+	{
 		return data;
 	}
 
 
 	@Override
-	public <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime) {
-
+	public <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime)
+	{
 		return data;
 	}
 
 
 	@Override
-	public void cleanUp() throws CacheException {
-
+	public void cleanUp() throws CacheException
+	{
 		/* Noop */
 	}
 }

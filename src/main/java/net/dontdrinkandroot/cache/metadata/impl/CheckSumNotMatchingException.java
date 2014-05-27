@@ -25,13 +25,14 @@ import net.dontdrinkandroot.cache.CacheException;
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class CheckSumNotMatchingException extends CacheException {
+public class CheckSumNotMatchingException extends CacheException
+{
 
 	private static final long serialVersionUID = -3098844381139022651L;
 
 
-	public CheckSumNotMatchingException() {
-
+	public CheckSumNotMatchingException()
+	{
 		super();
 	}
 

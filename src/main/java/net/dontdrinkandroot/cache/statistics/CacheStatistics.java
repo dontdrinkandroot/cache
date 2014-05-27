@@ -23,7 +23,8 @@ import java.io.Serializable;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public interface CacheStatistics extends Serializable {
+public interface CacheStatistics extends Serializable
+{
 
 	/**
 	 * Get the total number of cache hits.
@@ -56,7 +57,8 @@ public interface CacheStatistics extends Serializable {
 
 
 	/**
-	 * Get the current hit rate, this is a value [0,1] which is the percentage of hits on all get requests.
+	 * Get the current hit rate, this is a value [0,1] which is the percentage of hits on all get
+	 * requests.
 	 */
 	float getHitRate();
 

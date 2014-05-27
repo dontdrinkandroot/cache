@@ -42,7 +42,8 @@ import net.dontdrinkandroot.cache.statistics.CacheStatistics;
  * @param <V>
  *            Type of entries that can be stored and retrieved from the cache.
  */
-public interface Cache<K, V> {
+public interface Cache<K, V>
+{
 
 	static long UNLIMITED_IDLE_TIME = 0;
 

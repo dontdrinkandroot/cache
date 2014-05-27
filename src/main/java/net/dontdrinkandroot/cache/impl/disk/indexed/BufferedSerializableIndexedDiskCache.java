@@ -43,7 +43,8 @@ import net.dontdrinkandroot.cache.utils.Serializer;
  * @author Philip W. Sorst <philip@sorst.net>
  */
 public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDiskCache
-		implements BufferedRecyclingCache<Serializable, Serializable> {
+		implements BufferedRecyclingCache<Serializable, Serializable>
+{
 
 	private final Map<Serializable, Serializable> buffer;
 
@@ -62,8 +63,8 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 			final int maxSize,
 			final int recycleSize,
 			final File baseDir,
-			final int bufferSize) throws IOException {
-
+			final int bufferSize) throws IOException
+	{
 		this(name, defaultTimeToLive, Cache.UNLIMITED_IDLE_TIME, maxSize, recycleSize, baseDir, bufferSize);
 	}
 
@@ -75,8 +76,8 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 			final int maxSize,
 			final int recycleSize,
 			final File baseDir,
-			final int bufferSize) throws IOException {
-
+			final int bufferSize) throws IOException
+	{
 		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
 
 		this.bufferSize = bufferSize;
@@ -92,16 +93,16 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	 * reflects gets and puts to the buffer, not the cache itself, the size is the current size of
 	 * the buffer.
 	 */
-	public synchronized SimpleCacheStatistics getBufferStatistics() {
-
+	public synchronized SimpleCacheStatistics getBufferStatistics()
+	{
 		this.bufferStatistics.setCurrentSize(this.buffer.size());
 		return this.bufferStatistics;
 	}
 
 
 	@Override
-	protected <T extends Serializable> T doGet(Serializable key, final BlockMetaData metaData) throws CacheException {
-
+	protected <T extends Serializable> T doGet(Serializable key, final BlockMetaData metaData) throws CacheException
+	{
 		this.bufferStatistics.increaseGetCount();
 
 		@SuppressWarnings("unchecked")
@@ -138,8 +139,8 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 			Serializable key,
 			final T data,
 			final long timeToLive,
-			final long maxIdleTime) throws CacheException {
-
+			final long maxIdleTime) throws CacheException
+	{
 		/* Put data to disk and store it in the buffer */
 		T putData = super.doPut(key, data, timeToLive, maxIdleTime);
 		this.addToBuffer(key, putData);
@@ -157,8 +158,8 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
 
 	@Override
-	protected void doDelete(Serializable key, final BlockMetaData metaData) throws CacheException {
-
+	protected void doDelete(Serializable key, final BlockMetaData metaData) throws CacheException
+	{
 		/* Remove entry from buffer and from disk */
 		this.buffer.remove(key);
 		super.doDelete(key, metaData);
@@ -166,15 +167,15 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
 
 	@Override
-	public int getBufferSize() {
-
+	public int getBufferSize()
+	{
 		return this.bufferSize;
 	}
 
 
 	@Override
-	public void setBufferSize(int bufferSize) {
-
+	public void setBufferSize(int bufferSize)
+	{
 		this.bufferSize = bufferSize;
 	}
 
@@ -183,21 +184,21 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	 * Creates a copy of the given data.
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T extends Serializable> T copyData(T data) {
-
+	protected <T extends Serializable> T copyData(T data)
+	{
 		Serializable serializable = data;
 		return (T) Serializer.clone(serializable);
 	}
 
 
-	public boolean isCopyOnRead() {
-
+	public boolean isCopyOnRead()
+	{
 		return this.copyOnRead;
 	}
 
 
-	public boolean isCopyOnWrite() {
-
+	public boolean isCopyOnWrite()
+	{
 		return this.copyOnWrite;
 	}
 
@@ -206,8 +207,8 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	 * Sets if a successful get should return a copy of the cache entry, so when manipulating the
 	 * object no changes are persisted in the buffer.
 	 */
-	public BufferedSerializableIndexedDiskCache setCopyOnRead(boolean copyOnRead) {
-
+	public BufferedSerializableIndexedDiskCache setCopyOnRead(boolean copyOnRead)
+	{
 		this.copyOnRead = copyOnRead;
 		return this;
 	}
@@ -217,8 +218,8 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	 * Sets if a successful put should return a copy of the cache entry, so when manipulating the
 	 * object no changes are persisted in the buffer.
 	 */
-	public BufferedSerializableIndexedDiskCache setCopyOnWrite(boolean copyOnWrite) {
-
+	public BufferedSerializableIndexedDiskCache setCopyOnWrite(boolean copyOnWrite)
+	{
 		this.copyOnWrite = copyOnWrite;
 		return this;
 	}
@@ -227,8 +228,8 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	/**
 	 * Adds an entry to the buffer.
 	 */
-	private void addToBuffer(Serializable key, final Serializable data) {
-
+	private void addToBuffer(Serializable key, final Serializable data)
+	{
 		if (this.buffer.size() >= this.bufferSize) {
 
 			int toDelete = this.buffer.size() - this.bufferSize + 1;
@@ -253,8 +254,8 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 	 * Builds a map that holds the key metadata mapping of the buffer. Needed to run an expunge
 	 * strategy on the buffer.
 	 */
-	private Map<Serializable, BlockMetaData> buildBufferMetaDataMap() {
-
+	private Map<Serializable, BlockMetaData> buildBufferMetaDataMap()
+	{
 		Map<Serializable, BlockMetaData> bufferEntries = new HashMap<Serializable, BlockMetaData>();
 		Iterator<Serializable> keyIterator = this.buffer.keySet().iterator();
 		while (keyIterator.hasNext()) {
@@ -267,7 +268,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 				 * Strange, metadata was not found anymore, so entry does not exist on disk. Warn
 				 * and also delete in buffer
 				 */
-				this.getLogger().warn("{}: Metadata for {} was null", this.getName(), key.toString());
+				this.getLogger().warn(this.getName() + ": Metadata for {} was null", key.toString());
 				keyIterator.remove();
 			} else {
 				bufferEntries.put(key, metaData);

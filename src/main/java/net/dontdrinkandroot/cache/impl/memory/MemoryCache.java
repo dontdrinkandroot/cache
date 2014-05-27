@@ -29,7 +29,8 @@ import net.dontdrinkandroot.cache.utils.Serializer;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, SimpleMetaData> {
+public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, SimpleMetaData>
+{
 
 	protected final HashMap<K, V> dataMap;
 
@@ -38,8 +39,8 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 	private boolean copyOnWrite = true;
 
 
-	public MemoryCache(final String name, final long defaultTimeToLive, int maxSize, int recycleSize) {
-
+	public MemoryCache(final String name, final long defaultTimeToLive, int maxSize, int recycleSize)
+	{
 		super(name, defaultTimeToLive, maxSize, recycleSize);
 		this.dataMap = new HashMap<K, V>();
 	}
@@ -50,8 +51,8 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
 			int maxSize,
-			int recycleSize) {
-
+			int recycleSize)
+	{
 		super(name, defaultTimeToLive, maxSize, recycleSize);
 		this.dataMap = new HashMap<K, V>();
 	}
@@ -59,8 +60,8 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 
 	@Override
 	protected <T extends V> T doPut(final K key, final T data, final long timeToLive, final long maxIdleTime)
-			throws CacheException {
-
+			throws CacheException
+	{
 		final SimpleMetaData metaData = new SimpleMetaData(timeToLive);
 		this.putEntry(key, metaData);
 		this.dataMap.put(key, data);
@@ -75,15 +76,15 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 
 
 	@Override
-	protected void doDelete(K key, final SimpleMetaData metaData) throws CacheException {
-
+	protected void doDelete(K key, final SimpleMetaData metaData) throws CacheException
+	{
 		this.dataMap.remove(key);
 	}
 
 
 	@Override
-	protected <T extends V> T doGet(K key, final SimpleMetaData metaData) throws CacheException {
-
+	protected <T extends V> T doGet(K key, final SimpleMetaData metaData) throws CacheException
+	{
 		@SuppressWarnings("unchecked")
 		T data = (T) this.dataMap.get(key);
 
@@ -97,8 +98,8 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 
 
 	@SuppressWarnings("unchecked")
-	protected <T extends V> T copyData(T data) {
-
+	protected <T extends V> T copyData(T data)
+	{
 		if (data == null) {
 			return null;
 		}
@@ -115,27 +116,27 @@ public class MemoryCache<K, V> extends AbstractMapBackedCustomTtlCache<K, V, Sim
 	}
 
 
-	public boolean isCopyOnRead() {
-
+	public boolean isCopyOnRead()
+	{
 		return this.copyOnRead;
 	}
 
 
-	public boolean isCopyOnWrite() {
-
+	public boolean isCopyOnWrite()
+	{
 		return this.copyOnWrite;
 	}
 
 
-	public MemoryCache<K, V> setCopyOnRead(boolean copyOnRead) {
-
+	public MemoryCache<K, V> setCopyOnRead(boolean copyOnRead)
+	{
 		this.copyOnRead = copyOnRead;
 		return this;
 	}
 
 
-	public MemoryCache<K, V> setCopyOnWrite(boolean copyOnWrite) {
-
+	public MemoryCache<K, V> setCopyOnWrite(boolean copyOnWrite)
+	{
 		this.copyOnWrite = copyOnWrite;
 		return this;
 	}

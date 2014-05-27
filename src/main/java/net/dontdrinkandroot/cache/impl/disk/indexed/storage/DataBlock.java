@@ -20,7 +20,8 @@ package net.dontdrinkandroot.cache.impl.disk.indexed.storage;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class DataBlock implements Comparable<DataBlock> {
+public class DataBlock implements Comparable<DataBlock>
+{
 
 	public static final long LENGTH = 8 + 8;
 
@@ -29,8 +30,8 @@ public class DataBlock implements Comparable<DataBlock> {
 	private final long endPosition;
 
 
-	public DataBlock(final long startPosition, final long endPosition) {
-
+	public DataBlock(final long startPosition, final long endPosition)
+	{
 		if (endPosition < startPosition) {
 			throw new IllegalArgumentException("endPosition < startPosition: " + endPosition + "," + startPosition);
 		}
@@ -41,8 +42,8 @@ public class DataBlock implements Comparable<DataBlock> {
 
 
 	@Override
-	public int compareTo(final DataBlock other) {
-
+	public int compareTo(final DataBlock other)
+	{
 		final long startResult = this.startPosition - other.startPosition;
 
 		if (startResult < 0) {
@@ -64,8 +65,8 @@ public class DataBlock implements Comparable<DataBlock> {
 
 
 	@Override
-	public int hashCode() {
-
+	public int hashCode()
+	{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (this.endPosition ^ this.endPosition >>> 32);
@@ -76,8 +77,8 @@ public class DataBlock implements Comparable<DataBlock> {
 
 
 	@Override
-	public boolean equals(final Object obj) {
-
+	public boolean equals(final Object obj)
+	{
 		if (this == obj) {
 			return true;
 		}
@@ -104,14 +105,14 @@ public class DataBlock implements Comparable<DataBlock> {
 
 
 	@Override
-	public String toString() {
-
+	public String toString()
+	{
 		return this.startPosition + ":" + this.endPosition + " (" + this.getLength() + ")";
 	}
 
 
-	public boolean overlaps(final DataBlock other) {
-
+	public boolean overlaps(final DataBlock other)
+	{
 		final boolean before = this.startPosition <= other.startPosition && other.startPosition <= this.endPosition;
 		final boolean after = other.endPosition <= this.startPosition && this.startPosition <= other.endPosition;
 
@@ -119,20 +120,20 @@ public class DataBlock implements Comparable<DataBlock> {
 	}
 
 
-	public long getLength() {
-
+	public long getLength()
+	{
 		return this.endPosition - this.startPosition + 1;
 	}
 
 
-	public long getStartPosition() {
-
+	public long getStartPosition()
+	{
 		return this.startPosition;
 	}
 
 
-	public long getEndPosition() {
-
+	public long getEndPosition()
+	{
 		return this.endPosition;
 	}
 }

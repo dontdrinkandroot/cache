@@ -23,7 +23,8 @@ package net.dontdrinkandroot.cache;
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public interface CustomTtlCache<K, V> extends Cache<K, V> {
+public interface CustomTtlCache<K, V> extends Cache<K, V>
+{
 
 	/**
 	 * Store an entry in the cache with a specific time to live. Any errors are swallowed, use

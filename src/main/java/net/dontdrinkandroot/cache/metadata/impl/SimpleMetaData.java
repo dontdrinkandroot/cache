@@ -24,7 +24,8 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class SimpleMetaData implements MetaData {
+public class SimpleMetaData implements MetaData
+{
 
 	public static final double DECAY_FACTOR = 0.9;
 
@@ -40,8 +41,8 @@ public class SimpleMetaData implements MetaData {
 	private int hitCount = 1;
 
 
-	public SimpleMetaData(final long timeToLive) {
-
+	public SimpleMetaData(final long timeToLive)
+	{
 		this.created = System.currentTimeMillis();
 		this.timeToLive = timeToLive;
 		this.lastAccess = System.currentTimeMillis();
@@ -49,8 +50,8 @@ public class SimpleMetaData implements MetaData {
 	}
 
 
-	public SimpleMetaData(long created, final long timeToLive) {
-
+	public SimpleMetaData(long created, final long timeToLive)
+	{
 		this.created = created;
 		this.timeToLive = timeToLive;
 		this.lastAccess = System.currentTimeMillis();
@@ -58,8 +59,8 @@ public class SimpleMetaData implements MetaData {
 	}
 
 
-	public SimpleMetaData(long created, final long timeToLive, long maxIdleTime) {
-
+	public SimpleMetaData(long created, final long timeToLive, long maxIdleTime)
+	{
 		this.created = created;
 		this.timeToLive = timeToLive;
 		this.lastAccess = System.currentTimeMillis();
@@ -68,58 +69,58 @@ public class SimpleMetaData implements MetaData {
 
 
 	@Override
-	public long getTimeToLive() {
-
+	public long getTimeToLive()
+	{
 		return this.timeToLive;
 	}
 
 
 	@Override
-	public final long getExpiry() {
-
+	public final long getExpiry()
+	{
 		return this.created + this.timeToLive;
 	}
 
 
 	@Override
-	public final void update() {
-
+	public final void update()
+	{
 		this.increaseHitCount();
 		this.lastAccess = System.currentTimeMillis();
 	}
 
 
 	@Override
-	public final long getLastAccess() {
-
+	public final long getLastAccess()
+	{
 		return this.lastAccess;
 	}
 
 
 	@Override
-	public final int getHitCount() {
-
+	public final int getHitCount()
+	{
 		return this.hitCount;
 	}
 
 
 	@Override
-	public boolean isExpired() {
-
+	public boolean isExpired()
+	{
 		return this.created + this.timeToLive < System.currentTimeMillis();
 	}
 
 
 	@Override
-	public long getCreated() {
-
+	public long getCreated()
+	{
 		return this.created;
 	}
 
 
 	@Override
-	public boolean isStale() {
-
+	public boolean isStale()
+	{
 		if (this.maxIdleTime == Cache.UNLIMITED_IDLE_TIME) {
 			return false;
 		}
@@ -129,21 +130,21 @@ public class SimpleMetaData implements MetaData {
 
 
 	@Override
-	public long getMaxIdleTime() {
-
+	public long getMaxIdleTime()
+	{
 		return this.maxIdleTime;
 	}
 
 
 	@Override
-	public void decay() {
-
+	public void decay()
+	{
 		this.hitCount = (int) Math.floor(this.hitCount * SimpleMetaData.DECAY_FACTOR);
 	}
 
 
-	public final void increaseHitCount() {
-
+	public final void increaseHitCount()
+	{
 		if (this.hitCount < Integer.MAX_VALUE) {
 			this.hitCount++;
 		}

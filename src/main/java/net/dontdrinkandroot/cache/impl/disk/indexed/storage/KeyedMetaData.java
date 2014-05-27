@@ -23,7 +23,8 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
 import net.dontdrinkandroot.cache.metadata.impl.SimpleMetaData;
 
 
-public class KeyedMetaData<K extends Serializable> implements Serializable {
+public class KeyedMetaData<K extends Serializable> implements Serializable
+{
 
 	private final K key;
 
@@ -34,8 +35,8 @@ public class KeyedMetaData<K extends Serializable> implements Serializable {
 	private final long timeToLive;
 
 
-	public KeyedMetaData(K key, MetaData metaData) {
-
+	public KeyedMetaData(K key, MetaData metaData)
+	{
 		this.key = key;
 		this.created = metaData.getCreated();
 		this.timeToLive = metaData.getTimeToLive();
@@ -43,26 +44,26 @@ public class KeyedMetaData<K extends Serializable> implements Serializable {
 	}
 
 
-	public K getKey() {
-
+	public K getKey()
+	{
 		return this.key;
 	}
 
 
-	public long getCreated() {
-
+	public long getCreated()
+	{
 		return this.created;
 	}
 
 
-	public long getMaxIdleTime() {
-
+	public long getMaxIdleTime()
+	{
 		return this.maxIdleTime;
 	}
 
 
-	public SimpleMetaData getMetaData() {
-
+	public SimpleMetaData getMetaData()
+	{
 		return new SimpleMetaData(this.created, this.timeToLive, this.maxIdleTime);
 	}
 

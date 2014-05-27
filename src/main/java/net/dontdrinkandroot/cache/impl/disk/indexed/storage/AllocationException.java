@@ -25,13 +25,14 @@ import java.io.IOException;
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class AllocationException extends IOException {
+public class AllocationException extends IOException
+{
 
 	private static final long serialVersionUID = -9135050081147191231L;
 
 
-	public AllocationException(final String msg) {
-
+	public AllocationException(final String msg)
+	{
 		super(msg);
 	}
 

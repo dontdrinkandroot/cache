@@ -40,29 +40,30 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlCacheTest {
+public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlCacheTest
+{
 
 	private File baseDir;
 
 
 	@Before
-	public void before() throws IOException {
-
+	public void before() throws IOException
+	{
 		this.baseDir = File.createTempFile("cachetest", null);
 		this.baseDir.delete();
 	}
 
 
 	@After
-	public void after() throws IOException {
-
+	public void after() throws IOException
+	{
 		FileUtils.deleteDirectory(this.baseDir);
 	}
 
 
 	@Test
-	public void testGetPutDelete() throws Exception {
-
+	public void testGetPutDelete() throws Exception
+	{
 		final AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
@@ -83,8 +84,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 	 * overridden.
 	 */
 	@Test
-	public void testSameFileSizeOnPut() throws IOException, CacheException {
-
+	public void testSameFileSizeOnPut() throws IOException, CacheException
+	{
 		final AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
@@ -111,8 +112,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	@Test
-	public void testInvalidGet() throws Exception {
-
+	public void testInvalidGet() throws Exception
+	{
 		final SerializableIndexedDiskCache cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
@@ -155,8 +156,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	@Test
-	public void testDuplicatePut() throws IOException, CacheException {
-
+	public void testDuplicatePut() throws IOException, CacheException
+	{
 		final SerializableIndexedDiskCache cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
@@ -187,8 +188,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	@Test
-	public void testLockFile() throws IOException {
-
+	public void testLockFile() throws IOException
+	{
 		new SerializableIndexedDiskCache(
 				"testCache",
 				Duration.minutes(1),
@@ -216,8 +217,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	@Test
-	public void testReReadIndex() throws IOException, CacheException {
-
+	public void testReReadIndex() throws IOException, CacheException
+	{
 		AbstractIndexedDiskCache<Serializable, Serializable> cache =
 				new SerializableIndexedDiskCache(
 						"testCache",
@@ -254,8 +255,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	@Test
-	public void runLoadTest() throws Throwable {
-
+	public void runLoadTest() throws Throwable
+	{
 		Assume.assumeNotNull(System.getProperty("cache.test.runloadtest"));
 		final File ramDiskDir = new File(System.getProperty("cache.test.ramdisk"));
 		Assume.assumeTrue(ramDiskDir.exists());
@@ -277,7 +278,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 			final SimulationRunner runner = new SimulationRunner() {
 
 				@Override
-				protected void loadTestPostIterationHook(final Cache<Serializable, Serializable> cache) {
+				protected void loadTestPostIterationHook(final Cache<Serializable, Serializable> cache)
+				{
 
 				}
 			};
@@ -322,8 +324,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	@Test
-	public void runKnownLoadTest() throws Throwable {
-
+	public void runKnownLoadTest() throws Throwable
+	{
 		// Logger.getRootLogger().setLevel(Level.INFO);
 
 		Assume.assumeNotNull(System.getProperty("cache.test.runloadtest"));
@@ -348,7 +350,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 			final SimulationRunner runner = new SimulationRunner() {
 
 				@Override
-				protected void knownTestpostIterationHook(final Cache<Serializable, Serializable> cache) {
+				protected void knownTestpostIterationHook(final Cache<Serializable, Serializable> cache)
+				{
 
 				}
 			};
@@ -404,8 +407,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	@Test
-	public void sameObjectMultipleTimes() throws IOException, CacheException {
-
+	public void sameObjectMultipleTimes() throws IOException, CacheException
+	{
 		SerializableIndexedDiskCache cache = null;
 		try {
 
@@ -441,8 +444,8 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	@Override
-	protected Serializable translateKey(int key) {
-
+	protected Serializable translateKey(int key)
+	{
 		final StringBuffer sb = new StringBuffer();
 		for (int i = -1; i < key % 100; i++) {
 			sb.append(Long.toString(key));

@@ -23,7 +23,8 @@ import net.dontdrinkandroot.cache.statistics.CacheStatistics;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class SimpleCacheStatistics implements CacheStatistics {
+public class SimpleCacheStatistics implements CacheStatistics
+{
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,8 +41,8 @@ public class SimpleCacheStatistics implements CacheStatistics {
 	private int currentSize = 0;
 
 
-	public SimpleCacheStatistics() {
-
+	public SimpleCacheStatistics()
+	{
 		this.cacheHits = 0;
 		this.cacheMissesNotFound = 0;
 		this.cacheMissesExpired = 0;
@@ -51,73 +52,73 @@ public class SimpleCacheStatistics implements CacheStatistics {
 
 
 	@Override
-	public long getCacheHits() {
-
+	public long getCacheHits()
+	{
 		return this.cacheHits;
 	}
 
 
-	public void setCacheHits(final long cacheHits) {
-
+	public void setCacheHits(final long cacheHits)
+	{
 		this.cacheHits = cacheHits;
 	}
 
 
 	@Override
-	public long getCacheMissesNotFound() {
-
+	public long getCacheMissesNotFound()
+	{
 		return this.cacheMissesNotFound;
 	}
 
 
-	public void setCacheMissesNotFound(final long cacheMissesNotFound) {
-
+	public void setCacheMissesNotFound(final long cacheMissesNotFound)
+	{
 		this.cacheMissesNotFound = cacheMissesNotFound;
 	}
 
 
 	@Override
-	public long getCacheMissesExpired() {
-
+	public long getCacheMissesExpired()
+	{
 		return this.cacheMissesExpired;
 	}
 
 
-	public void setCacheMissesExpired(final long cacheMissesExpired) {
-
+	public void setCacheMissesExpired(final long cacheMissesExpired)
+	{
 		this.cacheMissesExpired = cacheMissesExpired;
 	}
 
 
 	@Override
-	public long getPutCount() {
-
+	public long getPutCount()
+	{
 		return this.putCount;
 	}
 
 
-	public void setPutCount(final long putCount) {
-
+	public void setPutCount(final long putCount)
+	{
 		this.putCount = putCount;
 	}
 
 
 	@Override
-	public long getGetCount() {
-
+	public long getGetCount()
+	{
 		return this.getCount;
 	}
 
 
-	public void setGetCount(final long getCount) {
-
+	public void setGetCount(final long getCount)
+	{
 		this.getCount = getCount;
 	}
 
 
 	@Override
-	public void reset() {
-
+	public void reset()
+	{
 		this.cacheHits = 0;
 		this.cacheMissesNotFound = 0;
 		this.cacheMissesExpired = 0;
@@ -127,8 +128,8 @@ public class SimpleCacheStatistics implements CacheStatistics {
 
 
 	@Override
-	public float getHitRate() {
-
+	public float getHitRate()
+	{
 		final long cacheHits = this.getCacheHits();
 		final long cacheMisses = this.getCacheMisses();
 
@@ -142,58 +143,58 @@ public class SimpleCacheStatistics implements CacheStatistics {
 
 
 	@Override
-	public long getCacheMisses() {
-
+	public long getCacheMisses()
+	{
 		return this.cacheMissesExpired + this.cacheMissesNotFound;
 	}
 
 
 	@Override
-	public int getCurrentSize() {
-
+	public int getCurrentSize()
+	{
 		return this.currentSize;
 	}
 
 
-	public void setCurrentSize(final int currentSize) {
-
+	public void setCurrentSize(final int currentSize)
+	{
 		this.currentSize = currentSize;
 	}
 
 
-	public void increasePutCount() {
-
+	public void increasePutCount()
+	{
 		this.putCount++;
 	}
 
 
-	public void increaseGetCount() {
-
+	public void increaseGetCount()
+	{
 		this.getCount++;
 	}
 
 
-	public void increaseCacheMissesNotFound() {
-
+	public void increaseCacheMissesNotFound()
+	{
 		this.cacheMissesNotFound++;
 	}
 
 
-	public void increaseCacheMissesExpired() {
-
+	public void increaseCacheMissesExpired()
+	{
 		this.cacheMissesExpired++;
 	}
 
 
-	public void increaseCacheHits() {
-
+	public void increaseCacheHits()
+	{
 		this.cacheHits++;
 	}
 
 
 	@Override
-	public String toString() {
-
+	public String toString()
+	{
 		StringBuffer sb = new StringBuffer();
 		sb.append("hitRate: " + this.getHitRate());
 		sb.append(",size: " + this.getCurrentSize());

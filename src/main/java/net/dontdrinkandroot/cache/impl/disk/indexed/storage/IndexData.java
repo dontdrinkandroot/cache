@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 
-public class IndexData {
+public class IndexData
+{
 
 	public static final long LENGTH = 1 + 2 * DataBlock.LENGTH;
 
@@ -32,47 +33,47 @@ public class IndexData {
 	public DataBlock valueBlock;
 
 
-	public IndexData(int blockNum, DataBlock keyMetaBlock, DataBlock valueBlock) {
-
+	public IndexData(int blockNum, DataBlock keyMetaBlock, DataBlock valueBlock)
+	{
 		this.blockNum = blockNum;
 		this.keyMetaBlock = keyMetaBlock;
 		this.valueBlock = valueBlock;
 	}
 
 
-	public IndexData(DataBlock keyMetaBlock, DataBlock valueBlock) {
-
+	public IndexData(DataBlock keyMetaBlock, DataBlock valueBlock)
+	{
 		this.keyMetaBlock = keyMetaBlock;
 		this.valueBlock = valueBlock;
 	}
 
 
-	public int getBlockNum() {
-
+	public int getBlockNum()
+	{
 		return this.blockNum;
 	}
 
 
-	public void setBlockNum(int blockNum) {
-
+	public void setBlockNum(int blockNum)
+	{
 		this.blockNum = blockNum;
 	}
 
 
-	public DataBlock getKeyMetaBlock() {
-
+	public DataBlock getKeyMetaBlock()
+	{
 		return this.keyMetaBlock;
 	}
 
 
-	public DataBlock getValueBlock() {
-
+	public DataBlock getValueBlock()
+	{
 		return this.valueBlock;
 	}
 
 
-	public static IndexData read(RandomAccessFile randomAccessFile, int blockNum) throws IOException {
-
+	public static IndexData read(RandomAccessFile randomAccessFile, int blockNum) throws IOException
+	{
 		final long position = IndexData.LENGTH * blockNum;
 
 		randomAccessFile.seek(position);
@@ -91,8 +92,8 @@ public class IndexData {
 	}
 
 
-	public IndexData write(RandomAccessFile randomAccessFile, int blockNum) throws IOException {
-
+	public IndexData write(RandomAccessFile randomAccessFile, int blockNum) throws IOException
+	{
 		this.blockNum = blockNum;
 
 		final long position = IndexData.LENGTH * blockNum;

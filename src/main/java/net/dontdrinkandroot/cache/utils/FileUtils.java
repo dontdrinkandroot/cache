@@ -34,7 +34,8 @@ import java.util.List;
  * 
  * @author Apache Commons IO
  */
-public class FileUtils {
+public class FileUtils
+{
 
 	private static final char WINDOWS_SEPARATOR = '\\';
 
@@ -47,8 +48,8 @@ public class FileUtils {
 	private static final long FILE_COPY_BUFFER_SIZE = FileUtils.ONE_MB * 30;
 
 
-	public static void deleteDirectory(File directory) throws IOException {
-
+	public static void deleteDirectory(File directory) throws IOException
+	{
 		if (!directory.exists()) {
 			return;
 		}
@@ -64,8 +65,8 @@ public class FileUtils {
 	}
 
 
-	public static boolean isSymlink(File file) throws IOException {
-
+	public static boolean isSymlink(File file) throws IOException
+	{
 		if (file == null) {
 			throw new NullPointerException("File must not be null");
 		}
@@ -88,14 +89,14 @@ public class FileUtils {
 	}
 
 
-	public static boolean isSystemWindows() {
-
+	public static boolean isSystemWindows()
+	{
 		return FileUtils.SYSTEM_SEPARATOR == FileUtils.WINDOWS_SEPARATOR;
 	}
 
 
-	public static void cleanDirectory(File directory) throws IOException {
-
+	public static void cleanDirectory(File directory) throws IOException
+	{
 		if (!directory.exists()) {
 			String message = directory + " does not exist";
 			throw new IllegalArgumentException(message);
@@ -126,8 +127,8 @@ public class FileUtils {
 	}
 
 
-	public static void forceDelete(File file) throws IOException {
-
+	public static void forceDelete(File file) throws IOException
+	{
 		if (file.isDirectory()) {
 			FileUtils.deleteDirectory(file);
 		} else {
@@ -143,14 +144,14 @@ public class FileUtils {
 	}
 
 
-	public static void copyFile(File srcFile, File destFile) throws IOException {
-
+	public static void copyFile(File srcFile, File destFile) throws IOException
+	{
 		FileUtils.copyFile(srcFile, destFile, true);
 	}
 
 
-	public static void copyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException {
-
+	public static void copyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException
+	{
 		if (srcFile == null) {
 			throw new NullPointerException("Source must not be null");
 		}
@@ -179,8 +180,8 @@ public class FileUtils {
 	}
 
 
-	private static void doCopyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException {
-
+	private static void doCopyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException
+	{
 		if (destFile.exists() && destFile.isDirectory()) {
 			throw new IOException("Destination '" + destFile + "' exists but is a directory");
 		}
@@ -217,8 +218,8 @@ public class FileUtils {
 	}
 
 
-	public static void closeQuietly(Closeable closeable) {
-
+	public static void closeQuietly(Closeable closeable)
+	{
 		try {
 			if (closeable != null) {
 				closeable.close();
@@ -229,20 +230,20 @@ public class FileUtils {
 	}
 
 
-	public static File getTempDirectory() {
-
+	public static File getTempDirectory()
+	{
 		return new File(FileUtils.getTempDirectoryPath());
 	}
 
 
-	public static String getTempDirectoryPath() {
-
+	public static String getTempDirectoryPath()
+	{
 		return System.getProperty("java.io.tmpdir");
 	}
 
 
-	public static Collection<File> listFilesRecursive(File directory) {
-
+	public static Collection<File> listFilesRecursive(File directory)
+	{
 		List<File> files = new ArrayList<File>();
 
 		File[] listFiles = directory.listFiles();
@@ -258,8 +259,8 @@ public class FileUtils {
 	}
 
 
-	private static void listFilesRecursive(File directory, List<File> files) {
-
+	private static void listFilesRecursive(File directory, List<File> files)
+	{
 		File[] listFiles = directory.listFiles();
 		for (File listFile : listFiles) {
 			if (listFile.isDirectory()) {

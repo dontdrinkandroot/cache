@@ -17,7 +17,8 @@
  */
 package net.dontdrinkandroot.cache.utils;
 
-public class Duration {
+public class Duration
+{
 
 	public static final long SECONDS_PER_MINUTE = 60;
 
@@ -34,26 +35,26 @@ public class Duration {
 	public static final long MILLIS_PER_DAY = Duration.MILLIS_PER_HOUR * Duration.HOURS_PER_DAY;
 
 
-	public static long seconds(int seconds) {
-
+	public static long seconds(int seconds)
+	{
 		return Duration.MILLIS_PER_SECOND * seconds;
 	}
 
 
-	public static long minutes(int minutes) {
-
+	public static long minutes(int minutes)
+	{
 		return Duration.MILLIS_PER_MINUTE * minutes;
 	}
 
 
-	public static long hours(int hours) {
-
+	public static long hours(int hours)
+	{
 		return Duration.MILLIS_PER_HOUR * hours;
 	}
 
 
-	public static long days(int days) {
-
+	public static long days(int days)
+	{
 		return Duration.MILLIS_PER_DAY * days;
 	}
 

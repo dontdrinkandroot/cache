@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public abstract class AbstractCache<K, V> implements Cache<K, V> {
+public abstract class AbstractCache<K, V> implements Cache<K, V>
+{
 
 	private final String name;
 
@@ -43,14 +44,14 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 	private long defaultMaxIdleTime;
 
 
-	public AbstractCache(final String name, long defaultTimeToLive) {
-
+	public AbstractCache(final String name, long defaultTimeToLive)
+	{
 		this(name, defaultTimeToLive, Cache.UNLIMITED_IDLE_TIME);
 	}
 
 
-	public AbstractCache(final String name, long defaultTimeToLive, long defaultMaxIdleTime) {
-
+	public AbstractCache(final String name, long defaultTimeToLive, long defaultMaxIdleTime)
+	{
 		this.name = name;
 		this.defaultTimeToLive = defaultTimeToLive;
 		this.defaultMaxIdleTime = defaultMaxIdleTime;
@@ -58,47 +59,47 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
 
 	@Override
-	public final String getName() {
-
+	public final String getName()
+	{
 		return this.name;
 	}
 
 
 	@Override
-	public final long getDefaultTtl() {
-
+	public final long getDefaultTtl()
+	{
 		return this.defaultTimeToLive;
 	}
 
 
 	@Override
-	public final long getDefaultMaxIdleTime() {
-
+	public final long getDefaultMaxIdleTime()
+	{
 		return this.defaultMaxIdleTime;
 	}
 
 
-	public final Logger getLogger() {
-
+	public final Logger getLogger()
+	{
 		return this.logger;
 	}
 
 
-	public final Logger getCleanUpLogger() {
-
+	public final Logger getCleanUpLogger()
+	{
 		return this.cleanUpLogger;
 	}
 
 
 	@Override
-	public final void setDefaultTtl(final long defaultTTL) {
-
+	public final void setDefaultTtl(final long defaultTTL)
+	{
 		this.defaultTimeToLive = defaultTTL;
 	}
 
 
-	public final void setDefaultMaxIdleTime(long defaultMaxIdleTime) {
-
+	public final void setDefaultMaxIdleTime(long defaultMaxIdleTime)
+	{
 		this.defaultMaxIdleTime = defaultMaxIdleTime;
 	}
 

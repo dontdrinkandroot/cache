@@ -22,7 +22,8 @@ package net.dontdrinkandroot.cache;
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public interface BufferedRecyclingCache<K, V> extends RecyclingCache<K, V> {
+public interface BufferedRecyclingCache<K, V> extends RecyclingCache<K, V>
+{
 
 	int getBufferSize();
 

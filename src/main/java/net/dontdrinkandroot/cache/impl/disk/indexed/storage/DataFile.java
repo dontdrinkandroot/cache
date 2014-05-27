@@ -31,7 +31,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class DataFile {
+public class DataFile
+{
 
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -46,24 +47,24 @@ public class DataFile {
 	protected File file;
 
 
-	public DataFile(final File file) throws FileNotFoundException {
-
+	public DataFile(final File file) throws FileNotFoundException
+	{
 		this.file = file;
 		this.randomAccessFile = new RandomAccessFile(file, "rw");
 		this.usedBlocks = new TreeSet<DataBlock>();
 	}
 
 
-	public synchronized void allocateSpace(final DataBlock dataBlock) throws AllocationException {
-
+	public synchronized void allocateSpace(final DataBlock dataBlock) throws AllocationException
+	{
 		this.checkIfNotExists(dataBlock);
 		this.logger.debug("Allocating {}", dataBlock.toString());
 		this.addBlock(dataBlock);
 	}
 
 
-	public synchronized boolean checkConsistency() {
-
+	public synchronized boolean checkConsistency()
+	{
 		if (this.usedBlocks.isEmpty()) {
 			return true;
 		}
@@ -86,14 +87,14 @@ public class DataFile {
 	/**
 	 * Closes the underlying random access file.
 	 */
-	public synchronized void close() throws IOException {
-
+	public synchronized void close() throws IOException
+	{
 		this.randomAccessFile.close();
 	}
 
 
-	public synchronized void delete(final DataBlock dataBlock, boolean truncate) {
-
+	public synchronized void delete(final DataBlock dataBlock, boolean truncate)
+	{
 		this.checkIfExists(dataBlock);
 		this.logger.debug("Releasing {}", dataBlock.toString());
 
@@ -126,14 +127,14 @@ public class DataFile {
 	}
 
 
-	public synchronized int getNumAllocated() {
-
+	public synchronized int getNumAllocated()
+	{
 		return this.usedBlocks.size();
 	}
 
 
-	public String getFileName() {
-
+	public String getFileName()
+	{
 		return this.file.getPath();
 	}
 
@@ -143,14 +144,14 @@ public class DataFile {
 	 * 
 	 * @throws IOException
 	 */
-	public synchronized long length() throws IOException {
-
+	public synchronized long length() throws IOException
+	{
 		return this.randomAccessFile.length();
 	}
 
 
-	public synchronized byte[] read(final DataBlock dataBlock) throws IOException {
-
+	public synchronized byte[] read(final DataBlock dataBlock) throws IOException
+	{
 		this.checkIfExists(dataBlock);
 
 		this.randomAccessFile.seek(dataBlock.getStartPosition());
@@ -161,8 +162,8 @@ public class DataFile {
 	}
 
 
-	public synchronized DataBlock write(final byte[] data) throws IOException {
-
+	public synchronized DataBlock write(final byte[] data) throws IOException
+	{
 		if (data.length <= 0) {
 			throw new IllegalArgumentException("Cannot write data with length smaller equals 0 (was "
 					+ data.length
@@ -177,8 +178,8 @@ public class DataFile {
 	}
 
 
-	private void addBlock(final DataBlock dataBlock) {
-
+	private void addBlock(final DataBlock dataBlock)
+	{
 		if (this.lastBlock == null) {
 
 			this.lastBlock = dataBlock;
@@ -195,8 +196,8 @@ public class DataFile {
 	}
 
 
-	private DataBlock allocateSpace(final long length) throws AllocationException {
-
+	private DataBlock allocateSpace(final long length) throws AllocationException
+	{
 		/* Remember start and end position for new used space */
 		long foundFreeStartPosition = 0;
 		long foundFreeEndPosition = 0;
@@ -233,24 +234,24 @@ public class DataFile {
 	}
 
 
-	private void checkIfExists(final DataBlock dataBlock) {
-
+	private void checkIfExists(final DataBlock dataBlock)
+	{
 		if (!this.usedBlocks.contains(dataBlock)) {
 			throw new RuntimeException("Data Block not found : " + dataBlock);
 		}
 	}
 
 
-	private void checkIfNotExists(final DataBlock dataBlock) throws AllocationException {
-
+	private void checkIfNotExists(final DataBlock dataBlock) throws AllocationException
+	{
 		if (this.usedBlocks.contains(dataBlock)) {
 			throw new AllocationException("Trying to allocate copy of " + dataBlock);
 		}
 	}
 
 
-	private DataBlock findLastBlock() {
-
+	private DataBlock findLastBlock()
+	{
 		final Iterator<DataBlock> iterator = this.usedBlocks.iterator();
 		DataBlock last = null;
 		while (iterator.hasNext()) {

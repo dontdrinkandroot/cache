@@ -40,7 +40,8 @@ import net.dontdrinkandroot.cache.utils.Duration;
  * @author Philip W. Sorst <philip@sorst.net>
  */
 public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends AbstractCache<K, V>
-		implements Cache<K, V> {
+		implements Cache<K, V>
+{
 
 	/** Statistics for this cache (e.g hit rate) */
 	private final SimpleCacheStatistics statistics;
@@ -72,8 +73,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			final String name,
 			final long defaultTimeToLive,
 			final int maxSize,
-			final int recycleSize) {
-
+			final int recycleSize)
+	{
 		this(name, defaultTimeToLive, Cache.UNLIMITED_IDLE_TIME, maxSize, recycleSize);
 	}
 
@@ -95,8 +96,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			final long defaultTimeToLive,
 			long defaultMaxIdleTime,
 			final int maxSize,
-			final int recycleSize) {
-
+			final int recycleSize)
+	{
 		super(name, defaultTimeToLive, defaultMaxIdleTime);
 
 		this.entriesMetaDataMap = new HashMap<K, M>();
@@ -108,27 +109,27 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public synchronized <T extends V> T put(K key, T data) {
-
+	public synchronized <T extends V> T put(K key, T data)
+	{
 		try {
 
 			return this.putWithErrors(key, data);
 
 		} catch (CacheException e) {
-			this.getLogger().warn("Putting " + key + " to cache failed", e);
+			this.getLogger().warn(this.getName() + ": Putting " + key + " to cache failed", e);
 			return data;
 		}
 	}
 
 
 	@Override
-	public final synchronized <T extends V> T putWithErrors(final K key, final T data) throws CacheException {
-
+	public final synchronized <T extends V> T putWithErrors(final K key, final T data) throws CacheException
+	{
 		if (key == null) {
 			throw new CacheException("Key must not be null");
 		}
 
-		this.getLogger().trace("Putting '{}' to cache", key);
+		this.getLogger().trace(this.getName() + ": Putting '{}' to cache", key);
 
 		/*
 		 * If key is already known, delete old entry before inserting new one (instead of
@@ -152,8 +153,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public final synchronized void delete(final K key) throws CacheException {
-
+	public final synchronized void delete(final K key) throws CacheException
+	{
 		final M metaData = this.entriesMetaDataMap.get(key);
 
 		if (metaData != null) {
@@ -163,8 +164,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public final synchronized void expunge() throws CacheException {
-
+	public final synchronized void expunge() throws CacheException
+	{
 		Set<Entry<K, M>> entrySet = this.entriesMetaDataMap.entrySet();
 
 		List<Entry<K, M>> toExpunge = new ArrayList<Entry<K, M>>();
@@ -202,8 +203,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public synchronized void cleanUp() throws CacheException {
-
+	public synchronized void cleanUp() throws CacheException
+	{
 		Iterator<Entry<K, M>> entriesIterator = this.entriesMetaDataMap.entrySet().iterator();
 		long numExpired = 0;
 		long numStale = 0;
@@ -225,10 +226,9 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			}
 		}
 
-		this.getLogger().info("{}: Cleaned up {} expired and {} stale entries", this.getName(), numExpired, numStale);
+		this.getLogger().info(this.getName() + ": Cleaned up {} expired and {} stale entries", numExpired, numStale);
 		this.getCleanUpLogger().info(
-				"{}: Cleaned up {} expired and {} stale entries",
-				this.getName(),
+				this.getName() + ": Cleaned up {} expired and {} stale entries",
 				numExpired,
 				numStale);
 
@@ -237,8 +237,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public synchronized MetaData getMetaData(K key) throws CacheException {
-
+	public synchronized MetaData getMetaData(K key) throws CacheException
+	{
 		final M metaData = this.entriesMetaDataMap.get(key);
 
 		/* Not found */
@@ -260,22 +260,22 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public synchronized <T extends V> T get(K key) {
-
+	public synchronized <T extends V> T get(K key)
+	{
 		try {
 
 			return this.getWithErrors(key);
 
 		} catch (CacheException e) {
-			this.getLogger().error("Getting " + key + " from cache failed", e);
+			this.getLogger().error(this.getName() + ": Getting " + key + " from cache failed", e);
 			return null;
 		}
 	}
 
 
 	@Override
-	public final synchronized <T extends V> T getWithErrors(final K key) throws CacheException {
-
+	public final synchronized <T extends V> T getWithErrors(final K key) throws CacheException
+	{
 		if (this.lastCleanUp + this.cleanUpInterval < System.currentTimeMillis()) {
 			this.cleanUp();
 		}
@@ -287,7 +287,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			/* Entry not found: cache miss */
 			this.statistics.increaseCacheMissesNotFound();
 			this.statistics.increaseGetCount();
-			this.getLogger().trace("Cache Miss for '{}'", key);
+			this.getLogger().trace(this.getName() + ": Cache Miss for '{}'", key);
 
 			return null;
 		}
@@ -297,7 +297,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 			/* Entry expired: cache miss expired */
 			this.statistics.increaseCacheMissesExpired();
 			this.statistics.increaseGetCount();
-			this.getLogger().trace("Cache Miss expired '{}'", key);
+			this.getLogger().trace(this.getName() + ": Cache Miss expired '{}'", key);
 
 			this.delete(key, metaData);
 
@@ -311,7 +311,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 			this.statistics.increaseCacheHits();
 			this.statistics.increaseGetCount();
-			this.getLogger().trace("Cache Hit for '{}'", key);
+			this.getLogger().trace(this.getName() + ": Cache Hit for '{}'", key);
 
 			metaData.update();
 
@@ -327,63 +327,63 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	@Override
-	public synchronized SimpleCacheStatistics getStatistics() {
-
+	public synchronized SimpleCacheStatistics getStatistics()
+	{
 		this.statistics.setCurrentSize(this.entriesMetaDataMap.size());
 		return this.statistics;
 	}
 
 
-	public MetaDataComparator<K, M> getComparator() {
-
+	public MetaDataComparator<K, M> getComparator()
+	{
 		return this.comparator;
 	}
 
 
-	public int getMaxSize() {
-
+	public int getMaxSize()
+	{
 		return this.maxSize;
 	}
 
 
-	public void setMaxSize(int maxSize) {
-
+	public void setMaxSize(int maxSize)
+	{
 		this.maxSize = maxSize;
 	}
 
 
-	public int getRecycleSize() {
-
+	public int getRecycleSize()
+	{
 		return this.recycleSize;
 	}
 
 
-	public void setRecycleSize(int recycleSize) {
-
+	public void setRecycleSize(int recycleSize)
+	{
 		this.recycleSize = recycleSize;
 	}
 
 
-	public long getCleanUpInterval() {
-
+	public long getCleanUpInterval()
+	{
 		return this.cleanUpInterval;
 	}
 
 
-	public void setCleanUpInterval(long cleanUpInterval) {
-
+	public void setCleanUpInterval(long cleanUpInterval)
+	{
 		this.cleanUpInterval = cleanUpInterval;
 	}
 
 
-	protected void putEntry(K key, M metaData) {
-
+	protected void putEntry(K key, M metaData)
+	{
 		this.entriesMetaDataMap.put(key, metaData);
 	}
 
 
-	protected M getEntry(K key) {
-
+	protected M getEntry(K key)
+	{
 		return this.entriesMetaDataMap.get(key);
 	}
 
@@ -397,19 +397,19 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	 * @throws CacheException
 	 *             Thrown on any errors encountered.
 	 */
-	protected void expunge(final Collection<Entry<K, M>> expungeEntriesMetaData) throws CacheException {
-
+	protected void expunge(final Collection<Entry<K, M>> expungeEntriesMetaData) throws CacheException
+	{
 		for (final Entry<K, M> metaData : expungeEntriesMetaData) {
 			this.delete(metaData.getKey(), metaData.getValue());
 		}
 
-		this.getLogger().info("{}: Expunged {} entries", this.getName(), expungeEntriesMetaData.size());
-		this.getCleanUpLogger().info("{}: Expunged {} entries", this.getName(), expungeEntriesMetaData.size());
+		this.getLogger().info(this.getName() + ": Expunged {} entries", expungeEntriesMetaData.size());
+		this.getCleanUpLogger().info(this.getName() + ": Expunged {} entries", expungeEntriesMetaData.size());
 	}
 
 
-	public synchronized void delete(K key, M metaData) throws CacheException {
-
+	public synchronized void delete(K key, M metaData) throws CacheException
+	{
 		this.doDelete(key, metaData);
 
 		this.entriesMetaDataMap.remove(key);
@@ -422,14 +422,14 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	 * 
 	 * @return a copy of the List of all metadata entries.
 	 */
-	public synchronized List<M> getEntriesMetaData() {
-
+	public synchronized List<M> getEntriesMetaData()
+	{
 		return new ArrayList<M>(this.entriesMetaDataMap.values());
 	}
 
 
-	protected boolean triggerExpunge() {
-
+	protected boolean triggerExpunge()
+	{
 		return this.entriesMetaDataMap.size() >= this.maxSize + this.recycleSize;
 	}
 

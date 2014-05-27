@@ -22,7 +22,8 @@ package net.dontdrinkandroot.cache;
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public interface RecyclingCache<K, V> extends Cache<K, V> {
+public interface RecyclingCache<K, V> extends Cache<K, V>
+{
 
 	int getMaxSize();
 

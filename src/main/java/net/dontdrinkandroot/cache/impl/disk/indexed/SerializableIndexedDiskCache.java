@@ -29,15 +29,16 @@ import net.dontdrinkandroot.cache.utils.Serializer;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Serializable, Serializable> {
+public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Serializable, Serializable>
+{
 
 	public SerializableIndexedDiskCache(
 			final String name,
 			final long defaultTimeToLive,
 			final int maxSize,
 			final int recycleSize,
-			final File baseDir) throws IOException {
-
+			final File baseDir) throws IOException
+	{
 		super(name, defaultTimeToLive, maxSize, recycleSize, baseDir);
 	}
 
@@ -48,15 +49,15 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 			final long defaultMaxIdleTime,
 			final int maxSize,
 			final int recycleSize,
-			final File baseDir) throws IOException {
-
+			final File baseDir) throws IOException
+	{
 		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
 	}
 
 
 	@Override
-	public <T extends Serializable> byte[] dataToBytes(final T data) throws CacheException {
-
+	public <T extends Serializable> byte[] dataToBytes(final T data) throws CacheException
+	{
 		try {
 
 			return Serializer.serialize(data);
@@ -69,8 +70,8 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Serializable> T dataFromBytes(final byte[] dataBytes) throws CacheException {
-
+	public <T extends Serializable> T dataFromBytes(final byte[] dataBytes) throws CacheException
+	{
 		try {
 
 			return (T) Serializer.deserialize(dataBytes);
@@ -81,14 +82,14 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
 	}
 
 
-	public int getIndexFileNumAllocatedBlocks() {
-
+	public int getIndexFileNumAllocatedBlocks()
+	{
 		return this.indexFile.getNumAllocated();
 	}
 
 
-	public int getDataFileNumAllocatedBlocks() {
-
+	public int getDataFileNumAllocatedBlocks()
+	{
 		return this.dataFile.getNumAllocated();
 	}
 

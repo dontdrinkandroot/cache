@@ -29,11 +29,12 @@ import net.dontdrinkandroot.cache.utils.ObjectUtils;
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class LfuComparator<K, M extends MetaData> implements MetaDataComparator<K, M> {
+public class LfuComparator<K, M extends MetaData> implements MetaDataComparator<K, M>
+{
 
 	@Override
-	public int compare(Entry<K, M> entry1, Entry<K, M> entry2) {
-
+	public int compare(Entry<K, M> entry1, Entry<K, M> entry2)
+	{
 		MetaData meta1 = entry1.getValue();
 		MetaData meta2 = entry2.getValue();
 

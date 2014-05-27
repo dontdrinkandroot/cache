@@ -34,7 +34,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class IndexFile {
+public class IndexFile
+{
 
 	public static float GOLDEN_RATIO = 1.61803399f;
 
@@ -47,8 +48,8 @@ public class IndexFile {
 	private int numAllocated = 0;
 
 
-	public IndexFile(final File file) throws FileNotFoundException {
-
+	public IndexFile(final File file) throws FileNotFoundException
+	{
 		this.randomAccessFile = new RandomAccessFile(file, "rw");
 
 		this.blockMap = new boolean[2];
@@ -60,14 +61,14 @@ public class IndexFile {
 	/**
 	 * Closes the underlying random access file.
 	 */
-	public synchronized void close() throws IOException {
-
+	public synchronized void close() throws IOException
+	{
 		this.randomAccessFile.close();
 	}
 
 
-	RandomAccessFile getRandomAccessFile() {
-
+	RandomAccessFile getRandomAccessFile()
+	{
 		return this.randomAccessFile;
 	}
 
@@ -75,8 +76,8 @@ public class IndexFile {
 	/**
 	 * Deletes the block of the given metaData.
 	 */
-	public synchronized void delete(IndexData indexData) throws IOException {
-
+	public synchronized void delete(IndexData indexData) throws IOException
+	{
 		this.delete(indexData.getBlockNum());
 	}
 
@@ -84,8 +85,8 @@ public class IndexFile {
 	/**
 	 * Deletes the given block.
 	 */
-	public synchronized void delete(final int blockNum) throws IOException {
-
+	public synchronized void delete(final int blockNum) throws IOException
+	{
 		/* Seek to the block, invalidate by writing 0 and deallocate block */
 		this.randomAccessFile.seek(blockNum * IndexData.LENGTH);
 		this.randomAccessFile.writeBoolean(false);
@@ -98,14 +99,14 @@ public class IndexFile {
 	/**
 	 * Gets the number of allocated blocks.
 	 */
-	public synchronized int getNumAllocated() {
-
+	public synchronized int getNumAllocated()
+	{
 		return this.numAllocated;
 	}
 
 
-	public synchronized Collection<IndexData> initialize() throws IOException {
-
+	public synchronized Collection<IndexData> initialize() throws IOException
+	{
 		List<IndexData> entries = new ArrayList<IndexData>();
 
 		final int numBlocks = this.getNumPossibleBlocks(this.randomAccessFile.length());
@@ -135,14 +136,14 @@ public class IndexFile {
 	/**
 	 * Returns the length of the underlying random access file.
 	 */
-	public long length() throws IOException {
-
+	public long length() throws IOException
+	{
 		return this.randomAccessFile.length();
 	}
 
 
-	public IndexData write(IndexData indexData) throws IOException {
-
+	public IndexData write(IndexData indexData) throws IOException
+	{
 		final int blockNum = this.allocateBlock();
 		return indexData.write(this.randomAccessFile, blockNum);
 	}
@@ -151,8 +152,8 @@ public class IndexFile {
 	/**
 	 * Find the first free block and allocate or allocate at end.
 	 */
-	private int allocateBlock() throws AllocationException {
-
+	private int allocateBlock() throws AllocationException
+	{
 		for (int currentBlockNum = 0; currentBlockNum < this.blockMap.length; currentBlockNum++) {
 
 			if (!this.blockMap[currentBlockNum]) {
@@ -165,8 +166,8 @@ public class IndexFile {
 	}
 
 
-	private int allocateBlock(final int blockNum) throws AllocationException {
-
+	private int allocateBlock(final int blockNum) throws AllocationException
+	{
 		/* Enlarge available blocks if needed */
 		if (blockNum > this.blockMap.length - 1) {
 			this.enlargeBlockMap(blockNum);
@@ -186,15 +187,15 @@ public class IndexFile {
 	}
 
 
-	private void enlargeBlockMap(final int neededBlockNum) {
-
+	private void enlargeBlockMap(final int neededBlockNum)
+	{
 		final int newLength = Math.max(neededBlockNum + 1, (int) (this.blockMap.length * IndexFile.GOLDEN_RATIO));
 		this.blockMap = Arrays.copyOf(this.blockMap, newLength);
 	}
 
 
-	private int getNumPossibleBlocks(final long length) {
-
+	private int getNumPossibleBlocks(final long length)
+	{
 		int numRequiredBlocks = (int) (length / IndexData.LENGTH);
 		if (length % IndexData.LENGTH > 0) {
 			numRequiredBlocks++;

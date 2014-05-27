@@ -27,15 +27,16 @@ import net.dontdrinkandroot.cache.CacheException;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class ByteArrayIndexedDiskCache extends AbstractIndexedDiskCache<Serializable, byte[]> {
+public class ByteArrayIndexedDiskCache extends AbstractIndexedDiskCache<Serializable, byte[]>
+{
 
 	public ByteArrayIndexedDiskCache(
 			final String name,
 			final long defaultTimeToLive,
 			final int maxSize,
 			final int recycleSize,
-			final File baseDir) throws IOException {
-
+			final File baseDir) throws IOException
+	{
 		super(name, defaultTimeToLive, maxSize, recycleSize, baseDir);
 	}
 
@@ -46,43 +47,41 @@ public class ByteArrayIndexedDiskCache extends AbstractIndexedDiskCache<Serializ
 			final long defaultMaxIdleTime,
 			final int maxSize,
 			final int recycleSize,
-			final File baseDir) throws IOException {
-
+			final File baseDir) throws IOException
+	{
 		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
 	}
 
 
 	@Override
-	public byte[] dataToBytes(final byte[] data) throws CacheException {
-
+	public byte[] dataToBytes(final byte[] data) throws CacheException
+	{
 		return data;
 	}
 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public byte[] dataFromBytes(final byte[] data) throws CacheException {
-
+	public byte[] dataFromBytes(final byte[] data) throws CacheException
+	{
 		return data;
 	}
 
 
-	public int getMetaFileNumAllocatedBlocks() {
-
+	public int getMetaFileNumAllocatedBlocks()
+	{
 		return this.indexFile.getNumAllocated();
-
 	}
 
 
-	public int getDataFileNumAllocatedBlocks() {
-
+	public int getDataFileNumAllocatedBlocks()
+	{
 		return this.dataFile.getNumAllocated();
-
 	}
 
 
-	public synchronized boolean assertAllocatedConsistency() {
-
+	public synchronized boolean assertAllocatedConsistency()
+	{
 		return this.indexFile.getNumAllocated() == this.getEntriesMetaData().size()
 				&& this.dataFile.getNumAllocated() == this.getEntriesMetaData().size();
 	}

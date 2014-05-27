@@ -26,7 +26,8 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
  * @author Philip W. Sorst <philip@sorst.net>
  */
 public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> extends AbstractMapBackedCache<K, V, M>
-		implements CustomTtlCache<K, V> {
+		implements CustomTtlCache<K, V>
+{
 
 	/**
 	 * Construct a new AbstractCustomTtlCache.
@@ -36,8 +37,8 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 	 * @param defaultTimeToLive
 	 *            The default Time to Live for Cache entries.
 	 */
-	public AbstractMapBackedCustomTtlCache(final String name, final long defaultTimeToLive, int maxSize, int recycleSize) {
-
+	public AbstractMapBackedCustomTtlCache(final String name, final long defaultTimeToLive, int maxSize, int recycleSize)
+	{
 		super(name, defaultTimeToLive, maxSize, recycleSize);
 	}
 
@@ -55,15 +56,15 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 			final long defaultTimeToLive,
 			final long defaultMaxIdleTime,
 			int maxSize,
-			int recycleSize) {
-
+			int recycleSize)
+	{
 		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
 	}
 
 
 	@Override
-	public <T extends V> T put(K key, T data, long timeToLive) {
-
+	public <T extends V> T put(K key, T data, long timeToLive)
+	{
 		try {
 			return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
 		} catch (CacheException e) {
@@ -74,8 +75,8 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 
 	@Override
-	public synchronized <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime) {
-
+	public synchronized <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime)
+	{
 		try {
 			return this.putWithErrors(key, data, timeToLive, maxIdleTime);
 		} catch (CacheException e) {
@@ -90,8 +91,8 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 			final K key,
 			final T data,
 			final long timeToLive,
-			final long maxIdleTime) throws CacheException {
-
+			final long maxIdleTime) throws CacheException
+	{
 		if (key == null) {
 			throw new CacheException("Key must not be null");
 		}
@@ -119,15 +120,15 @@ public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> 
 
 	@Override
 	public final synchronized <T extends V> T putWithErrors(final K key, final T data, final long timeToLive)
-			throws CacheException {
-
+			throws CacheException
+	{
 		return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
 	}
 
 
 	@Override
-	protected <T extends V> T doPut(final K key, final T data) throws CacheException {
-
+	protected <T extends V> T doPut(final K key, final T data) throws CacheException
+	{
 		return this.doPut(key, data, this.getDefaultTtl(), this.getDefaultMaxIdleTime());
 	};
 

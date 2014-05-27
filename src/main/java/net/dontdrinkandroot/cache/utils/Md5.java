@@ -26,7 +26,8 @@ import java.util.Arrays;
 /**
  * @author Philip W. Sorst <philip@sorst.net>
  */
-public class Md5 {
+public class Md5
+{
 
 	private static final char[] HEX_DIGITS_LOWER = {
 			'0',
@@ -49,39 +50,39 @@ public class Md5 {
 	private final byte[] md5Bytes;
 
 
-	public Md5(final String s) {
-
+	public Md5(final String s)
+	{
 		this.md5Bytes = this.md5(s);
 	}
 
 
-	public Md5(final byte[] md5Bytes) {
-
+	public Md5(final byte[] md5Bytes)
+	{
 		this.md5Bytes = md5Bytes;
 	}
 
 
-	public static Md5 fromMd5Hex(final String md5Hex) throws Md5Exception {
-
+	public static Md5 fromMd5Hex(final String md5Hex) throws Md5Exception
+	{
 		final Md5 md5 = new Md5(Md5.decodeHex(md5Hex.toCharArray()));
 		return md5;
 	}
 
 
-	public byte[] getBytes() {
-
+	public byte[] getBytes()
+	{
 		return this.md5Bytes;
 	}
 
 
-	public String getHex() {
-
+	public String getHex()
+	{
 		return new String(Md5.encodeHex(this.md5Bytes));
 	}
 
 
-	private byte[] md5(String data) {
-
+	private byte[] md5(String data)
+	{
 		try {
 			return this.getMd5Digest().digest(data.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
@@ -91,8 +92,8 @@ public class Md5 {
 	}
 
 
-	private MessageDigest getMd5Digest() {
-
+	private MessageDigest getMd5Digest()
+	{
 		try {
 			return MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
@@ -102,8 +103,8 @@ public class Md5 {
 	}
 
 
-	public static char[] encodeHex(byte[] data) {
-
+	public static char[] encodeHex(byte[] data)
+	{
 		int l = data.length;
 		char[] out = new char[l << 1];
 		/* two characters form the hex value. */
@@ -115,8 +116,8 @@ public class Md5 {
 	}
 
 
-	public static byte[] decodeHex(char[] data) throws Md5Exception {
-
+	public static byte[] decodeHex(char[] data) throws Md5Exception
+	{
 		int len = data.length;
 
 		if ((len & 0x01) != 0) {
@@ -138,8 +139,8 @@ public class Md5 {
 	}
 
 
-	private static int toDigit(char ch, int index) {
-
+	private static int toDigit(char ch, int index)
+	{
 		int digit = Character.digit(ch, 16);
 		if (digit == -1) {
 			throw new IllegalArgumentException("Illegal hexadecimal character " + ch + " at index " + index);
@@ -149,8 +150,8 @@ public class Md5 {
 
 
 	@Override
-	public int hashCode() {
-
+	public int hashCode()
+	{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Arrays.hashCode(this.md5Bytes);
@@ -160,8 +161,8 @@ public class Md5 {
 
 
 	@Override
-	public boolean equals(final Object obj) {
-
+	public boolean equals(final Object obj)
+	{
 		if (this == obj) {
 			return true;
 		}
