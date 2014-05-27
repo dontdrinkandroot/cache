@@ -27,7 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class SimulationRunner {
+public class SimulationRunner
+{
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -36,8 +37,8 @@ public class SimulationRunner {
 			final Cache<Serializable, Serializable> cache,
 			final int numThreads,
 			final int iterations,
-			final double alpha) throws Throwable {
-
+			final double alpha) throws Throwable
+	{
 		final Set<LoadTestThread> threads = new HashSet<LoadTestThread>();
 
 		for (int threadNumber = 0; threadNumber < numThreads; threadNumber++) {
@@ -55,8 +56,8 @@ public class SimulationRunner {
 	}
 
 
-	protected void loadTestPostIterationHook(final Cache<Serializable, Serializable> cache) {
-
+	protected void loadTestPostIterationHook(final Cache<Serializable, Serializable> cache)
+	{
 	}
 
 
@@ -65,8 +66,8 @@ public class SimulationRunner {
 			final int numThreads,
 			final int iterations,
 			final double alpha,
-			final Set<Long> known) throws Throwable {
-
+			final Set<Long> known) throws Throwable
+	{
 		final Set<Long> synchronizedKnown = Collections.synchronizedSet(known);
 
 		final Set<KnownTestThread> threads = new HashSet<KnownTestThread>();
@@ -89,13 +90,13 @@ public class SimulationRunner {
 	}
 
 
-	protected void knownTestpostIterationHook(final Cache<Serializable, Serializable> cache) {
-
+	protected void knownTestpostIterationHook(final Cache<Serializable, Serializable> cache)
+	{
 	}
 
 
-	private String longToKey(final long l) {
-
+	private String longToKey(final long l)
+	{
 		return Long.toString(l);
 
 		// final StringBuffer s = new StringBuffer();
@@ -110,7 +111,8 @@ public class SimulationRunner {
 	}
 
 
-	class LoadTestThread extends Thread {
+	class LoadTestThread extends Thread
+	{
 
 		private final int num;
 
@@ -123,8 +125,8 @@ public class SimulationRunner {
 		private Throwable t;
 
 
-		public LoadTestThread(int num, Cache<Serializable, Serializable> cache, int iterations, double alpha) {
-
+		public LoadTestThread(int num, Cache<Serializable, Serializable> cache, int iterations, double alpha)
+		{
 			this.num = num;
 			this.cache = cache;
 			this.iterations = iterations;
@@ -132,15 +134,15 @@ public class SimulationRunner {
 		}
 
 
-		Throwable getError() {
-
+		Throwable getError()
+		{
 			return this.t;
 		}
 
 
 		@Override
-		public void run() {
-
+		public void run()
+		{
 			try {
 
 				for (int i = 0; i < this.iterations; i++) {
@@ -177,7 +179,8 @@ public class SimulationRunner {
 		}
 	}
 
-	class KnownTestThread extends Thread {
+	class KnownTestThread extends Thread
+	{
 
 		private final int iterations;
 
@@ -197,8 +200,8 @@ public class SimulationRunner {
 				Cache<Serializable, Serializable> cache,
 				int iterations,
 				double alpha,
-				Set<Long> known) {
-
+				Set<Long> known)
+		{
 			this.num = num;
 			this.cache = cache;
 			this.iterations = iterations;
@@ -207,16 +210,16 @@ public class SimulationRunner {
 		}
 
 
-		Throwable getError() {
-
+		Throwable getError()
+		{
 			return this.error;
 		}
 
 
 		@Override
-		public void run() {
-
-			for (int i = 0; i < this.iterations; i++) {
+		public void run()
+		{
+			for (int iteration = 0; iteration < this.iterations; iteration++) {
 
 				long id = (int) Math.round(JUnitUtils.pareto(this.alpha));
 				while (id < 0) {
@@ -230,22 +233,40 @@ public class SimulationRunner {
 
 						if (Math.random() < .25) {
 
-							SimulationRunner.this.logger.info(this.num + ":" + i + ": Deleting " + id);
+							SimulationRunner.this.logger.info("Thread "
+									+ this.num
+									+ ": Iteration "
+									+ iteration
+									+ ": DELETE Id "
+									+ id);
 							this.known.remove(id);
 							this.cache.delete(key);
 
 						} else {
 
-							SimulationRunner.this.logger.info(this.num + ":" + i + ": Getting " + id);
-							Assert.assertEquals(new ExampleObject(id), this.cache.getWithErrors(key));
+							SimulationRunner.this.logger.info("Thread "
+									+ this.num
+									+ ": Iteration "
+									+ iteration
+									+ ": GET Id "
+									+ id);
+							Assert.assertEquals(
+									"Thread " + this.num,
+									new ExampleObject(id),
+									this.cache.getWithErrors(key));
 						}
 
 					} else {
 
-						final ExampleObject eo = new ExampleObject(id);
-						SimulationRunner.this.logger.info(this.num + ":" + i + ": Putting " + id);
+						final ExampleObject exampleObject = new ExampleObject(id);
+						SimulationRunner.this.logger.info("Thread "
+								+ this.num
+								+ ": Iteration "
+								+ iteration
+								+ ": PUT Id "
+								+ id);
 						this.known.add(id);
-						this.cache.putWithErrors(key, eo);
+						this.cache.putWithErrors(key, exampleObject);
 					}
 
 					SimulationRunner.this.knownTestpostIterationHook(this.cache);

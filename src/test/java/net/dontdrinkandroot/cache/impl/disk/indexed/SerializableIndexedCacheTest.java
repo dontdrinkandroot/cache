@@ -33,6 +33,8 @@ import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -80,8 +82,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 
 
 	/**
-	 * Tests if on putting the same key/value the filesize doesn't change as the entries get
-	 * overridden.
+	 * Tests if on putting the same key/value the filesize doesn't change as the entries get overridden.
 	 */
 	@Test
 	public void testSameFileSizeOnPut() throws IOException, CacheException
@@ -326,7 +327,7 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 	@Test
 	public void runKnownLoadTest() throws Throwable
 	{
-		// Logger.getRootLogger().setLevel(Level.INFO);
+		Logger.getRootLogger().setLevel(Level.INFO);
 
 		Assume.assumeNotNull(System.getProperty("cache.test.runloadtest"));
 		final File ramDiskDir = new File(System.getProperty("cache.test.ramdisk"));
@@ -356,7 +357,12 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 				}
 			};
 			known =
-					runner.runKnownTest(loadTestCache, 1, 10000, JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND, known);
+					runner.runKnownTest(
+							loadTestCache,
+							1,
+							100000,
+							JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_THOUSAND,
+							known);
 
 			loadTestCache.flush();
 
@@ -424,13 +430,9 @@ public class SerializableIndexedCacheTest extends AbstractSerializableCustomTtlC
 			Serializable key = this.translateKey(1);
 			ExampleObject ex = new ExampleObject(1);
 			for (int i = 0; i < 1000; i++) {
-				this.getLogger().info("put");
 				Assert.assertEquals(ex, cache.put(key, ex));
-				this.getLogger().info("put");
 				Assert.assertEquals(ex, cache.put(key, ex));
-				this.getLogger().info("get");
 				Assert.assertEquals(ex, cache.get(key));
-				this.getLogger().info("delete");
 				cache.delete(key);
 			}
 

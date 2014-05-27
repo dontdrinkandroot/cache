@@ -132,4 +132,21 @@ public class BlockMetaData implements MetaData
 		this.indexData = indexData;
 	}
 
+
+	@Override
+	public String toString()
+	{
+		StringBuffer sb = new StringBuffer("BlockMetaData[");
+		if (this.indexData != null) {
+			sb.append("indexData=" + this.indexData.toString());
+			sb.append(",");
+		}
+		if (this.metaData != null) {
+			sb.append("metaData=" + this.metaData.toString());
+		}
+		sb.append("]");
+
+		return sb.toString();
+	}
+
 }

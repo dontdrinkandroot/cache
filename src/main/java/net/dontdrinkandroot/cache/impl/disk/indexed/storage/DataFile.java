@@ -174,7 +174,26 @@ public class DataFile
 		this.randomAccessFile.seek(dataBlock.getStartPosition());
 		this.randomAccessFile.write(data);
 
+		// this.delayWrite();
+
 		return dataBlock;
+	}
+
+
+	/**
+	 * Delays the write process, only for tests.
+	 */
+	private void delayWrite()
+	{
+		long targetTime = (long) (System.currentTimeMillis() + Math.random() * 10);
+		long sleepTime = targetTime - System.currentTimeMillis();
+		while (sleepTime > 0) {
+			try {
+				Thread.sleep(sleepTime);
+				sleepTime = targetTime - System.currentTimeMillis();
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 
 
