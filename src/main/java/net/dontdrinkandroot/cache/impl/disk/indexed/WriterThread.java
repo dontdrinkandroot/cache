@@ -216,65 +216,72 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
 	@Override
 	public void run()
 	{
-		int queueSize = 0;
+		try {
 
-		while (!this.stopRequested) {
+			int queueSize = 0;
 
-			synchronized (this.processingLock) {
-				this.entryWasProcessed = false;
-				this.skipWrite = false;
-			}
+			while (!this.stopRequested) {
 
-			synchronized (this) {
-
-				K key = null;
-				QueueEntry queueEntry = null;
-
-				synchronized (this.queueLock) {
-					Iterator<Entry<K, QueueEntry>> iterator = this.queue.entrySet().iterator();
-					if (iterator.hasNext()) {
-						Entry<K, QueueEntry> entry = iterator.next();
-						key = entry.getKey();
-						queueEntry = entry.getValue();
-						this.currentKey = key;
-						this.currentQueueEntry = queueEntry;
-						iterator.remove();
-						queueSize = this.queue.size();
-					}
+				synchronized (this.processingLock) {
+					this.entryWasProcessed = false;
+					this.skipWrite = false;
 				}
 
-				if (this.currentKey != null) {
+				synchronized (this) {
 
-					synchronized (this.processingLock) {
-						if (!this.skipWrite) {
-							try {
-								this.logger.debug(this.getName() + ": Writing {}, {} left", key, queueSize);
-								this.write(key, queueEntry);
-							} catch (IOException e) {
-								this.logger.error(this.getName() + ": Writing entry failed", e);
-							} finally {
-								this.entryWasProcessed = true;
-							}
+					K key = null;
+					QueueEntry queueEntry = null;
+
+					synchronized (this.queueLock) {
+						Iterator<Entry<K, QueueEntry>> iterator = this.queue.entrySet().iterator();
+						if (iterator.hasNext()) {
+							Entry<K, QueueEntry> entry = iterator.next();
+							key = entry.getKey();
+							queueEntry = entry.getValue();
+							this.currentKey = key;
+							this.currentQueueEntry = queueEntry;
+							iterator.remove();
+							queueSize = this.queue.size();
 						}
 					}
 
-					synchronized (this.queueLock) {
-						this.currentKey = null;
-						this.currentQueueEntry = null;
+					if (this.currentKey != null) {
+
+						synchronized (this.processingLock) {
+							if (!this.skipWrite) {
+								try {
+									this.logger.debug(this.getName() + ": Writing {}, {} left", key, queueSize);
+									this.write(key, queueEntry);
+								} catch (IOException e) {
+									this.logger.error(this.getName() + ": Writing entry failed", e);
+								} finally {
+									this.entryWasProcessed = true;
+								}
+							}
+						}
+
+						synchronized (this.queueLock) {
+							this.currentKey = null;
+							this.currentQueueEntry = null;
+						}
+					}
+
+				}
+
+				if (!this.entryWasProcessed) {
+					try {
+						Thread.sleep(10000L);
+					} catch (InterruptedException e) {
 					}
 				}
-
 			}
 
-			if (!this.entryWasProcessed) {
-				try {
-					Thread.sleep(10000L);
-				} catch (InterruptedException e) {
-				}
-			}
+			this.logger.info(this.getName() + " stopped");
+
+		} catch (RuntimeException e) {
+			this.logger.error(this.getName() + ": Something went horribly wrong", e);
+			throw e;
 		}
-
-		this.logger.info(this.getName() + " stopped");
 	}
 
 
