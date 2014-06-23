@@ -6,7 +6,7 @@
 		<version>5</version>
 	</parent>
 	<artifactId>cache</artifactId>
-	<version>0.7.3-SNAPSHOT</version>
+	<version>0.7.3</version>
 	<description>Simple caching framework</description>
 
 	<developers>
