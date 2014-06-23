@@ -18,7 +18,7 @@
 package net.dontdrinkandroot.cache;
 
 /**
- * A Buffered Cache that has a recycling ExpungeStrategy for both persistent storage and buffer.
+ * A {@link RecyclingCache} that uses an additional buffer.
  * 
  * @author Philip W. Sorst <philip@sorst.net>
  */

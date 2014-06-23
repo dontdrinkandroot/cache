@@ -29,6 +29,7 @@ import java.util.TreeSet;
 
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
+import net.dontdrinkandroot.cache.RecyclingCache;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 import net.dontdrinkandroot.cache.metadata.comparator.MetaDataComparator;
 import net.dontdrinkandroot.cache.metadata.comparator.impl.LfuComparator;
@@ -40,7 +41,7 @@ import net.dontdrinkandroot.cache.utils.Duration;
  * @author Philip W. Sorst <philip@sorst.net>
  */
 public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends AbstractCache<K, V>
-		implements Cache<K, V>
+		implements RecyclingCache<K, V>
 {
 
 	/** Statistics for this cache (e.g hit rate) */
@@ -132,8 +133,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 		this.getLogger().trace(this.getName() + ": Putting '{}' to cache", key);
 
 		/*
-		 * If key is already known, delete old entry before inserting new one (instead of
-		 * overwriting, e.g. for disk based implementations)
+		 * If key is already known, delete old entry before inserting new one (instead of overwriting, e.g. for disk
+		 * based implementations)
 		 */
 		final M metaData = this.getEntry(key);
 		if (metaData != null) {
@@ -340,24 +341,28 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 	}
 
 
+	@Override
 	public int getMaxSize()
 	{
 		return this.maxSize;
 	}
 
 
+	@Override
 	public void setMaxSize(int maxSize)
 	{
 		this.maxSize = maxSize;
 	}
 
 
+	@Override
 	public int getRecycleSize()
 	{
 		return this.recycleSize;
 	}
 
 
+	@Override
 	public void setRecycleSize(int recycleSize)
 	{
 		this.recycleSize = recycleSize;
@@ -389,8 +394,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	/**
-	 * Performs the actual expunging of entries with the given metadata. Can be subclassed as they
-	 * might want to chain or do some other magic, by default the entries will simply be deleted.
+	 * Performs the actual expunging of entries with the given metadata. Can be subclassed as they might want to chain
+	 * or do some other magic, by default the entries will simply be deleted.
 	 * 
 	 * @param expungeEntriesMetaData
 	 *            A List of the {@link MetaData} of the entries to expunge.
@@ -435,8 +440,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
 
 	/**
-	 * Performs deletion of the data belonging to the metadata. Removal from the map is done by the
-	 * superclass.
+	 * Performs deletion of the data belonging to the metadata. Removal from the map is done by the superclass.
 	 */
 	protected abstract void doDelete(K key, M metaData) throws CacheException;
 
