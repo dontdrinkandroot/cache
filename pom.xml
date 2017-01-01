@@ -1,59 +1,75 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>net.dontdrinkandroot</groupId>
-		<artifactId>parent</artifactId>
-		<version>5</version>
-	</parent>
-	<artifactId>cache</artifactId>
-	<version>0.7.4-SNAPSHOT</version>
-	<description>Simple caching framework</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.dontdrinkandroot</groupId>
+    <artifactId>cache</artifactId>
+    <version>0.8.0-SNAPSHOT</version>
+    <description>Simple caching framework</description>
 
-	<developers>
-		<developer>
-			<name>Philip Washington Sorst</name>
-			<url>http://sorst.net</url>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>Philip Washington Sorst</name>
+            <url>https://sorst.net</url>
+        </developer>
+    </developers>
 
-	<scm>
-		<developerConnection>scm:git:https://github.com/dontdrinkandroot/cache.java.git</developerConnection>
-	</scm>
-	
-	<repositories>
-		<repository>
-			<id>public</id>
-			<url>http://maven.dontdrinkandroot.net/content/groups/public</url>
-		</repository>
-	</repositories>
-	
-	<build>
-	
-		<plugins>
-			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<systemPropertyVariables>
-						<cache.test.ramdisk>${cache.test.ramdisk}</cache.test.ramdisk>
-						<cache.test.runloadtest>${cache.test.runloadtest}</cache.test.runloadtest>
-					</systemPropertyVariables>
-				</configuration>
-			</plugin>
+    <scm>
+        <developerConnection>scm:git:https://github.com/dontdrinkandroot/cache.java.git</developerConnection>
+    </scm>
 
-		</plugins>
-		
-	</build>
+    <repositories>
+        <repository>
+            <id>public</id>
+            <url>http://maven.dontdrinkandroot.net/content/groups/public</url>
+        </repository>
+    </repositories>
 
-	<dependencies>
+    <properties>
+        <version.org.slf4j>1.7.25</version.org.slf4j>
+        <version.junit>4.12</version.junit>
+    </properties>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
-	</dependencies>
-	
+    <build>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <cache.test.ramdisk>${cache.test.ramdisk}</cache.test.ramdisk>
+                        <cache.test.runloadtest>${cache.test.runloadtest}</cache.test.runloadtest>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${version.org.slf4j}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${version.org.slf4j}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
 </project>
