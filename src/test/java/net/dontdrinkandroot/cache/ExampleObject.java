@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -19,89 +19,81 @@ package net.dontdrinkandroot.cache;
 
 import java.io.Serializable;
 
+public class ExampleObject implements Serializable
+{
 
-public class ExampleObject implements Serializable {
+    private static final long serialVersionUID = 7121793410453788968L;
 
-	private static final long serialVersionUID = 7121793410453788968L;
+    private final String string;
 
-	private final String string;
+    private long id;
 
-	private long id;
+    public ExampleObject(final long id)
+    {
+        this.id = id;
+        this.string = this.createString(id);
+    }
 
+    public ExampleObject(final long l, final String string)
+    {
+        this.id = l;
+        this.string = string;
+    }
 
-	public ExampleObject(final long id) {
+    private String createString(final long l)
+    {
+        final StringBuffer s = new StringBuffer();
+        for (int i = -1; i < l % 100; i++) {
+            s.append(Long.toString(l));
+        }
 
-		this.id = id;
-		this.string = this.createString(id);
-	}
+        return s.toString();
+    }
 
+    public void setId(final long id)
+    {
+        this.id = id;
+    }
 
-	public ExampleObject(final long l, final String string) {
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (this.id ^ this.id >>> 32);
+        result = prime * result + (this.string == null ? 0 : this.string.hashCode());
+        return result;
+    }
 
-		this.id = l;
-		this.string = string;
-	}
+    @Override
+    public boolean equals(final Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        final ExampleObject other = (ExampleObject) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        if (this.string == null) {
+            if (other.string != null) {
+                return false;
+            }
+        } else if (!this.string.equals(other.string)) {
+            return false;
+        }
+        return true;
+    }
 
-
-	private String createString(final long l) {
-
-		final StringBuffer s = new StringBuffer();
-		for (int i = -1; i < l % 100; i++) {
-			s.append(Long.toString(l));
-		}
-
-		return s.toString();
-	}
-
-
-	public void setId(final long id) {
-
-		this.id = id;
-	}
-
-
-	@Override
-	public int hashCode() {
-
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (this.id ^ this.id >>> 32);
-		result = prime * result + (this.string == null ? 0 : this.string.hashCode());
-		return result;
-	}
-
-
-	@Override
-	public boolean equals(final Object obj) {
-
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-		final ExampleObject other = (ExampleObject) obj;
-		if (this.id != other.id) {
-			return false;
-		}
-		if (this.string == null) {
-			if (other.string != null) {
-				return false;
-			}
-		} else if (!this.string.equals(other.string)) {
-			return false;
-		}
-		return true;
-	}
-
-
-	@Override
-	public String toString() {
-
-		return "ExampleObject[id=" + this.id + "]";
-	}
-
+    @Override
+    public String toString()
+    {
+        return "ExampleObject[id=" + this.id + "]";
+    }
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -23,36 +23,30 @@ package net.dontdrinkandroot.cache;
  * ignore this exception as caching is not meant to be a reliable storage, still this might lead to
  * significant and undetected performance issues, so at least some kind of logging should be
  * implemented.
- * 
- * @author Philip W. Sorst <philip@sorst.net>
+ *
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public class CacheException extends Exception
 {
+    private static final long serialVersionUID = -7471725780904149067L;
 
-	private static final long serialVersionUID = -7471725780904149067L;
+    public CacheException()
+    {
+        super();
+    }
 
+    public CacheException(final String msg)
+    {
+        super(msg);
+    }
 
-	public CacheException()
-	{
-		super();
-	}
+    public CacheException(final Throwable t)
+    {
+        super(t);
+    }
 
-
-	public CacheException(final String msg)
-	{
-		super(msg);
-	}
-
-
-	public CacheException(final Throwable t)
-	{
-		super(t);
-	}
-
-
-	public CacheException(final String msg, final Throwable t)
-	{
-		super(msg, t);
-	}
-
+    public CacheException(final String msg, final Throwable t)
+    {
+        super(msg, t);
+    }
 }

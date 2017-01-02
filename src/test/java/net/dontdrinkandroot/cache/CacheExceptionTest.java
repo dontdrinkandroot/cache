@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -19,35 +19,33 @@ package net.dontdrinkandroot.cache;
 
 import org.junit.Test;
 
-public class CacheExceptionTest {
+public class CacheExceptionTest
+{
+    @Test
+    public void testConstructors()
+    {
+        try {
+            throw new CacheException();
+        } catch (CacheException e) {
+            /* Expected */
+        }
 
-	@Test
-	public void testConstructors() {
+        try {
+            throw new CacheException("Test Message");
+        } catch (CacheException e) {
+            /* Expected */
+        }
 
-		try {
-			throw new CacheException();
-		} catch (CacheException e) {
-			/* Expected */
-		}
+        try {
+            throw new CacheException(new Exception());
+        } catch (CacheException e) {
+            /* Expected */
+        }
 
-		try {
-			throw new CacheException("Test Message");
-		} catch (CacheException e) {
-			/* Expected */
-		}
-
-		try {
-			throw new CacheException(new Exception());
-		} catch (CacheException e) {
-			/* Expected */
-		}
-
-		try {
-			throw new CacheException("Test Message", new Exception());
-		} catch (CacheException e) {
-			/* Expected */
-		}
-
-	}
-
+        try {
+            throw new CacheException("Test Message", new Exception());
+        } catch (CacheException e) {
+            /* Expected */
+        }
+    }
 }

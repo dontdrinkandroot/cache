@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -17,31 +17,27 @@
  */
 package net.dontdrinkandroot.cache.impl;
 
-import java.io.Serializable;
-
 import net.dontdrinkandroot.cache.AbstractCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.ExampleObject;
-
 import org.junit.Assert;
 
+import java.io.Serializable;
 
 public abstract class AbstractSerializableCustomTtlCacheTest
-		extends AbstractCustomTtlCacheTest<Serializable, Serializable> {
+        extends AbstractCustomTtlCacheTest<Serializable, Serializable>
+{
+    @Override
+    protected void doAssertGet(int key, Cache<Serializable, Serializable> cache) throws Exception
+    {
+        Serializable ser = cache.getWithErrors(this.translateKey(key));
+        Assert.assertNotNull(ser);
+        Assert.assertEquals(new ExampleObject(key), ser);
+    }
 
-	@Override
-	protected void doAssertGet(int key, Cache<Serializable, Serializable> cache) throws Exception {
-
-		Serializable ser = cache.getWithErrors(this.translateKey(key));
-		Assert.assertNotNull(ser);
-		Assert.assertEquals(new ExampleObject(key), ser);
-	}
-
-
-	@Override
-	protected Serializable createInputObject(int key) throws Exception {
-
-		return new ExampleObject(key);
-	}
-
+    @Override
+    protected Serializable createInputObject(int key) throws Exception
+    {
+        return new ExampleObject(key);
+    }
 }

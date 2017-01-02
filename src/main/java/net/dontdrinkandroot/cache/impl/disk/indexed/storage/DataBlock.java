@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -18,122 +18,108 @@
 package net.dontdrinkandroot.cache.impl.disk.indexed.storage;
 
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public class DataBlock implements Comparable<DataBlock>
 {
+    public static final long LENGTH = 8 + 8;
 
-	public static final long LENGTH = 8 + 8;
+    private final long startPosition;
 
-	private final long startPosition;
+    private final long endPosition;
 
-	private final long endPosition;
+    public DataBlock(final long startPosition, final long endPosition)
+    {
+        if (endPosition < startPosition) {
+            throw new IllegalArgumentException("endPosition < startPosition: " + endPosition + "," + startPosition);
+        }
 
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+    }
 
-	public DataBlock(final long startPosition, final long endPosition)
-	{
-		if (endPosition < startPosition) {
-			throw new IllegalArgumentException("endPosition < startPosition: " + endPosition + "," + startPosition);
-		}
+    @Override
+    public int compareTo(final DataBlock other)
+    {
+        final long startResult = this.startPosition - other.startPosition;
 
-		this.startPosition = startPosition;
-		this.endPosition = endPosition;
-	}
+        if (startResult < 0) {
+            return -1;
+        } else if (startResult > 0) {
+            return 1;
+        }
 
+        final long endResult = this.endPosition - other.endPosition;
 
-	@Override
-	public int compareTo(final DataBlock other)
-	{
-		final long startResult = this.startPosition - other.startPosition;
+        if (endResult < 0) {
+            return -1;
+        } else if (endResult > 0) {
+            return 1;
+        }
 
-		if (startResult < 0) {
-			return -1;
-		} else if (startResult > 0) {
-			return 1;
-		}
+        return 0;
+    }
 
-		final long endResult = this.endPosition - other.endPosition;
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (this.endPosition ^ this.endPosition >>> 32);
+        result = prime * result + (int) (this.startPosition ^ this.startPosition >>> 32);
 
-		if (endResult < 0) {
-			return -1;
-		} else if (endResult > 0) {
-			return 1;
-		}
+        return result;
+    }
 
-		return 0;
-	}
+    @Override
+    public boolean equals(final Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
 
+        if (obj == null) {
+            return false;
+        }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (this.endPosition ^ this.endPosition >>> 32);
-		result = prime * result + (int) (this.startPosition ^ this.startPosition >>> 32);
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
 
-		return result;
-	}
+        final DataBlock other = (DataBlock) obj;
+        if (this.endPosition != other.endPosition) {
+            return false;
+        }
 
+        return this.startPosition == other.startPosition;
+    }
 
-	@Override
-	public boolean equals(final Object obj)
-	{
-		if (this == obj) {
-			return true;
-		}
+    @Override
+    public String toString()
+    {
+        return this.startPosition + ":" + this.endPosition + " (" + this.getLength() + ")";
+    }
 
-		if (obj == null) {
-			return false;
-		}
+    public boolean overlaps(final DataBlock other)
+    {
+        final boolean before = this.startPosition <= other.startPosition && other.startPosition <= this.endPosition;
+        final boolean after = other.endPosition <= this.startPosition && this.startPosition <= other.endPosition;
 
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
+        return before || after;
+    }
 
-		final DataBlock other = (DataBlock) obj;
-		if (this.endPosition != other.endPosition) {
-			return false;
-		}
+    public long getLength()
+    {
+        return this.endPosition - this.startPosition + 1;
+    }
 
-		if (this.startPosition != other.startPosition) {
-			return false;
-		}
+    public long getStartPosition()
+    {
+        return this.startPosition;
+    }
 
-		return true;
-	}
-
-
-	@Override
-	public String toString()
-	{
-		return this.startPosition + ":" + this.endPosition + " (" + this.getLength() + ")";
-	}
-
-
-	public boolean overlaps(final DataBlock other)
-	{
-		final boolean before = this.startPosition <= other.startPosition && other.startPosition <= this.endPosition;
-		final boolean after = other.endPosition <= this.startPosition && this.startPosition <= other.endPosition;
-
-		return before || after;
-	}
-
-
-	public long getLength()
-	{
-		return this.endPosition - this.startPosition + 1;
-	}
-
-
-	public long getStartPosition()
-	{
-		return this.startPosition;
-	}
-
-
-	public long getEndPosition()
-	{
-		return this.endPosition;
-	}
+    public long getEndPosition()
+    {
+        return this.endPosition;
+    }
 }

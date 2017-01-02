@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -19,19 +19,17 @@ package net.dontdrinkandroot.cache.metadata;
 
 import net.dontdrinkandroot.cache.utils.Md5;
 import net.dontdrinkandroot.cache.utils.Md5Exception;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-
-public class Md5Test {
-
-	@Test
-	public void testConstruction() throws Md5Exception {
-
-		String testString = " asdfjkh akasdkfa sdf a";
-		Md5 md5_1 = new Md5(testString);
-		Md5 md5_2 = Md5.fromMd5Hex(md5_1.getHex());
-		Assert.assertEquals(md5_1, md5_2);
-	}
+public class Md5Test
+{
+    @Test
+    public void testConstruction() throws Md5Exception
+    {
+        String testString = " asdfjkh akasdkfa sdf a";
+        Md5 md5_1 = new Md5(testString);
+        Md5 md5_2 = Md5.fromMd5Hex(md5_1.getHex());
+        Assert.assertEquals(md5_1, md5_2);
+    }
 }

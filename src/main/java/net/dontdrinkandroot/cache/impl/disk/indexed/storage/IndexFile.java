@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -17,6 +17,9 @@
  */
 package net.dontdrinkandroot.cache.impl.disk.indexed.storage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,182 +29,161 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 // TODO: implement shrinking of index file
+
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public class IndexFile
 {
+    public static float GOLDEN_RATIO = 1.61803399f;
 
-	public static float GOLDEN_RATIO = 1.61803399f;
+    private final RandomAccessFile randomAccessFile;
 
-	private final RandomAccessFile randomAccessFile;
+    private boolean[] blockMap;
 
-	private boolean[] blockMap;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private int numAllocated = 0;
 
-	private int numAllocated = 0;
+    public IndexFile(final File file) throws FileNotFoundException
+    {
+        this.randomAccessFile = new RandomAccessFile(file, "rw");
 
+        this.blockMap = new boolean[2];
+        this.blockMap[0] = false;
+        this.blockMap[1] = false;
+    }
 
-	public IndexFile(final File file) throws FileNotFoundException
-	{
-		this.randomAccessFile = new RandomAccessFile(file, "rw");
+    /**
+     * Closes the underlying random access file.
+     */
+    public synchronized void close() throws IOException
+    {
+        this.randomAccessFile.close();
+    }
 
-		this.blockMap = new boolean[2];
-		this.blockMap[0] = false;
-		this.blockMap[1] = false;
-	}
+    RandomAccessFile getRandomAccessFile()
+    {
+        return this.randomAccessFile;
+    }
 
+    /**
+     * Deletes the block of the given metaData.
+     */
+    public synchronized void delete(IndexData indexData) throws IOException
+    {
+        this.delete(indexData.getBlockNum());
+    }
 
-	/**
-	 * Closes the underlying random access file.
-	 */
-	public synchronized void close() throws IOException
-	{
-		this.randomAccessFile.close();
-	}
+    /**
+     * Deletes the given block.
+     */
+    public synchronized void delete(final int blockNum) throws IOException
+    {
+        /* Seek to the block, invalidate by writing 0 and deallocate block */
+        this.randomAccessFile.seek(blockNum * IndexData.LENGTH);
+        this.randomAccessFile.writeBoolean(false);
+        this.blockMap[blockNum] = false;
+        this.numAllocated--;
+        this.logger.debug("Invalidating {}, {} allocated", blockNum, this.numAllocated);
+    }
 
+    /**
+     * Gets the number of allocated blocks.
+     */
+    public synchronized int getNumAllocated()
+    {
+        return this.numAllocated;
+    }
 
-	RandomAccessFile getRandomAccessFile()
-	{
-		return this.randomAccessFile;
-	}
+    public synchronized Collection<IndexData> initialize() throws IOException
+    {
+        List<IndexData> entries = new ArrayList<IndexData>();
 
+        final int numBlocks = this.getNumPossibleBlocks(this.randomAccessFile.length());
 
-	/**
-	 * Deletes the block of the given metaData.
-	 */
-	public synchronized void delete(IndexData indexData) throws IOException
-	{
-		this.delete(indexData.getBlockNum());
-	}
+        for (int currentBlockNum = 0; currentBlockNum < numBlocks; currentBlockNum++) {
 
+            try {
 
-	/**
-	 * Deletes the given block.
-	 */
-	public synchronized void delete(final int blockNum) throws IOException
-	{
-		/* Seek to the block, invalidate by writing 0 and deallocate block */
-		this.randomAccessFile.seek(blockNum * IndexData.LENGTH);
-		this.randomAccessFile.writeBoolean(false);
-		this.blockMap[blockNum] = false;
-		this.numAllocated--;
-		this.logger.debug("Invalidating {}, {} allocated", blockNum, this.numAllocated);
-	}
+                IndexData data = IndexData.read(this.randomAccessFile, currentBlockNum);
+                if (data != null) {
+                    this.allocateBlock(currentBlockNum);
+                    entries.add(data);
+                }
+            } catch (final AllocationException e) {
+                this.logger.error("Allocating " + currentBlockNum + " failed");
+            } catch (final IOException e) {
+                this.logger.warn("Reading failed at {}: {}", new Object[]{currentBlockNum, e.getMessage()});
+            }
+        }
 
+        return entries;
+    }
 
-	/**
-	 * Gets the number of allocated blocks.
-	 */
-	public synchronized int getNumAllocated()
-	{
-		return this.numAllocated;
-	}
+    /**
+     * Returns the length of the underlying random access file.
+     */
+    public long length() throws IOException
+    {
+        return this.randomAccessFile.length();
+    }
 
+    public IndexData write(IndexData indexData) throws IOException
+    {
+        final int blockNum = this.allocateBlock();
+        return indexData.write(this.randomAccessFile, blockNum);
+    }
 
-	public synchronized Collection<IndexData> initialize() throws IOException
-	{
-		List<IndexData> entries = new ArrayList<IndexData>();
+    /**
+     * Find the first free block and allocate or allocate at end.
+     */
+    private int allocateBlock() throws AllocationException
+    {
+        for (int currentBlockNum = 0; currentBlockNum < this.blockMap.length; currentBlockNum++) {
 
-		final int numBlocks = this.getNumPossibleBlocks(this.randomAccessFile.length());
+            if (!this.blockMap[currentBlockNum]) {
+                return this.allocateBlock(currentBlockNum);
+            }
+        }
 
-		for (int currentBlockNum = 0; currentBlockNum < numBlocks; currentBlockNum++) {
+        return this.allocateBlock(this.blockMap.length);
+    }
 
-			try {
-
-				IndexData data = IndexData.read(this.randomAccessFile, currentBlockNum);
-				if (data != null) {
-					this.allocateBlock(currentBlockNum);
-					entries.add(data);
-				}
-
-			} catch (final AllocationException e) {
-				this.logger.error("Allocating " + currentBlockNum + " failed");
-			} catch (final IOException e) {
-				this.logger.warn("Reading failed at {}: {}", new Object[] { currentBlockNum, e.getMessage() });
-			}
-
-		}
-
-		return entries;
-	}
-
-
-	/**
-	 * Returns the length of the underlying random access file.
-	 */
-	public long length() throws IOException
-	{
-		return this.randomAccessFile.length();
-	}
-
-
-	public IndexData write(IndexData indexData) throws IOException
-	{
-		final int blockNum = this.allocateBlock();
-		return indexData.write(this.randomAccessFile, blockNum);
-	}
-
-
-	/**
-	 * Find the first free block and allocate or allocate at end.
-	 */
-	private int allocateBlock() throws AllocationException
-	{
-		for (int currentBlockNum = 0; currentBlockNum < this.blockMap.length; currentBlockNum++) {
-
-			if (!this.blockMap[currentBlockNum]) {
-				return this.allocateBlock(currentBlockNum);
-			}
-
-		}
-
-		return this.allocateBlock(this.blockMap.length);
-	}
-
-
-	private int allocateBlock(final int blockNum) throws AllocationException
-	{
-		/* Enlarge available blocks if needed */
-		if (blockNum > this.blockMap.length - 1) {
-			this.enlargeBlockMap(blockNum);
-		}
+    private int allocateBlock(final int blockNum) throws AllocationException
+    {
+        /* Enlarge available blocks if needed */
+        if (blockNum > this.blockMap.length - 1) {
+            this.enlargeBlockMap(blockNum);
+        }
 
 		/* Block already occupied, fail */
-		if (this.blockMap[blockNum]) {
-			throw new AllocationException("Block " + blockNum + " already in use");
-		}
+        if (this.blockMap[blockNum]) {
+            throw new AllocationException("Block " + blockNum + " already in use");
+        }
 
 		/* Allocate block */
-		this.blockMap[blockNum] = true;
-		this.numAllocated++;
-		this.logger.debug("Allocating {}, {} allocated", blockNum, this.numAllocated);
+        this.blockMap[blockNum] = true;
+        this.numAllocated++;
+        this.logger.debug("Allocating {}, {} allocated", blockNum, this.numAllocated);
 
-		return blockNum;
-	}
+        return blockNum;
+    }
 
+    private void enlargeBlockMap(final int neededBlockNum)
+    {
+        final int newLength = Math.max(neededBlockNum + 1, (int) (this.blockMap.length * IndexFile.GOLDEN_RATIO));
+        this.blockMap = Arrays.copyOf(this.blockMap, newLength);
+    }
 
-	private void enlargeBlockMap(final int neededBlockNum)
-	{
-		final int newLength = Math.max(neededBlockNum + 1, (int) (this.blockMap.length * IndexFile.GOLDEN_RATIO));
-		this.blockMap = Arrays.copyOf(this.blockMap, newLength);
-	}
+    private int getNumPossibleBlocks(final long length)
+    {
+        int numRequiredBlocks = (int) (length / IndexData.LENGTH);
+        if (length % IndexData.LENGTH > 0) {
+            numRequiredBlocks++;
+        }
 
-
-	private int getNumPossibleBlocks(final long length)
-	{
-		int numRequiredBlocks = (int) (length / IndexData.LENGTH);
-		if (length % IndexData.LENGTH > 0) {
-			numRequiredBlocks++;
-		}
-
-		return numRequiredBlocks;
-	}
-
+        return numRequiredBlocks;
+    }
 }

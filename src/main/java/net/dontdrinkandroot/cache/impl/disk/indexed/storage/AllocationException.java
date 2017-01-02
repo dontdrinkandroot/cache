@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -19,21 +19,17 @@ package net.dontdrinkandroot.cache.impl.disk.indexed.storage;
 
 import java.io.IOException;
 
-
 /**
  * Exception that denotes that the allocation of a block failed.
- * 
- * @author Philip W. Sorst <philip@sorst.net>
+ *
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public class AllocationException extends IOException
 {
+    private static final long serialVersionUID = -9135050081147191231L;
 
-	private static final long serialVersionUID = -9135050081147191231L;
-
-
-	public AllocationException(final String msg)
-	{
-		super(msg);
-	}
-
+    public AllocationException(final String msg)
+    {
+        super(msg);
+    }
 }

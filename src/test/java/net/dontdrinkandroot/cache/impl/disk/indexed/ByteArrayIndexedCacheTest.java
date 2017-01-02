@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -17,94 +17,85 @@
  */
 package net.dontdrinkandroot.cache.impl.disk.indexed;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-
 import net.dontdrinkandroot.cache.AbstractCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 
 public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serializable, byte[]>
 {
+    private File baseDir;
 
-	private File baseDir;
+    @Before
+    public void before() throws IOException
+    {
+        this.baseDir = File.createTempFile("cachetest", null);
+        this.baseDir.delete();
+    }
 
+    @After
+    public void after() throws IOException
+    {
+        FileUtils.deleteDirectory(this.baseDir);
+    }
 
-	@Before
-	public void before() throws IOException
-	{
-		this.baseDir = File.createTempFile("cachetest", null);
-		this.baseDir.delete();
-	}
+    @Test
+    public void testPutGetDelete() throws Exception
+    {
+        ByteArrayIndexedDiskCache cache =
+                new ByteArrayIndexedDiskCache(
+                        "testCache",
+                        Duration.minutes(1),
+                        Cache.UNLIMITED_IDLE_TIME,
+                        Integer.MAX_VALUE,
+                        Integer.MAX_VALUE,
+                        this.baseDir
+                );
 
+        Assert.assertEquals(0, cache.getDataFileNumAllocatedBlocks());
+        Assert.assertEquals(0, cache.getMetaFileNumAllocatedBlocks());
+        cache.assertAllocatedConsistency();
 
-	@After
-	public void after() throws IOException
-	{
-		FileUtils.deleteDirectory(this.baseDir);
-	}
+        this.testCustomGetPutDelete(cache);
 
+        cache.close();
+    }
 
-	@Test
-	public void testPutGetDelete() throws Exception
-	{
-		ByteArrayIndexedDiskCache cache =
-				new ByteArrayIndexedDiskCache(
-						"testCache",
-						Duration.minutes(1),
-						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
-						this.baseDir);
+    @Override
+    protected void doAssertGet(int key, Cache<Serializable, byte[]> cache) throws Exception
+    {
+        byte[] bytes = cache.getWithErrors(this.translateKey(key));
+        Assert.assertNotNull(bytes);
+        Assert.assertArrayEquals(this.createInputObject(key), bytes);
+    }
 
-		Assert.assertEquals(0, cache.getDataFileNumAllocatedBlocks());
-		Assert.assertEquals(0, cache.getMetaFileNumAllocatedBlocks());
-		cache.assertAllocatedConsistency();
+    @Override
+    protected byte[] createInputObject(int key) throws Exception
+    {
+        final StringBuffer s = new StringBuffer();
+        for (int i = -1; i < key % 100; i++) {
+            s.append(Long.toString(key));
+        }
 
-		this.testCustomGetPutDelete(cache);
+        return s.toString().getBytes("UTF-8");
+    }
 
-		cache.close();
-	}
+    @Override
+    protected String translateKey(int key)
+    {
+        final StringBuffer sb = new StringBuffer();
+        for (int i = -1; i < key % 100; i++) {
+            sb.append(Long.toString(key));
+        }
 
-
-	@Override
-	protected void doAssertGet(int key, Cache<Serializable, byte[]> cache) throws Exception
-	{
-		byte[] bytes = cache.getWithErrors(this.translateKey(key));
-		Assert.assertNotNull(bytes);
-		Assert.assertArrayEquals(this.createInputObject(key), bytes);
-	}
-
-
-	@Override
-	protected byte[] createInputObject(int key) throws Exception
-	{
-		final StringBuffer s = new StringBuffer();
-		for (int i = -1; i < key % 100; i++) {
-			s.append(Long.toString(key));
-		}
-
-		return s.toString().getBytes("UTF-8");
-	}
-
-
-	@Override
-	protected String translateKey(int key)
-	{
-		final StringBuffer sb = new StringBuffer();
-		for (int i = -1; i < key % 100; i++) {
-			sb.append(Long.toString(key));
-		}
-
-		return sb.toString();
-	}
-
+        return sb.toString();
+    }
 }

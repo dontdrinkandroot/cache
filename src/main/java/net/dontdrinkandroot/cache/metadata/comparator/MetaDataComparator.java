@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -17,16 +17,15 @@
  */
 package net.dontdrinkandroot.cache.metadata.comparator;
 
+import net.dontdrinkandroot.cache.metadata.MetaData;
+
 import java.util.Comparator;
 import java.util.Map.Entry;
 
-import net.dontdrinkandroot.cache.metadata.MetaData;
-
 
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public interface MetaDataComparator<K, M extends MetaData> extends Comparator<Entry<K, M>>
 {
-
 }

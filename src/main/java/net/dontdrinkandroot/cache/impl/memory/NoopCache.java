@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -23,143 +23,122 @@ import net.dontdrinkandroot.cache.metadata.MetaData;
 import net.dontdrinkandroot.cache.statistics.CacheStatistics;
 import net.dontdrinkandroot.cache.statistics.impl.SimpleCacheStatistics;
 
-
 /**
  * A serializable cache that does not actually perform any caching operation.
- * 
- * @author Philip W. Sorst <philip@sorst.net>
+ *
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public class NoopCache<K, V> implements CustomTtlCache<K, V>
 {
+    private String name;
 
-	private String name;
+    public NoopCache(final String name)
+    {
 
+        this.name = name;
+    }
 
-	public NoopCache(final String name)
-	{
+    @Override
+    public <T extends V> T putWithErrors(final K key, final T data) throws CacheException
+    {
+        return data;
+    }
 
-		this.name = name;
-	}
+    @Override
+    public <T extends V> T getWithErrors(final K key) throws CacheException
+    {
+        return null;
+    }
 
+    @Override
+    public MetaData getMetaData(K key) throws CacheException
+    {
+        return null;
+    }
 
-	@Override
-	public <T extends V> T putWithErrors(final K key, final T data) throws CacheException
-	{
-		return data;
-	}
+    @Override
+    public void setDefaultTtl(final long defaultTTL)
+    {
+    }
 
+    @Override
+    public long getDefaultTtl()
+    {
+        return 0;
+    }
 
-	@Override
-	public <T extends V> T getWithErrors(final K key) throws CacheException
-	{
-		return null;
-	}
+    @Override
+    public void delete(final K key) throws CacheException
+    {
+    }
 
+    @Override
+    public void expunge()
+    {
+    }
 
-	@Override
-	public MetaData getMetaData(K key) throws CacheException
-	{
-		return null;
-	}
+    public void setName(final String name)
+    {
+        this.name = name;
+    }
 
+    @Override
+    public String getName()
+    {
+        return this.name;
+    }
 
-	@Override
-	public void setDefaultTtl(final long defaultTTL)
-	{
-	}
+    @Override
+    public <T extends V> T putWithErrors(final K key, final T data, final long timeToLive) throws CacheException
+    {
+        return data;
+    }
 
+    @Override
+    public CacheStatistics getStatistics()
+    {
+        return new SimpleCacheStatistics();
+    }
 
-	@Override
-	public long getDefaultTtl()
-	{
-		return 0;
-	}
+    @Override
+    public long getDefaultMaxIdleTime()
+    {
+        return 0;
+    }
 
+    @Override
+    public <T extends V> T putWithErrors(K key, T data, long timeToLive, long maxIdleTime) throws CacheException
+    {
+        return data;
+    }
 
-	@Override
-	public void delete(final K key) throws CacheException
-	{
-	}
+    @Override
+    public <T extends V> T put(K key, T data)
+    {
+        return data;
+    }
 
+    @Override
+    public <T extends V> T get(K key)
+    {
+        return null;
+    }
 
-	@Override
-	public void expunge()
-	{
-	}
+    @Override
+    public <T extends V> T put(K key, T data, long timeToLive)
+    {
+        return data;
+    }
 
+    @Override
+    public <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime)
+    {
+        return data;
+    }
 
-	public void setName(final String name)
-	{
-		this.name = name;
-	}
-
-
-	@Override
-	public String getName()
-	{
-		return this.name;
-	}
-
-
-	@Override
-	public <T extends V> T putWithErrors(final K key, final T data, final long timeToLive) throws CacheException
-	{
-		return data;
-	}
-
-
-	@Override
-	public CacheStatistics getStatistics()
-	{
-		return new SimpleCacheStatistics();
-	}
-
-
-	@Override
-	public long getDefaultMaxIdleTime()
-	{
-		return 0;
-	}
-
-
-	@Override
-	public <T extends V> T putWithErrors(K key, T data, long timeToLive, long maxIdleTime) throws CacheException
-	{
-		return data;
-	}
-
-
-	@Override
-	public <T extends V> T put(K key, T data)
-	{
-		return data;
-	}
-
-
-	@Override
-	public <T extends V> T get(K key)
-	{
-		return null;
-	}
-
-
-	@Override
-	public <T extends V> T put(K key, T data, long timeToLive)
-	{
-		return data;
-	}
-
-
-	@Override
-	public <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime)
-	{
-		return data;
-	}
-
-
-	@Override
-	public void cleanUp() throws CacheException
-	{
-		/* Noop */
-	}
+    @Override
+    public void cleanUp() throws CacheException
+    {
+        /* Noop */
+    }
 }

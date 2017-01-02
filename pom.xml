@@ -13,6 +13,14 @@
         </developer>
     </developers>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <scm>
         <developerConnection>scm:git:https://github.com/dontdrinkandroot/cache.java.git</developerConnection>
     </scm>
@@ -25,6 +33,7 @@
     </repositories>
 
     <properties>
+        <version.com.mycila.license-maven-plugin>3.0</version.com.mycila.license-maven-plugin>
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.junit>4.12</version.junit>
     </properties>
@@ -41,6 +50,24 @@
                         <cache.test.ramdisk>${cache.test.ramdisk}</cache.test.ramdisk>
                         <cache.test.runloadtest>${cache.test.runloadtest}</cache.test.runloadtest>
                     </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>${version.com.mycila.license-maven-plugin}</version>
+                <configuration>
+                    <header>LICENSE</header>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                    </mapping>
+                    <excludes>
+                        <exclude>LICENSE</exclude>
+                        <exclude>**/*.xml</exclude>
+                        <exclude>**/*.properties</exclude>
+                        <exclude>**/*.html</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 

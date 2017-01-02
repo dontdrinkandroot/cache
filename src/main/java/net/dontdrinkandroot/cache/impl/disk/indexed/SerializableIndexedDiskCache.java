@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -17,80 +17,72 @@
  */
 package net.dontdrinkandroot.cache.impl.disk.indexed;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.utils.SerializationException;
 import net.dontdrinkandroot.cache.utils.Serializer;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Serializable, Serializable>
 {
+    public SerializableIndexedDiskCache(
+            final String name,
+            final long defaultTimeToLive,
+            final int maxSize,
+            final int recycleSize,
+            final File baseDir
+    ) throws IOException
+    {
+        super(name, defaultTimeToLive, maxSize, recycleSize, baseDir);
+    }
 
-	public SerializableIndexedDiskCache(
-			final String name,
-			final long defaultTimeToLive,
-			final int maxSize,
-			final int recycleSize,
-			final File baseDir) throws IOException
-	{
-		super(name, defaultTimeToLive, maxSize, recycleSize, baseDir);
-	}
+    public SerializableIndexedDiskCache(
+            final String name,
+            final long defaultTimeToLive,
+            final long defaultMaxIdleTime,
+            final int maxSize,
+            final int recycleSize,
+            final File baseDir
+    ) throws IOException
+    {
+        super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
+    }
 
+    @Override
+    public <T extends Serializable> byte[] dataToBytes(final T data) throws CacheException
+    {
+        try {
 
-	public SerializableIndexedDiskCache(
-			final String name,
-			final long defaultTimeToLive,
-			final long defaultMaxIdleTime,
-			final int maxSize,
-			final int recycleSize,
-			final File baseDir) throws IOException
-	{
-		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
-	}
+            return Serializer.serialize(data);
+        } catch (final SerializationException e) {
+            throw new CacheException(e);
+        }
+    }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Serializable> T dataFromBytes(final byte[] dataBytes) throws CacheException
+    {
+        try {
 
-	@Override
-	public <T extends Serializable> byte[] dataToBytes(final T data) throws CacheException
-	{
-		try {
+            return (T) Serializer.deserialize(dataBytes);
+        } catch (final SerializationException e) {
+            throw new CacheException(e);
+        }
+    }
 
-			return Serializer.serialize(data);
+    public int getIndexFileNumAllocatedBlocks()
+    {
+        return this.indexFile.getNumAllocated();
+    }
 
-		} catch (final SerializationException e) {
-			throw new CacheException(e);
-		}
-	}
-
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Serializable> T dataFromBytes(final byte[] dataBytes) throws CacheException
-	{
-		try {
-
-			return (T) Serializer.deserialize(dataBytes);
-
-		} catch (final SerializationException e) {
-			throw new CacheException(e);
-		}
-	}
-
-
-	public int getIndexFileNumAllocatedBlocks()
-	{
-		return this.indexFile.getNumAllocated();
-	}
-
-
-	public int getDataFileNumAllocatedBlocks()
-	{
-		return this.dataFile.getNumAllocated();
-	}
-
+    public int getDataFileNumAllocatedBlocks()
+    {
+        return this.dataFile.getNumAllocated();
+    }
 }

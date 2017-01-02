@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -17,54 +17,46 @@
  */
 package net.dontdrinkandroot.cache.impl.disk.indexed.storage;
 
-import java.io.Serializable;
-
 import net.dontdrinkandroot.cache.metadata.MetaData;
 import net.dontdrinkandroot.cache.metadata.impl.SimpleMetaData;
 
+import java.io.Serializable;
 
 public class KeyedMetaData<K extends Serializable> implements Serializable
 {
+    private final K key;
 
-	private final K key;
+    private final long created;
 
-	private final long created;
+    private final long maxIdleTime;
 
-	private final long maxIdleTime;
+    private final long timeToLive;
 
-	private final long timeToLive;
+    public KeyedMetaData(K key, MetaData metaData)
+    {
+        this.key = key;
+        this.created = metaData.getCreated();
+        this.timeToLive = metaData.getTimeToLive();
+        this.maxIdleTime = metaData.getMaxIdleTime();
+    }
 
+    public K getKey()
+    {
+        return this.key;
+    }
 
-	public KeyedMetaData(K key, MetaData metaData)
-	{
-		this.key = key;
-		this.created = metaData.getCreated();
-		this.timeToLive = metaData.getTimeToLive();
-		this.maxIdleTime = metaData.getMaxIdleTime();
-	}
+    public long getCreated()
+    {
+        return this.created;
+    }
 
+    public long getMaxIdleTime()
+    {
+        return this.maxIdleTime;
+    }
 
-	public K getKey()
-	{
-		return this.key;
-	}
-
-
-	public long getCreated()
-	{
-		return this.created;
-	}
-
-
-	public long getMaxIdleTime()
-	{
-		return this.maxIdleTime;
-	}
-
-
-	public SimpleMetaData getMetaData()
-	{
-		return new SimpleMetaData(this.created, this.timeToLive, this.maxIdleTime);
-	}
-
+    public SimpleMetaData getMetaData()
+    {
+        return new SimpleMetaData(this.created, this.timeToLive, this.maxIdleTime);
+    }
 }

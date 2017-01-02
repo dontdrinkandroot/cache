@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -19,64 +19,54 @@ package net.dontdrinkandroot.cache.statistics;
 
 import java.io.Serializable;
 
-
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public interface CacheStatistics extends Serializable
 {
+    /**
+     * Get the total number of cache hits.
+     */
+    long getCacheHits();
 
-	/**
-	 * Get the total number of cache hits.
-	 */
-	long getCacheHits();
+    /**
+     * Get the number of cache misses where the entry was not found.
+     */
+    long getCacheMissesNotFound();
 
+    /**
+     * Get the total put count.
+     */
+    long getPutCount();
 
-	/**
-	 * Get the number of cache misses where the entry was not found.
-	 */
-	long getCacheMissesNotFound();
+    /**
+     * Get the total get count.
+     */
+    long getGetCount();
 
+    /**
+     * Reset the statistics.
+     */
+    void reset();
 
-	/**
-	 * Get the total put count.
-	 */
-	long getPutCount();
+    /**
+     * Get the current hit rate, this is a value [0,1] which is the percentage of hits on all get
+     * requests.
+     */
+    float getHitRate();
 
+    /**
+     * Get the total number of cache misses.
+     */
+    long getCacheMisses();
 
-	/**
-	 * Get the total get count.
-	 */
-	long getGetCount();
+    /**
+     * Get the current size (the number of entries) in the cache.
+     */
+    int getCurrentSize();
 
-
-	/**
-	 * Reset the statistics.
-	 */
-	void reset();
-
-
-	/**
-	 * Get the current hit rate, this is a value [0,1] which is the percentage of hits on all get
-	 * requests.
-	 */
-	float getHitRate();
-
-
-	/**
-	 * Get the total number of cache misses.
-	 */
-	long getCacheMisses();
-
-
-	/**
-	 * Get the current size (the number of entries) in the cache.
-	 */
-	int getCurrentSize();
-
-
-	/**
-	 * Get the number of cache misses where the entry was expired.
-	 */
-	long getCacheMissesExpired();
+    /**
+     * Get the number of cache misses where the entry was expired.
+     */
+    long getCacheMissesExpired();
 }

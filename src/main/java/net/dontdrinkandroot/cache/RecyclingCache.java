@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -19,20 +19,16 @@ package net.dontdrinkandroot.cache;
 
 /**
  * A {@link Cache} that uses a recycling ExpungeStrategy.
- * 
- * @author Philip W. Sorst <philip@sorst.net>
+ *
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public interface RecyclingCache<K, V> extends Cache<K, V>
 {
+    int getMaxSize();
 
-	int getMaxSize();
+    void setMaxSize(int maxSize);
 
+    int getRecycleSize();
 
-	void setMaxSize(int maxSize);
-
-
-	int getRecycleSize();
-
-
-	void setRecycleSize(int recycleSize);
+    void setRecycleSize(int recycleSize);
 }

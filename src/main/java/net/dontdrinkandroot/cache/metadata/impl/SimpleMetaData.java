@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -20,151 +20,135 @@ package net.dontdrinkandroot.cache.metadata.impl;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 
-
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public class SimpleMetaData implements MetaData
 {
+    public static final double DECAY_FACTOR = 0.9;
 
-	public static final double DECAY_FACTOR = 0.9;
+    private final long timeToLive;
 
-	private final long timeToLive;
+    private final long created;
 
-	private final long created;
+    private final long maxIdleTime;
 
-	private final long maxIdleTime;
+    private long lastAccess;
 
-	private long lastAccess;
+    /**
+     * How often the corresponding entry has been accessed.
+     */
+    private int hitCount = 1;
 
-	/** How often the corresponding entry has been accessed. */
-	private int hitCount = 1;
+    public SimpleMetaData(final long timeToLive)
+    {
+        this.created = System.currentTimeMillis();
+        this.timeToLive = timeToLive;
+        this.lastAccess = System.currentTimeMillis();
+        this.maxIdleTime = Cache.UNLIMITED_IDLE_TIME;
+    }
 
+    public SimpleMetaData(long created, final long timeToLive)
+    {
+        this.created = created;
+        this.timeToLive = timeToLive;
+        this.lastAccess = System.currentTimeMillis();
+        this.maxIdleTime = Cache.UNLIMITED_IDLE_TIME;
+    }
 
-	public SimpleMetaData(final long timeToLive)
-	{
-		this.created = System.currentTimeMillis();
-		this.timeToLive = timeToLive;
-		this.lastAccess = System.currentTimeMillis();
-		this.maxIdleTime = Cache.UNLIMITED_IDLE_TIME;
-	}
+    public SimpleMetaData(long created, final long timeToLive, long maxIdleTime)
+    {
+        this.created = created;
+        this.timeToLive = timeToLive;
+        this.lastAccess = System.currentTimeMillis();
+        this.maxIdleTime = maxIdleTime;
+    }
 
+    @Override
+    public long getTimeToLive()
+    {
+        return this.timeToLive;
+    }
 
-	public SimpleMetaData(long created, final long timeToLive)
-	{
-		this.created = created;
-		this.timeToLive = timeToLive;
-		this.lastAccess = System.currentTimeMillis();
-		this.maxIdleTime = Cache.UNLIMITED_IDLE_TIME;
-	}
+    @Override
+    public final long getExpiry()
+    {
+        return this.created + this.timeToLive;
+    }
 
+    @Override
+    public final void update()
+    {
+        this.increaseHitCount();
+        this.lastAccess = System.currentTimeMillis();
+    }
 
-	public SimpleMetaData(long created, final long timeToLive, long maxIdleTime)
-	{
-		this.created = created;
-		this.timeToLive = timeToLive;
-		this.lastAccess = System.currentTimeMillis();
-		this.maxIdleTime = maxIdleTime;
-	}
+    @Override
+    public final long getLastAccess()
+    {
+        return this.lastAccess;
+    }
 
+    @Override
+    public final int getHitCount()
+    {
+        return this.hitCount;
+    }
 
-	@Override
-	public long getTimeToLive()
-	{
-		return this.timeToLive;
-	}
+    @Override
+    public boolean isExpired()
+    {
+        return this.created + this.timeToLive < System.currentTimeMillis();
+    }
 
+    @Override
+    public long getCreated()
+    {
+        return this.created;
+    }
 
-	@Override
-	public final long getExpiry()
-	{
-		return this.created + this.timeToLive;
-	}
+    @Override
+    public boolean isStale()
+    {
+        if (this.maxIdleTime == Cache.UNLIMITED_IDLE_TIME) {
+            return false;
+        }
 
+        return this.lastAccess + this.maxIdleTime < System.currentTimeMillis();
+    }
 
-	@Override
-	public final void update()
-	{
-		this.increaseHitCount();
-		this.lastAccess = System.currentTimeMillis();
-	}
+    @Override
+    public long getMaxIdleTime()
+    {
+        return this.maxIdleTime;
+    }
 
+    @Override
+    public void decay()
+    {
+        this.hitCount = (int) Math.floor(this.hitCount * SimpleMetaData.DECAY_FACTOR);
+    }
 
-	@Override
-	public final long getLastAccess()
-	{
-		return this.lastAccess;
-	}
+    public final void increaseHitCount()
+    {
+        if (this.hitCount < Integer.MAX_VALUE) {
+            this.hitCount++;
+        }
+    }
 
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("SimpleMetaData[");
+        sb.append("timeToLive=" + this.timeToLive);
+        sb.append(",");
+        sb.append("created=" + this.timeToLive);
+        sb.append(",");
+        sb.append("maxIdleTime=" + this.maxIdleTime);
+        sb.append(",");
+        sb.append("lastAccess=" + this.lastAccess);
+        sb.append("]");
 
-	@Override
-	public final int getHitCount()
-	{
-		return this.hitCount;
-	}
-
-
-	@Override
-	public boolean isExpired()
-	{
-		return this.created + this.timeToLive < System.currentTimeMillis();
-	}
-
-
-	@Override
-	public long getCreated()
-	{
-		return this.created;
-	}
-
-
-	@Override
-	public boolean isStale()
-	{
-		if (this.maxIdleTime == Cache.UNLIMITED_IDLE_TIME) {
-			return false;
-		}
-
-		return this.lastAccess + this.maxIdleTime < System.currentTimeMillis();
-	}
-
-
-	@Override
-	public long getMaxIdleTime()
-	{
-		return this.maxIdleTime;
-	}
-
-
-	@Override
-	public void decay()
-	{
-		this.hitCount = (int) Math.floor(this.hitCount * SimpleMetaData.DECAY_FACTOR);
-	}
-
-
-	public final void increaseHitCount()
-	{
-		if (this.hitCount < Integer.MAX_VALUE) {
-			this.hitCount++;
-		}
-	}
-
-
-	@Override
-	public String toString()
-	{
-		StringBuffer sb = new StringBuffer("SimpleMetaData[");
-		sb.append("timeToLive=" + this.timeToLive);
-		sb.append(",");
-		sb.append("created=" + this.timeToLive);
-		sb.append(",");
-		sb.append("maxIdleTime=" + this.maxIdleTime);
-		sb.append(",");
-		sb.append("lastAccess=" + this.lastAccess);
-		sb.append("]");
-
-		return sb.toString();
-	}
-
+        return sb.toString();
+    }
 }

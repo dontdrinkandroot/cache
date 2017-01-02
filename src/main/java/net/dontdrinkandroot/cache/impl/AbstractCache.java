@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -18,89 +18,84 @@
 package net.dontdrinkandroot.cache.impl;
 
 import net.dontdrinkandroot.cache.Cache;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public abstract class AbstractCache<K, V> implements Cache<K, V>
 {
+    private final String name;
 
-	private final String name;
+    /**
+     * Normal logger
+     */
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	/** Normal logger */
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    /**
+     * Aggregated logger for cache entries
+     */
+    private final Logger cleanUpLogger = LoggerFactory.getLogger("CleanUp");
 
-	/** Aggregated logger for cache entries */
-	private final Logger cleanUpLogger = LoggerFactory.getLogger("CleanUp");
+    /**
+     * Default time to live for cache entries
+     */
+    private long defaultTimeToLive;
 
-	/** Default time to live for cache entries */
-	private long defaultTimeToLive;
+    /**
+     * Default max idle time for cache entries
+     */
+    private long defaultMaxIdleTime;
 
-	/** Default max idle time for cache entries */
-	private long defaultMaxIdleTime;
+    public AbstractCache(final String name, long defaultTimeToLive)
+    {
+        this(name, defaultTimeToLive, Cache.UNLIMITED_IDLE_TIME);
+    }
 
+    public AbstractCache(final String name, long defaultTimeToLive, long defaultMaxIdleTime)
+    {
+        this.name = name;
+        this.defaultTimeToLive = defaultTimeToLive;
+        this.defaultMaxIdleTime = defaultMaxIdleTime;
+    }
 
-	public AbstractCache(final String name, long defaultTimeToLive)
-	{
-		this(name, defaultTimeToLive, Cache.UNLIMITED_IDLE_TIME);
-	}
+    @Override
+    public final String getName()
+    {
+        return this.name;
+    }
 
+    @Override
+    public final long getDefaultTtl()
+    {
+        return this.defaultTimeToLive;
+    }
 
-	public AbstractCache(final String name, long defaultTimeToLive, long defaultMaxIdleTime)
-	{
-		this.name = name;
-		this.defaultTimeToLive = defaultTimeToLive;
-		this.defaultMaxIdleTime = defaultMaxIdleTime;
-	}
+    @Override
+    public final long getDefaultMaxIdleTime()
+    {
+        return this.defaultMaxIdleTime;
+    }
 
+    public final Logger getLogger()
+    {
+        return this.logger;
+    }
 
-	@Override
-	public final String getName()
-	{
-		return this.name;
-	}
+    public final Logger getCleanUpLogger()
+    {
+        return this.cleanUpLogger;
+    }
 
+    @Override
+    public final void setDefaultTtl(final long defaultTTL)
+    {
+        this.defaultTimeToLive = defaultTTL;
+    }
 
-	@Override
-	public final long getDefaultTtl()
-	{
-		return this.defaultTimeToLive;
-	}
-
-
-	@Override
-	public final long getDefaultMaxIdleTime()
-	{
-		return this.defaultMaxIdleTime;
-	}
-
-
-	public final Logger getLogger()
-	{
-		return this.logger;
-	}
-
-
-	public final Logger getCleanUpLogger()
-	{
-		return this.cleanUpLogger;
-	}
-
-
-	@Override
-	public final void setDefaultTtl(final long defaultTTL)
-	{
-		this.defaultTimeToLive = defaultTTL;
-	}
-
-
-	public final void setDefaultMaxIdleTime(long defaultMaxIdleTime)
-	{
-		this.defaultMaxIdleTime = defaultMaxIdleTime;
-	}
-
+    public final void setDefaultMaxIdleTime(long defaultMaxIdleTime)
+    {
+        this.defaultMaxIdleTime = defaultMaxIdleTime;
+    }
 }

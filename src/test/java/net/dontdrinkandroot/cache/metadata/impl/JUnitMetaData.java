@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -20,132 +20,115 @@ package net.dontdrinkandroot.cache.metadata.impl;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 
+public class JUnitMetaData implements MetaData
+{
+    public static final double DECAY_FACTOR = 0.9;
 
-public class JUnitMetaData implements MetaData {
+    private long timeToLive;
 
-	public static final double DECAY_FACTOR = 0.9;
+    private long lastAccess;
 
-	private long timeToLive;
+    private long maxIdleTime;
 
-	private long lastAccess;
+    private long created;
 
-	private long maxIdleTime;
+    private int hitCount;
 
-	private long created;
+    public JUnitMetaData()
+    {
+        /* Noop */
+    }
 
-	private int hitCount;
+    @Override
+    public boolean isExpired()
+    {
+        return this.created + this.timeToLive < System.currentTimeMillis();
+    }
 
+    @Override
+    public long getExpiry()
+    {
+        return this.created + this.timeToLive;
+    }
 
-	public JUnitMetaData() {
+    @Override
+    public void update()
+    {
+        if (this.hitCount < Integer.MAX_VALUE) {
+            this.hitCount++;
+        }
+        this.lastAccess = System.currentTimeMillis();
+    }
 
-		/* Noop */
-	}
+    @Override
+    public int getHitCount()
+    {
+        return this.hitCount;
+    }
 
+    @Override
+    public long getLastAccess()
+    {
+        return this.lastAccess;
+    }
 
-	@Override
-	public boolean isExpired() {
+    @Override
+    public long getCreated()
+    {
+        return this.created;
+    }
 
-		return this.created + this.timeToLive < System.currentTimeMillis();
-	}
+    @Override
+    public long getTimeToLive()
+    {
+        return this.timeToLive;
+    }
 
+    public JUnitMetaData setCreated(long created)
+    {
+        this.created = created;
+        return this;
+    }
 
-	@Override
-	public long getExpiry() {
+    public JUnitMetaData setExpiry(long expiry)
+    {
+        this.timeToLive = expiry - this.created;
+        return this;
+    }
 
-		return this.created + this.timeToLive;
-	}
+    public JUnitMetaData setHitCount(int hits)
+    {
+        this.hitCount = hits;
+        return this;
+    }
 
+    public JUnitMetaData setLastAccess(long lastAccess)
+    {
+        this.lastAccess = lastAccess;
+        return this;
+    }
 
-	@Override
-	public void update() {
+    @Override
+    public boolean isStale()
+    {
+        if (this.maxIdleTime == Cache.UNLIMITED_IDLE_TIME) {
+            return false;
+        }
 
-		if (this.hitCount < Integer.MAX_VALUE) {
-			this.hitCount++;
-		}
-		this.lastAccess = System.currentTimeMillis();
-	}
+        return this.lastAccess + this.maxIdleTime < System.currentTimeMillis();
+    }
 
+    @Override
+    public long getMaxIdleTime()
+    {
+        return this.maxIdleTime;
+    }
 
-	@Override
-	public int getHitCount() {
-
-		return this.hitCount;
-	}
-
-
-	@Override
-	public long getLastAccess() {
-
-		return this.lastAccess;
-	}
-
-
-	@Override
-	public long getCreated() {
-
-		return this.created;
-	}
-
-
-	@Override
-	public long getTimeToLive() {
-
-		return this.timeToLive;
-	}
-
-
-	public JUnitMetaData setCreated(long created) {
-
-		this.created = created;
-		return this;
-	}
-
-
-	public JUnitMetaData setExpiry(long expiry) {
-
-		this.timeToLive = expiry - this.created;
-		return this;
-	}
-
-
-	public JUnitMetaData setHitCount(int hits) {
-
-		this.hitCount = hits;
-		return this;
-	}
-
-
-	public JUnitMetaData setLastAccess(long lastAccess) {
-
-		this.lastAccess = lastAccess;
-		return this;
-	}
-
-
-	@Override
-	public boolean isStale() {
-
-		if (this.maxIdleTime == Cache.UNLIMITED_IDLE_TIME) {
-			return false;
-		}
-
-		return this.lastAccess + this.maxIdleTime < System.currentTimeMillis();
-	}
-
-
-	@Override
-	public long getMaxIdleTime() {
-
-		return this.maxIdleTime;
-	}
-
-
-	@Override
-	public void decay() {
-
-		if (this.hitCount > 0) {
-			this.hitCount = (int) Math.floor(this.hitCount * JUnitMetaData.DECAY_FACTOR);
-		}
-	}
-
+    @Override
+    public void decay()
+    {
+        if (this.hitCount > 0) {
+            this.hitCount = (int) Math.floor(this.hitCount * JUnitMetaData.DECAY_FACTOR);
+        }
+    }
 }

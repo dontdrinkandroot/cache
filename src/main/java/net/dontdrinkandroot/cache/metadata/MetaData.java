@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -19,70 +19,59 @@ package net.dontdrinkandroot.cache.metadata;
 
 import java.io.Serializable;
 
-
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public interface MetaData extends Serializable
 {
+    /**
+     * Check if the entry is expired.
+     */
+    boolean isExpired();
 
-	/**
-	 * Check if the entry is expired.
-	 */
-	boolean isExpired();
+    /**
+     * Check if the entry has not been accessed within the idle period.
+     */
+    boolean isStale();
 
+    /**
+     * Get the timestamp when the entry expires.
+     */
+    long getExpiry();
 
-	/**
-	 * Check if the entry has not been accessed within the idle period.
-	 */
-	boolean isStale();
+    /**
+     * Get the maximum time that the entry may idle (not being accessed) before being evicted (in
+     * milliseconds).
+     */
+    long getMaxIdleTime();
 
+    /**
+     * Update the entry after a cache hit.
+     */
+    void update();
 
-	/**
-	 * Get the timestamp when the entry expires.
-	 */
-	long getExpiry();
+    /**
+     * Get the number of hits.
+     */
+    int getHitCount();
 
+    /**
+     * Get the timestamp when the entry was last accessed.
+     */
+    long getLastAccess();
 
-	/**
-	 * Get the maximum time that the entry may idle (not being accessed) before being evicted (in
-	 * milliseconds).
-	 */
-	long getMaxIdleTime();
+    /**
+     * Get the timestamp when the entry was created.
+     */
+    long getCreated();
 
+    /**
+     * Decreases the hitcount for use with LRU based expunge strategies.
+     */
+    void decay();
 
-	/**
-	 * Update the entry after a cache hit.
-	 */
-	void update();
-
-
-	/**
-	 * Get the number of hits.
-	 */
-	int getHitCount();
-
-
-	/**
-	 * Get the timestamp when the entry was last accessed.
-	 */
-	long getLastAccess();
-
-
-	/**
-	 * Get the timestamp when the entry was created.
-	 */
-	long getCreated();
-
-
-	/**
-	 * Decreases the hitcount for use with LRU based expunge strategies.
-	 */
-	void decay();
-
-
-	/**
-	 * Gets the time to live of this entry (in milliseconds).
-	 */
-	long getTimeToLive();
+    /**
+     * Gets the time to live of this entry (in milliseconds).
+     */
+    long getTimeToLive();
 }

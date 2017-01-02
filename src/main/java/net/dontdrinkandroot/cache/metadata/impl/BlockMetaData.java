@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -20,133 +20,114 @@ package net.dontdrinkandroot.cache.metadata.impl;
 import net.dontdrinkandroot.cache.impl.disk.indexed.storage.IndexData;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 
-
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public class BlockMetaData implements MetaData
 {
+    private IndexData indexData;
 
-	private IndexData indexData;
+    private final SimpleMetaData metaData;
 
-	private final SimpleMetaData metaData;
+    public BlockMetaData(IndexData indexData, SimpleMetaData metaData)
+    {
+        this.indexData = indexData;
+        this.metaData = metaData;
+    }
 
+    public BlockMetaData(SimpleMetaData metaData)
+    {
+        this.metaData = metaData;
+    }
 
-	public BlockMetaData(IndexData indexData, SimpleMetaData metaData)
-	{
-		this.indexData = indexData;
-		this.metaData = metaData;
-	}
+    @Override
+    public boolean isExpired()
+    {
+        return this.metaData.isExpired();
+    }
 
+    @Override
+    public boolean isStale()
+    {
+        return this.metaData.isStale();
+    }
 
-	public BlockMetaData(SimpleMetaData metaData)
-	{
-		this.metaData = metaData;
-	}
+    @Override
+    public long getExpiry()
+    {
+        return this.metaData.getExpiry();
+    }
 
+    @Override
+    public long getMaxIdleTime()
+    {
+        return this.metaData.getMaxIdleTime();
+    }
 
-	@Override
-	public boolean isExpired()
-	{
-		return this.metaData.isExpired();
-	}
+    @Override
+    public void update()
+    {
+        this.metaData.update();
+    }
 
+    @Override
+    public int getHitCount()
+    {
+        return this.metaData.getHitCount();
+    }
 
-	@Override
-	public boolean isStale()
-	{
-		return this.metaData.isStale();
-	}
+    @Override
+    public long getLastAccess()
+    {
+        return this.metaData.getLastAccess();
+    }
 
+    @Override
+    public long getCreated()
+    {
+        return this.metaData.getCreated();
+    }
 
-	@Override
-	public long getExpiry()
-	{
-		return this.metaData.getExpiry();
-	}
+    @Override
+    public void decay()
+    {
+        this.metaData.decay();
+    }
 
+    @Override
+    public long getTimeToLive()
+    {
+        return this.metaData.getTimeToLive();
+    }
 
-	@Override
-	public long getMaxIdleTime()
-	{
-		return this.metaData.getMaxIdleTime();
-	}
+    public SimpleMetaData getMetaData()
+    {
+        return this.metaData;
+    }
 
+    public IndexData getIndexData()
+    {
+        return this.indexData;
+    }
 
-	@Override
-	public void update()
-	{
-		this.metaData.update();
-	}
+    public void setIndexData(IndexData indexData)
+    {
+        this.indexData = indexData;
+    }
 
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("BlockMetaData[");
+        if (this.indexData != null) {
+            sb.append("indexData=" + this.indexData.toString());
+            sb.append(",");
+        }
+        if (this.metaData != null) {
+            sb.append("metaData=" + this.metaData.toString());
+        }
+        sb.append("]");
 
-	@Override
-	public int getHitCount()
-	{
-		return this.metaData.getHitCount();
-	}
-
-
-	@Override
-	public long getLastAccess()
-	{
-		return this.metaData.getLastAccess();
-	}
-
-
-	@Override
-	public long getCreated()
-	{
-		return this.metaData.getCreated();
-	}
-
-
-	@Override
-	public void decay()
-	{
-		this.metaData.decay();
-	}
-
-
-	@Override
-	public long getTimeToLive()
-	{
-		return this.metaData.getTimeToLive();
-	}
-
-
-	public SimpleMetaData getMetaData()
-	{
-		return this.metaData;
-	}
-
-
-	public IndexData getIndexData()
-	{
-		return this.indexData;
-	}
-
-
-	public void setIndexData(IndexData indexData)
-	{
-		this.indexData = indexData;
-	}
-
-
-	@Override
-	public String toString()
-	{
-		StringBuffer sb = new StringBuffer("BlockMetaData[");
-		if (this.indexData != null) {
-			sb.append("indexData=" + this.indexData.toString());
-			sb.append(",");
-		}
-		if (this.metaData != null) {
-			sb.append("metaData=" + this.metaData.toString());
-		}
-		sb.append("]");
-
-		return sb.toString();
-	}
-
+        return sb.toString();
+    }
 }

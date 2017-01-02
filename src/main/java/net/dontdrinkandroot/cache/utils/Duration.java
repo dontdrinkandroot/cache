@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -19,43 +19,37 @@ package net.dontdrinkandroot.cache.utils;
 
 public class Duration
 {
+    public static final long SECONDS_PER_MINUTE = 60;
 
-	public static final long SECONDS_PER_MINUTE = 60;
+    public static final long MINUTES_PER_HOUR = 60;
 
-	public static final long MINUTES_PER_HOUR = 60;
+    public static final long HOURS_PER_DAY = 60;
 
-	public static final long HOURS_PER_DAY = 60;
+    public static final long MILLIS_PER_SECOND = 1000;
 
-	public static final long MILLIS_PER_SECOND = 1000;
+    public static final long MILLIS_PER_MINUTE = Duration.MILLIS_PER_SECOND * Duration.SECONDS_PER_MINUTE;
 
-	public static final long MILLIS_PER_MINUTE = Duration.MILLIS_PER_SECOND * Duration.SECONDS_PER_MINUTE;
+    public static final long MILLIS_PER_HOUR = Duration.MINUTES_PER_HOUR * Duration.MILLIS_PER_MINUTE;
 
-	public static final long MILLIS_PER_HOUR = Duration.MINUTES_PER_HOUR * Duration.MILLIS_PER_MINUTE;
+    public static final long MILLIS_PER_DAY = Duration.MILLIS_PER_HOUR * Duration.HOURS_PER_DAY;
 
-	public static final long MILLIS_PER_DAY = Duration.MILLIS_PER_HOUR * Duration.HOURS_PER_DAY;
+    public static long seconds(int seconds)
+    {
+        return Duration.MILLIS_PER_SECOND * seconds;
+    }
 
+    public static long minutes(int minutes)
+    {
+        return Duration.MILLIS_PER_MINUTE * minutes;
+    }
 
-	public static long seconds(int seconds)
-	{
-		return Duration.MILLIS_PER_SECOND * seconds;
-	}
+    public static long hours(int hours)
+    {
+        return Duration.MILLIS_PER_HOUR * hours;
+    }
 
-
-	public static long minutes(int minutes)
-	{
-		return Duration.MILLIS_PER_MINUTE * minutes;
-	}
-
-
-	public static long hours(int hours)
-	{
-		return Duration.MILLIS_PER_HOUR * hours;
-	}
-
-
-	public static long days(int days)
-	{
-		return Duration.MILLIS_PER_DAY * days;
-	}
-
+    public static long days(int days)
+    {
+        return Duration.MILLIS_PER_DAY * days;
+    }
 }

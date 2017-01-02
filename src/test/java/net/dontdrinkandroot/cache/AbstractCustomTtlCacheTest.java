@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -21,48 +21,43 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+public abstract class AbstractCustomTtlCacheTest<K, V> extends AbstractCacheTest<K, V>
+{
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-public abstract class AbstractCustomTtlCacheTest<K, V> extends AbstractCacheTest<K, V> {
+    protected Logger getLogger()
+    {
+        return this.logger;
+    }
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected void testCustomGetPutDelete(CustomTtlCache<K, V> cache) throws Exception
+    {
+        this.testDefaultPutGetDelete(cache);
 
-
-	protected Logger getLogger() {
-
-		return this.logger;
-	}
-
-
-	protected void testCustomGetPutDelete(CustomTtlCache<K, V> cache) throws Exception {
-
-		this.testDefaultPutGetDelete(cache);
-
-		this.put(this.increaseAndGetCurrentId(), cache, 0L);
+        this.put(this.increaseAndGetCurrentId(), cache, 0L);
 
 		/* Wait until expired */
-		Thread.sleep(1);
-		this.size--;
+        Thread.sleep(1);
+        this.size--;
 
-		this.assertExpired(this.getCurrentId(), cache);
-	}
+        this.assertExpired(this.getCurrentId(), cache);
+    }
 
+    protected V put(int key, CustomTtlCache<K, V> cache, long ttl) throws Exception
+    {
+        V object = cache.putWithErrors(this.translateKey(key), this.createInputObject(key), ttl);
+        this.putCount++;
+        this.size++;
+        this.assertStatistics(cache);
 
-	protected V put(int key, CustomTtlCache<K, V> cache, long ttl) throws Exception {
+        return object;
+    }
 
-		V object = cache.putWithErrors(this.translateKey(key), this.createInputObject(key), ttl);
-		this.putCount++;
-		this.size++;
-		this.assertStatistics(cache);
-
-		return object;
-	}
-
-
-	protected void assertExpired(int key, Cache<K, V> cache) throws Exception {
-
-		Assert.assertNull(cache.getWithErrors(this.translateKey(key)));
-		this.getCount++;
-		this.expiredCount++;
-		this.assertStatistics(cache);
-	}
+    protected void assertExpired(int key, Cache<K, V> cache) throws Exception
+    {
+        Assert.assertNull(cache.getWithErrors(this.translateKey(key)));
+        this.getCount++;
+        this.expiredCount++;
+        this.assertStatistics(cache);
+    }
 }

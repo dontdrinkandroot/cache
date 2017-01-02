@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -17,181 +17,167 @@
  */
 package net.dontdrinkandroot.cache.impl.disk.file;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import net.dontdrinkandroot.cache.AbstractCacheTest;
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
 import net.dontdrinkandroot.cache.utils.Md5;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-public class FileCacheTest extends AbstractCacheTest<Md5, File> {
+public class FileCacheTest extends AbstractCacheTest<Md5, File>
+{
+    private final static File baseDir = new File(FileUtils.getTempDirectory(), "filefilebackedcachetest");
 
-	private final static File baseDir = new File(FileUtils.getTempDirectory(), "filefilebackedcachetest");
+    @AfterClass
+    public static void afterClass() throws IOException
+    {
+        FileUtils.deleteDirectory(FileCacheTest.baseDir);
+    }
 
+    @Before
+    public void before() throws IOException
+    {
+        FileUtils.deleteDirectory(FileCacheTest.baseDir);
+    }
 
-	@AfterClass
-	public static void afterClass() throws IOException {
+    @Test
+    public void testDefaultGetPutDelete() throws Exception
+    {
+        FileCache cache =
+                new FileCache(
+                        "testCache",
+                        Duration.minutes(1),
+                        Cache.UNLIMITED_IDLE_TIME,
+                        Integer.MAX_VALUE,
+                        Integer.MAX_VALUE,
+                        FileCacheTest.baseDir,
+                        2
+                );
 
-		FileUtils.deleteDirectory(FileCacheTest.baseDir);
-	}
+        super.testDefaultPutGetDelete(cache);
+    }
 
+    @Test
+    public void testReReadIndex() throws Exception
+    {
+        FileCache cache =
+                new FileCache(
+                        "testCache",
+                        Duration.minutes(1),
+                        Cache.UNLIMITED_IDLE_TIME,
+                        Integer.MAX_VALUE,
+                        Integer.MAX_VALUE,
+                        FileCacheTest.baseDir,
+                        2
+                );
 
-	@Before
-	public void before() throws IOException {
+        cache.putWithErrors(this.translateKey(0), this.createInputObject(0));
+        this.doAssertGet(0, cache);
+        cache.putWithErrors(this.translateKey(1), this.createInputObject(1));
+        this.doAssertGet(1, cache);
+        cache.putWithErrors(this.translateKey(2), this.createInputObject(2));
+        this.doAssertGet(2, cache);
 
-		FileUtils.deleteDirectory(FileCacheTest.baseDir);
-	}
+        cache =
+                new FileCache(
+                        "testCache",
+                        Duration.minutes(1),
+                        Cache.UNLIMITED_IDLE_TIME,
+                        Integer.MAX_VALUE,
+                        Integer.MAX_VALUE,
+                        FileCacheTest.baseDir,
+                        2
+                );
 
+        this.doAssertGet(0, cache);
+        this.doAssertGet(1, cache);
+        this.doAssertGet(2, cache);
+    }
 
-	@Test
-	public void testDefaultGetPutDelete() throws Exception {
+    @Test
+    public void testDefaultExpiry() throws Exception
+    {
+        final FileCache cache =
+                new FileCache(
+                        "testCache",
+                        0L,
+                        Cache.UNLIMITED_IDLE_TIME,
+                        Integer.MAX_VALUE,
+                        Integer.MAX_VALUE,
+                        FileCacheTest.baseDir,
+                        2
+                );
 
-		FileCache cache =
-				new FileCache(
-						"testCache",
-						Duration.minutes(1),
-						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
-						FileCacheTest.baseDir,
-						2);
+        super.testDefaultExpiry(cache);
+    }
 
-		super.testDefaultPutGetDelete(cache);
-	}
+    @Override
+    protected void doAssertGet(int key, Cache<Md5, File> cache) throws Exception
+    {
+        File file = cache.getWithErrors(this.translateKey(key));
+        Assert.assertNotNull(file);
 
+        final List<String> lines = this.readLines(file);
+        Assert.assertEquals(1, lines.size());
+        Assert.assertEquals(this.translateKey(key).getHex(), lines.iterator().next());
+    }
 
-	@Test
-	public void testReReadIndex() throws Exception {
+    private List<String> readLines(File file) throws IOException
+    {
+        List<String> lines = new ArrayList<String>();
+        BufferedReader br = new BufferedReader(new FileReader(file));
 
-		FileCache cache =
-				new FileCache(
-						"testCache",
-						Duration.minutes(1),
-						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
-						FileCacheTest.baseDir,
-						2);
+        String line;
+        do {
+            line = br.readLine();
+            if (line != null) {
+                lines.add(line);
+            }
+        } while (line != null);
 
-		cache.putWithErrors(this.translateKey(0), this.createInputObject(0));
-		this.doAssertGet(0, cache);
-		cache.putWithErrors(this.translateKey(1), this.createInputObject(1));
-		this.doAssertGet(1, cache);
-		cache.putWithErrors(this.translateKey(2), this.createInputObject(2));
-		this.doAssertGet(2, cache);
+        br.close();
 
-		cache =
-				new FileCache(
-						"testCache",
-						Duration.minutes(1),
-						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
-						FileCacheTest.baseDir,
-						2);
+        return lines;
+    }
 
-		this.doAssertGet(0, cache);
-		this.doAssertGet(1, cache);
-		this.doAssertGet(2, cache);
-	}
+    private void writeLines(File file, Set<String> lines) throws IOException
+    {
+        BufferedWriter bw;
+        bw = new BufferedWriter(new FileWriter(file));
+        for (String line : lines) {
+            bw.write(line + "\n");
+        }
 
+        bw.close();
+    }
 
-	@Test
-	public void testDefaultExpiry() throws Exception {
+    @Override
+    protected File createInputObject(int key) throws Exception
+    {
+        File file = File.createTempFile("filecachetest", ".tmp");
+        file.deleteOnExit();
+        this.writeLines(file, Collections.singleton(this.translateKey(key).getHex()));
 
-		final FileCache cache =
-				new FileCache(
-						"testCache",
-						0L,
-						Cache.UNLIMITED_IDLE_TIME,
-						Integer.MAX_VALUE,
-						Integer.MAX_VALUE,
-						FileCacheTest.baseDir,
-						2);
+        return file;
+    }
 
-		super.testDefaultExpiry(cache);
-	}
+    @Override
+    protected Md5 translateKey(int key)
+    {
+        final StringBuffer sb = new StringBuffer();
+        for (int i = -1; i < key % 100; i++) {
+            sb.append(Long.toString(key));
+        }
 
-
-	@Override
-	protected void doAssertGet(int key, Cache<Md5, File> cache) throws Exception {
-
-		File file = cache.getWithErrors(this.translateKey(key));
-		Assert.assertNotNull(file);
-
-		final List<String> lines = this.readLines(file);
-		Assert.assertEquals(1, lines.size());
-		Assert.assertEquals(this.translateKey(key).getHex(), lines.iterator().next());
-	}
-
-
-	private List<String> readLines(File file) throws IOException {
-
-		List<String> lines = new ArrayList<String>();
-		BufferedReader br = new BufferedReader(new FileReader(file));
-
-		String line;
-		do {
-			line = br.readLine();
-			if (line != null) {
-				lines.add(line);
-			}
-		} while (line != null);
-
-		br.close();
-
-		return lines;
-	}
-
-
-	private void writeLines(File file, Set<String> lines) throws IOException {
-
-		BufferedWriter bw;
-		bw = new BufferedWriter(new FileWriter(file));
-		for (String line : lines) {
-			bw.write(line + "\n");
-		}
-
-		bw.close();
-	}
-
-
-	@Override
-	protected File createInputObject(int key) throws Exception {
-
-		File file = File.createTempFile("filecachetest", ".tmp");
-		file.deleteOnExit();
-		this.writeLines(file, Collections.singleton(this.translateKey(key).getHex()));
-
-		return file;
-	}
-
-
-	@Override
-	protected Md5 translateKey(int key) {
-
-		final StringBuffer sb = new StringBuffer();
-		for (int i = -1; i < key % 100; i++) {
-			sb.append(Long.toString(key));
-		}
-
-		return new Md5(sb.toString());
-	}
-
+        return new Md5(sb.toString());
+    }
 }

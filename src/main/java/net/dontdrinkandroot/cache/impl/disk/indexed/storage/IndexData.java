@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -20,110 +20,98 @@ package net.dontdrinkandroot.cache.impl.disk.indexed.storage;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-
 public class IndexData
 {
+    public static final long LENGTH = 1 + 2 * DataBlock.LENGTH;
 
-	public static final long LENGTH = 1 + 2 * DataBlock.LENGTH;
+    public int blockNum;
 
-	public int blockNum;
+    public DataBlock keyMetaBlock;
 
-	public DataBlock keyMetaBlock;
+    public DataBlock valueBlock;
 
-	public DataBlock valueBlock;
+    public IndexData(int blockNum, DataBlock keyMetaBlock, DataBlock valueBlock)
+    {
+        this.blockNum = blockNum;
+        this.keyMetaBlock = keyMetaBlock;
+        this.valueBlock = valueBlock;
+    }
 
+    public IndexData(DataBlock keyMetaBlock, DataBlock valueBlock)
+    {
+        this.keyMetaBlock = keyMetaBlock;
+        this.valueBlock = valueBlock;
+    }
 
-	public IndexData(int blockNum, DataBlock keyMetaBlock, DataBlock valueBlock)
-	{
-		this.blockNum = blockNum;
-		this.keyMetaBlock = keyMetaBlock;
-		this.valueBlock = valueBlock;
-	}
+    public int getBlockNum()
+    {
+        return this.blockNum;
+    }
 
+    public void setBlockNum(int blockNum)
+    {
+        this.blockNum = blockNum;
+    }
 
-	public IndexData(DataBlock keyMetaBlock, DataBlock valueBlock)
-	{
-		this.keyMetaBlock = keyMetaBlock;
-		this.valueBlock = valueBlock;
-	}
+    public DataBlock getKeyMetaBlock()
+    {
+        return this.keyMetaBlock;
+    }
 
+    public DataBlock getValueBlock()
+    {
+        return this.valueBlock;
+    }
 
-	public int getBlockNum()
-	{
-		return this.blockNum;
-	}
+    public static IndexData read(RandomAccessFile randomAccessFile, int blockNum) throws IOException
+    {
+        final long position = IndexData.LENGTH * blockNum;
 
+        randomAccessFile.seek(position);
 
-	public void setBlockNum(int blockNum)
-	{
-		this.blockNum = blockNum;
-	}
+        boolean allocated = randomAccessFile.readBoolean();
+        if (!allocated) {
+            return null;
+        }
 
+        long keyMetaStart = randomAccessFile.readLong();
+        long keyMetaEnd = randomAccessFile.readLong();
+        long valueStart = randomAccessFile.readLong();
+        long valueEnd = randomAccessFile.readLong();
 
-	public DataBlock getKeyMetaBlock()
-	{
-		return this.keyMetaBlock;
-	}
+        return new IndexData(blockNum, new DataBlock(keyMetaStart, keyMetaEnd), new DataBlock(valueStart, valueEnd));
+    }
 
+    public IndexData write(RandomAccessFile randomAccessFile, int blockNum) throws IOException
+    {
+        this.blockNum = blockNum;
 
-	public DataBlock getValueBlock()
-	{
-		return this.valueBlock;
-	}
+        final long position = IndexData.LENGTH * blockNum;
 
-
-	public static IndexData read(RandomAccessFile randomAccessFile, int blockNum) throws IOException
-	{
-		final long position = IndexData.LENGTH * blockNum;
-
-		randomAccessFile.seek(position);
-
-		boolean allocated = randomAccessFile.readBoolean();
-		if (!allocated) {
-			return null;
-		}
-
-		long keyMetaStart = randomAccessFile.readLong();
-		long keyMetaEnd = randomAccessFile.readLong();
-		long valueStart = randomAccessFile.readLong();
-		long valueEnd = randomAccessFile.readLong();
-
-		return new IndexData(blockNum, new DataBlock(keyMetaStart, keyMetaEnd), new DataBlock(valueStart, valueEnd));
-	}
-
-
-	public IndexData write(RandomAccessFile randomAccessFile, int blockNum) throws IOException
-	{
-		this.blockNum = blockNum;
-
-		final long position = IndexData.LENGTH * blockNum;
-
-		randomAccessFile.seek(position);
+        randomAccessFile.seek(position);
 
 		/* Allocation marker */
-		randomAccessFile.writeBoolean(true);
+        randomAccessFile.writeBoolean(true);
 
-		randomAccessFile.writeLong(this.keyMetaBlock.getStartPosition());
-		randomAccessFile.writeLong(this.keyMetaBlock.getEndPosition());
-		randomAccessFile.writeLong(this.valueBlock.getStartPosition());
-		randomAccessFile.writeLong(this.valueBlock.getEndPosition());
+        randomAccessFile.writeLong(this.keyMetaBlock.getStartPosition());
+        randomAccessFile.writeLong(this.keyMetaBlock.getEndPosition());
+        randomAccessFile.writeLong(this.valueBlock.getStartPosition());
+        randomAccessFile.writeLong(this.valueBlock.getEndPosition());
 
-		return this;
-	}
+        return this;
+    }
 
+    @Override
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer("IndexData[");
+        sb.append("blockNum=" + this.blockNum);
+        sb.append(",");
+        sb.append("keyMetaBlock=" + this.keyMetaBlock);
+        sb.append(",");
+        sb.append("valueBlock=" + this.valueBlock);
+        sb.append("]");
 
-	@Override
-	public String toString()
-	{
-		StringBuffer sb = new StringBuffer("IndexData[");
-		sb.append("blockNum=" + this.blockNum);
-		sb.append(",");
-		sb.append("keyMetaBlock=" + this.keyMetaBlock);
-		sb.append(",");
-		sb.append("valueBlock=" + this.valueBlock);
-		sb.append("]");
-
-		return sb.toString();
-	}
-
+        return sb.toString();
+    }
 }

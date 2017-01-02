@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -21,122 +21,115 @@ import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.CustomTtlCache;
 import net.dontdrinkandroot.cache.metadata.MetaData;
 
-
 /**
- * @author Philip W. Sorst <philip@sorst.net>
+ * @author Philip Washington Sorst <philip@sorst.net>
  */
 public abstract class AbstractMapBackedCustomTtlCache<K, V, M extends MetaData> extends AbstractMapBackedCache<K, V, M>
-		implements CustomTtlCache<K, V>
+        implements CustomTtlCache<K, V>
 {
+    /**
+     * Construct a new AbstractCustomTtlCache.
+     *
+     * @param name              The name of the cache.
+     * @param defaultTimeToLive The default Time to Live for Cache entries.
+     */
+    public AbstractMapBackedCustomTtlCache(
+            final String name,
+            final long defaultTimeToLive,
+            int maxSize,
+            int recycleSize
+    )
+    {
+        super(name, defaultTimeToLive, maxSize, recycleSize);
+    }
 
-	/**
-	 * Construct a new AbstractCustomTtlCache.
-	 * 
-	 * @param name
-	 *            The name of the cache.
-	 * @param defaultTimeToLive
-	 *            The default Time to Live for Cache entries.
-	 */
-	public AbstractMapBackedCustomTtlCache(final String name, final long defaultTimeToLive, int maxSize, int recycleSize)
-	{
-		super(name, defaultTimeToLive, maxSize, recycleSize);
-	}
+    /**
+     * Construct a new AbstractCustomTtlCache.
+     *
+     * @param name              The name of the cache.
+     * @param defaultTimeToLive The default Time to Live for Cache entries.
+     */
+    public AbstractMapBackedCustomTtlCache(
+            final String name,
+            final long defaultTimeToLive,
+            final long defaultMaxIdleTime,
+            int maxSize,
+            int recycleSize
+    )
+    {
+        super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
+    }
 
+    @Override
+    public <T extends V> T put(K key, T data, long timeToLive)
+    {
+        try {
+            return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
+        } catch (CacheException e) {
+            this.getLogger().warn("Putting " + key + " to cache failed", e);
+            return data;
+        }
+    }
 
-	/**
-	 * Construct a new AbstractCustomTtlCache.
-	 * 
-	 * @param name
-	 *            The name of the cache.
-	 * @param defaultTimeToLive
-	 *            The default Time to Live for Cache entries.
-	 */
-	public AbstractMapBackedCustomTtlCache(
-			final String name,
-			final long defaultTimeToLive,
-			final long defaultMaxIdleTime,
-			int maxSize,
-			int recycleSize)
-	{
-		super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize);
-	}
+    @Override
+    public synchronized <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime)
+    {
+        try {
+            return this.putWithErrors(key, data, timeToLive, maxIdleTime);
+        } catch (CacheException e) {
+            this.getLogger().warn("Putting " + key + " to cache failed", e);
+            return data;
+        }
+    }
 
+    @Override
+    public final synchronized <T extends V> T putWithErrors(
+            final K key,
+            final T data,
+            final long timeToLive,
+            final long maxIdleTime
+    ) throws CacheException
+    {
+        if (key == null) {
+            throw new CacheException("Key must not be null");
+        }
 
-	@Override
-	public <T extends V> T put(K key, T data, long timeToLive)
-	{
-		try {
-			return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
-		} catch (CacheException e) {
-			this.getLogger().warn("Putting " + key + " to cache failed", e);
-			return data;
-		}
-	}
+        this.getLogger().trace("Putting '{}' to cache", key);
 
-
-	@Override
-	public synchronized <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime)
-	{
-		try {
-			return this.putWithErrors(key, data, timeToLive, maxIdleTime);
-		} catch (CacheException e) {
-			this.getLogger().warn("Putting " + key + " to cache failed", e);
-			return data;
-		}
-	}
-
-
-	@Override
-	public final synchronized <T extends V> T putWithErrors(
-			final K key,
-			final T data,
-			final long timeToLive,
-			final long maxIdleTime) throws CacheException
-	{
-		if (key == null) {
-			throw new CacheException("Key must not be null");
-		}
-
-		this.getLogger().trace("Putting '{}' to cache", key);
-
-		final M metaData = this.getEntry(key);
+        final M metaData = this.getEntry(key);
 
 		/* If the key is already known, delete entry first */
-		if (metaData != null) {
-			this.delete(key, metaData);
-		}
+        if (metaData != null) {
+            this.delete(key, metaData);
+        }
 
-		if (this.triggerExpunge()) {
-			this.expunge();
-		}
+        if (this.triggerExpunge()) {
+            this.expunge();
+        }
 
-		final T result = this.doPut(key, data, timeToLive, maxIdleTime);
+        final T result = this.doPut(key, data, timeToLive, maxIdleTime);
 
-		this.getStatistics().increasePutCount();
+        this.getStatistics().increasePutCount();
 
-		return result;
-	}
+        return result;
+    }
 
+    @Override
+    public final synchronized <T extends V> T putWithErrors(final K key, final T data, final long timeToLive)
+            throws CacheException
+    {
+        return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
+    }
 
-	@Override
-	public final synchronized <T extends V> T putWithErrors(final K key, final T data, final long timeToLive)
-			throws CacheException
-	{
-		return this.putWithErrors(key, data, timeToLive, this.getDefaultMaxIdleTime());
-	}
+    @Override
+    protected <T extends V> T doPut(final K key, final T data) throws CacheException
+    {
+        return this.doPut(key, data, this.getDefaultTtl(), this.getDefaultMaxIdleTime());
+    }
 
-
-	@Override
-	protected <T extends V> T doPut(final K key, final T data) throws CacheException
-	{
-		return this.doPut(key, data, this.getDefaultTtl(), this.getDefaultMaxIdleTime());
-	};
-
-
-	/**
-	 * Performs storage of the given data and adds new metadata to the map.
-	 */
-	protected abstract <T extends V> T doPut(K key, T data, long timeToLive, long defaultMaxIdleTime)
-			throws CacheException;
-
+    /**
+     * Performs storage of the given data and adds new metadata to the map.
+     */
+    protected abstract <T extends V> T doPut(K key, T data, long timeToLive, long defaultMaxIdleTime)
+            throws CacheException;
 }

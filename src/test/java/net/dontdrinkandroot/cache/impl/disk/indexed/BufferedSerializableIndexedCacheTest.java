@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012-2014 Philip W. Sorst <philip@sorst.net>
+/*
+ * Copyright (C) 2012-2017 Philip Washington Sorst <philip@sorst.net>
  * and individual contributors as indicated
  * by the @authors tag.
  *
@@ -17,217 +17,214 @@
  */
 package net.dontdrinkandroot.cache.impl.disk.indexed;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-
 import net.dontdrinkandroot.cache.Cache;
 import net.dontdrinkandroot.cache.CacheException;
 import net.dontdrinkandroot.cache.ExampleObject;
 import net.dontdrinkandroot.cache.impl.AbstractSerializableCustomTtlCacheTest;
 import net.dontdrinkandroot.cache.utils.Duration;
 import net.dontdrinkandroot.cache.utils.FileUtils;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 
-public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCustomTtlCacheTest {
+public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCustomTtlCacheTest
+{
 
-	private File baseDir;
+    private File baseDir;
 
+    @Before
+    public void before() throws IOException
+    {
+        this.baseDir = File.createTempFile("cachetest", null);
+        this.baseDir.delete();
+    }
 
-	@Before
-	public void before() throws IOException {
+    @After
+    public void after() throws IOException
+    {
+        FileUtils.deleteDirectory(this.baseDir);
+    }
 
-		this.baseDir = File.createTempFile("cachetest", null);
-		this.baseDir.delete();
-	}
+    @Test
+    public void testGetPutDelete() throws Exception
+    {
+        final AbstractIndexedDiskCache<Serializable, Serializable> cache =
+                new BufferedSerializableIndexedDiskCache(
+                        "testCache",
+                        Duration.minutes(1),
+                        Cache.UNLIMITED_IDLE_TIME,
+                        100000,
+                        100000,
+                        this.baseDir,
+                        100000
+                );
 
+        this.testCustomGetPutDelete(cache);
 
-	@After
-	public void after() throws IOException {
+        cache.close();
+    }
 
-		FileUtils.deleteDirectory(this.baseDir);
-	}
+    /**
+     * Tests if on putting the same key/value the filesize doesn't change as the entries get
+     * overridden.
+     */
+    @Test
+    public void testSameFileSizeOnPut() throws IOException, CacheException
+    {
+        final AbstractIndexedDiskCache<Serializable, Serializable> cache =
+                new BufferedSerializableIndexedDiskCache(
+                        "testCache",
+                        Duration.minutes(1),
+                        Cache.UNLIMITED_IDLE_TIME,
+                        100000,
+                        100000,
+                        this.baseDir,
+                        100000
+                );
 
+        cache.putWithErrors("12345", "12345");
 
-	@Test
-	public void testGetPutDelete() throws Exception {
+        cache.flush();
 
-		final AbstractIndexedDiskCache<Serializable, Serializable> cache =
-				new BufferedSerializableIndexedDiskCache(
-						"testCache",
-						Duration.minutes(1),
-						Cache.UNLIMITED_IDLE_TIME,
-						100000,
-						100000,
-						this.baseDir,
-						100000);
+        final long dataFileSize = cache.getDataFile().length();
+        final long metafileLength = cache.getIndexFile().length();
 
-		this.testCustomGetPutDelete(cache);
+        cache.putWithErrors("12345", "12345");
 
-		cache.close();
-	}
+        cache.flush();
 
+        Assert.assertEquals(dataFileSize, cache.getDataFile().length());
+        Assert.assertEquals(metafileLength, cache.getIndexFile().length());
 
-	/**
-	 * Tests if on putting the same key/value the filesize doesn't change as the entries get
-	 * overridden.
-	 */
-	@Test
-	public void testSameFileSizeOnPut() throws IOException, CacheException {
+        cache.close();
+    }
 
-		final AbstractIndexedDiskCache<Serializable, Serializable> cache =
-				new BufferedSerializableIndexedDiskCache(
-						"testCache",
-						Duration.minutes(1),
-						Cache.UNLIMITED_IDLE_TIME,
-						100000,
-						100000,
-						this.baseDir,
-						100000);
-
-		cache.putWithErrors("12345", "12345");
-
-		cache.flush();
-
-		final long dataFileSize = cache.getDataFile().length();
-		final long metafileLength = cache.getIndexFile().length();
-
-		cache.putWithErrors("12345", "12345");
-
-		cache.flush();
-
-		Assert.assertEquals(dataFileSize, cache.getDataFile().length());
-		Assert.assertEquals(metafileLength, cache.getIndexFile().length());
-
-		cache.close();
-	}
-
-
-	/**
-	 * Tests if the index is reread correctly after cache restart.
-	 */
-	@Test
-	public void testReReadIndex() throws IOException, CacheException {
-
-		AbstractIndexedDiskCache<Serializable, Serializable> cache =
-				new BufferedSerializableIndexedDiskCache(
-						"testCache",
-						Duration.minutes(1),
-						Cache.UNLIMITED_IDLE_TIME,
-						100000,
-						100000,
-						this.baseDir,
-						100000);
+    /**
+     * Tests if the index is reread correctly after cache restart.
+     */
+    @Test
+    public void testReReadIndex() throws IOException, CacheException
+    {
+        AbstractIndexedDiskCache<Serializable, Serializable> cache =
+                new BufferedSerializableIndexedDiskCache(
+                        "testCache",
+                        Duration.minutes(1),
+                        Cache.UNLIMITED_IDLE_TIME,
+                        100000,
+                        100000,
+                        this.baseDir,
+                        100000
+                );
 
 		/* Put 10 entries to cache */
-		for (int i = 0; i < 10; i++) {
-			cache.putWithErrors(Integer.toString(i), new ExampleObject(i));
-		}
-		/* Invalidate one entry */
-		cache.delete(Integer.toString(0));
-		cache.close();
+        for (int i = 0; i < 10; i++) {
+            cache.putWithErrors(Integer.toString(i), new ExampleObject(i));
+        }
+        /* Invalidate one entry */
+        cache.delete(Integer.toString(0));
+        cache.close();
 
-		cache =
-				new BufferedSerializableIndexedDiskCache(
-						"testCache",
-						Duration.minutes(1),
-						Cache.UNLIMITED_IDLE_TIME,
-						100000,
-						100000,
-						this.baseDir,
-						100000);
+        cache =
+                new BufferedSerializableIndexedDiskCache(
+                        "testCache",
+                        Duration.minutes(1),
+                        Cache.UNLIMITED_IDLE_TIME,
+                        100000,
+                        100000,
+                        this.baseDir,
+                        100000
+                );
 
 		/* Test invalidated not there */
-		Assert.assertNull(cache.getWithErrors(Integer.toString(0)));
+        Assert.assertNull(cache.getWithErrors(Integer.toString(0)));
 
 		/* Test remaining still exist */
-		for (int i = 1; i < 10; i++) {
-			Assert.assertEquals(new ExampleObject(i), cache.getWithErrors(Integer.toString(i)));
-		}
+        for (int i = 1; i < 10; i++) {
+            Assert.assertEquals(new ExampleObject(i), cache.getWithErrors(Integer.toString(i)));
+        }
 
-		cache.close();
-	}
+        cache.close();
+    }
 
+    // @Test
+    // public void runLoadTest() throws Throwable {
+    //
+    // Assume.assumeNotNull(System.getProperty("cache.test.runloadtest"));
+    // final File ramDiskDir = new File(System.getProperty("cache.test.ramdisk"));
+    // Assume.assumeTrue(ramDiskDir.exists());
+    // final File dataFile = new File(ramDiskDir, "dataFile");
+    // final File metaFile = new File(ramDiskDir, "metaFile");
+    //
+    // try {
+    //
+    // Logger.getRootLogger().setLevel(Level.DEBUG);
+    //
+    // final BufferedSerializableIndexedDiskCache loadTestCache =
+    // new BufferedSerializableIndexedDiskCache(
+    // "serializableMetaFileCacheTest",
+    // Duration.seconds(1),
+    // Cache.UNLIMITED_IDLE_TIME,
+    // new LruRecyclingExpungeStrategy(100000, .1f),
+    // this.baseDir,
+    // new LruRecyclingExpungeStrategy(10000, .1f));
+    // final SimulationRunner runner = new SimulationRunner() {
+    //
+    // @Override
+    // protected void loadTestPostIterationHook(final Cache<Serializable, Serializable> cache) {
+    //
+    // Assert.assertEquals(
+    // loadTestCache.getEntriesMetaData().size(),
+    // loadTestCache.getIndexFileNumAllocatedBlocks());
+    // Assert.assertEquals(
+    // loadTestCache.getEntriesMetaData().size() * 2,
+    // loadTestCache.getDataFileNumAllocatedBlocks());
+    // }
+    // };
+    // runner.runLoadTest(loadTestCache, 10, 1000000,
+    // JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
+    //
+    // final int size = loadTestCache.getStatistics().getCurrentSize();
+    // final float hitRate = loadTestCache.getStatistics().getHitRate();
+    //
+    // loadTestCache.close();
+    //
+    // Logger.getRootLogger().setLevel(Level.INFO);
+    //
+    // final BufferedSerializableIndexedDiskCache loadTestCacheNew =
+    // new BufferedSerializableIndexedDiskCache(
+    // "serializableMetaFileCacheTest",
+    // Duration.seconds(1),
+    // Cache.UNLIMITED_IDLE_TIME,
+    // new LruRecyclingExpungeStrategy(100000, .1f),
+    // this.baseDir,
+    // new LruRecyclingExpungeStrategy(10000, .1f));
+    //
+    // Logger.getRootLogger().setLevel(Level.DEBUG);
+    //
+    // this.getLogger().info("Hitrate: " + hitRate);
+    //
+    // Assert.assertEquals(size, loadTestCacheNew.getStatistics().getCurrentSize());
+    //
+    // } finally {
+    // metaFile.delete();
+    // dataFile.delete();
+    // }
+    //
+    // }
 
-	// @Test
-	// public void runLoadTest() throws Throwable {
-	//
-	// Assume.assumeNotNull(System.getProperty("cache.test.runloadtest"));
-	// final File ramDiskDir = new File(System.getProperty("cache.test.ramdisk"));
-	// Assume.assumeTrue(ramDiskDir.exists());
-	// final File dataFile = new File(ramDiskDir, "dataFile");
-	// final File metaFile = new File(ramDiskDir, "metaFile");
-	//
-	// try {
-	//
-	// Logger.getRootLogger().setLevel(Level.DEBUG);
-	//
-	// final BufferedSerializableIndexedDiskCache loadTestCache =
-	// new BufferedSerializableIndexedDiskCache(
-	// "serializableMetaFileCacheTest",
-	// Duration.seconds(1),
-	// Cache.UNLIMITED_IDLE_TIME,
-	// new LruRecyclingExpungeStrategy(100000, .1f),
-	// this.baseDir,
-	// new LruRecyclingExpungeStrategy(10000, .1f));
-	// final SimulationRunner runner = new SimulationRunner() {
-	//
-	// @Override
-	// protected void loadTestPostIterationHook(final Cache<Serializable, Serializable> cache) {
-	//
-	// Assert.assertEquals(
-	// loadTestCache.getEntriesMetaData().size(),
-	// loadTestCache.getIndexFileNumAllocatedBlocks());
-	// Assert.assertEquals(
-	// loadTestCache.getEntriesMetaData().size() * 2,
-	// loadTestCache.getDataFileNumAllocatedBlocks());
-	// }
-	// };
-	// runner.runLoadTest(loadTestCache, 10, 1000000,
-	// JUnitUtils.PARETO_EIGHTY_PERCENT_UNDER_HUNDREDTHOUSAND);
-	//
-	// final int size = loadTestCache.getStatistics().getCurrentSize();
-	// final float hitRate = loadTestCache.getStatistics().getHitRate();
-	//
-	// loadTestCache.close();
-	//
-	// Logger.getRootLogger().setLevel(Level.INFO);
-	//
-	// final BufferedSerializableIndexedDiskCache loadTestCacheNew =
-	// new BufferedSerializableIndexedDiskCache(
-	// "serializableMetaFileCacheTest",
-	// Duration.seconds(1),
-	// Cache.UNLIMITED_IDLE_TIME,
-	// new LruRecyclingExpungeStrategy(100000, .1f),
-	// this.baseDir,
-	// new LruRecyclingExpungeStrategy(10000, .1f));
-	//
-	// Logger.getRootLogger().setLevel(Level.DEBUG);
-	//
-	// this.getLogger().info("Hitrate: " + hitRate);
-	//
-	// Assert.assertEquals(size, loadTestCacheNew.getStatistics().getCurrentSize());
-	//
-	// } finally {
-	// metaFile.delete();
-	// dataFile.delete();
-	// }
-	//
-	// }
+    @Override
+    protected Serializable translateKey(int key)
+    {
+        final StringBuffer sb = new StringBuffer();
+        for (int i = -1; i < key % 100; i++) {
+            sb.append(Long.toString(key));
+        }
 
-	@Override
-	protected Serializable translateKey(int key) {
-
-		final StringBuffer sb = new StringBuffer();
-		for (int i = -1; i < key % 100; i++) {
-			sb.append(Long.toString(key));
-		}
-
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 }
