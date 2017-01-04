@@ -1,0 +1,16 @@
+language: java
+
+jdk:
+- oraclejdk8
+
+cache:
+  directories:
+  - "$HOME/.m2/repository"
+
+env:
+  global:
+  - secure: N3N78+TREBbe53PYl4lpx7QWAPJRiyvzQSNLq5UJNIOVvxQCKtNtgFqFPourL2p0DQf5HxeGD1gj7jpgG9s1f66jhNimD38MUUPRwbmi+1DosgnsKYsKpyJbc9BL5/lik0JtV2M1wgaBjjva1+1Eld6onpaQ+G2gbKFUd7Hks4U=
+  - secure: kOqNrKeopnfG7AN7o0ANcv0EwPcx6IggnwD+cmS1A27/f8SFWh1/zm7tAC2HRglLgWDmKkfCuVCimbF4t8XosKlWQ952sZTn1OtjmsNthqhamaBeMAThZA3IvorLfzccUTCZ3SZpMjfT7NShWcUJtuL4ScDFt93LweYOs6aa6t8=
+
+script:
+- mvn -DfailOnServiceError=false clean jacoco:prepare-agent test deploy jacoco:report coveralls:report --settings travis-maven-settings.xml
