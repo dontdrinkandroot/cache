@@ -9,8 +9,9 @@ cache:
 
 env:
   global:
-  - secure: N3N78+TREBbe53PYl4lpx7QWAPJRiyvzQSNLq5UJNIOVvxQCKtNtgFqFPourL2p0DQf5HxeGD1gj7jpgG9s1f66jhNimD38MUUPRwbmi+1DosgnsKYsKpyJbc9BL5/lik0JtV2M1wgaBjjva1+1Eld6onpaQ+G2gbKFUd7Hks4U=
-  - secure: kOqNrKeopnfG7AN7o0ANcv0EwPcx6IggnwD+cmS1A27/f8SFWh1/zm7tAC2HRglLgWDmKkfCuVCimbF4t8XosKlWQ952sZTn1OtjmsNthqhamaBeMAThZA3IvorLfzccUTCZ3SZpMjfT7NShWcUJtuL4ScDFt93LweYOs6aa6t8=
+  - secure: kQkJpWqGQ4yjmTMpqcXSfzBUNhOamAJQ15JzX+rQcsSXTkeXkPbWqQDcNf8ci26KmiEN+baVXlPGMiZhG7fWKngasyhCiWV62TLXzWiazAZeB/57w5sQwf5LAzMdsmcRhzyqA03Yi2ezg1fi9+QQarlEHHHyy563mOMRLk1tpxE=
+  - secure: YgPynUE3ssWAgyKlUZeXZiU1IBZD6b4zXmXzkLLEq1MD5Xz4fwQDdhul117wC/nDJPwdjQSV7Ej3hVD20m10XL3thWchXE7vWfXve06D7Tc6dutE2iPlPtTPzYqyQbNR+DU7W76CQPmvCh2Dlyu1ih+oNHsZ5wM7pVN/R1QUClk=
 
 script:
-- mvn -DfailOnServiceError=false clean jacoco:prepare-agent test deploy jacoco:report coveralls:report --settings travis-maven-settings.xml
+- mvn -DfailOnServiceError=false clean jacoco:prepare-agent test deploy jacoco:report
+  coveralls:report --settings travis-maven-settings.xml
