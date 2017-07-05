@@ -32,6 +32,10 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /**
+ * A disk cache that stores its content in a data file and its index in an index file. A writer thread is responsible
+ * for writing new data to disk asynchronously. Make sure you call {@link #close()} in order to shut down the cache
+ * correctly.
+ *
  * @author Philip Washington Sorst <philip@sorst.net>
  */
 public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends Serializable>
@@ -131,9 +135,10 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
     }
 
     /**
-     * Closes the cache.
+     * Closes the cache. You need to call this in order to shutdown the writer thread and the index files correctly.
+     * Otherwise the cache will remain in locked state.
      */
-    protected synchronized void close() throws IOException
+    public synchronized void close() throws IOException
     {
         this.flush();
 

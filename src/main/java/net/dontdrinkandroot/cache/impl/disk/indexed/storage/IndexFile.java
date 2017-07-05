@@ -29,8 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-// TODO: implement shrinking of index file
-
 /**
  * @author Philip Washington Sorst <philip@sorst.net>
  */
