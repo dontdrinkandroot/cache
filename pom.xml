@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.dontdrinkandroot</groupId>
     <artifactId>cache</artifactId>
-    <version>0.8.1-SNAPSHOT</version>
+    <version>0.8.1</version>
 
     <name>cache</name>
     <url>https://dontdrinkandroot.net/github/cache.java</url>
@@ -38,7 +38,7 @@
         <connection>scm:git:git@github.com/dontdrinkandroot/cache.java.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/dontdrinkandroot/cache.java.git
         </developerConnection>
-        <tag>HEAD</tag>
+        <tag>v0.8.1</tag>
     </scm>
 
     <issueManagement>
