@@ -35,9 +35,7 @@ import java.util.TreeSet;
 
 /**
  * A {@link SerializableIndexedDiskCache} that buffers entries in memory on successful disk put and
- * get operations. The size and contents of the buffer are determined by a buffer
- * {@link ExpungeStrategy} that works the same way as a normal {@link ExpungeStrategy} but only on
- * the buffer entries.
+ * get operations in order to avoid disk access.
  *
  * @author Philip Washington Sorst <philip@sorst.net>
  */
@@ -79,7 +77,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
         super(name, defaultTimeToLive, defaultMaxIdleTime, maxSize, recycleSize, baseDir);
 
         this.bufferSize = bufferSize;
-        this.buffer = new HashMap<Serializable, Serializable>();
+        this.buffer = new HashMap<>();
         this.bufferStatistics = new SimpleCacheStatistics();
     }
 
@@ -141,7 +139,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
         this.addToBuffer(key, putData);
 
 		/*
-		 * Return a copy if desired so changes on the data after the cache put are not reflected in
+         * Return a copy if desired so changes on the data after the cache put are not reflected in
 		 * the buffer
 		 */
         if (this.copyOnWrite) {
@@ -177,8 +175,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
     @SuppressWarnings("unchecked")
     protected <T extends Serializable> T copyData(T data)
     {
-        Serializable serializable = data;
-        return (T) Serializer.clone(serializable);
+        return Serializer.clone(data);
     }
 
     public boolean isCopyOnRead()
@@ -250,7 +247,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
             if (metaData == null) {
                 /*
-				 * Strange, metadata was not found anymore, so entry does not exist on disk. Warn
+                 * Strange, metadata was not found anymore, so entry does not exist on disk. Warn
 				 * and also delete in buffer
 				 */
                 this.getLogger().warn(this.getName() + ": Metadata for {} was null", key.toString());

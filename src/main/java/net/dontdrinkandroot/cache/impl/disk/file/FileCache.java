@@ -77,8 +77,7 @@ public class FileCache extends AbstractMapBackedCache<Md5, File, SimpleMetaData>
     @Override
     protected File doGet(Md5 key, final SimpleMetaData metaData) throws CacheException
     {
-        final File file = new File(this.getFileName(key));
-        return file;
+        return new File(this.getFileName(key));
     }
 
     @SuppressWarnings("unchecked")

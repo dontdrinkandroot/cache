@@ -134,7 +134,7 @@ public class DataFile
     /**
      * Returns the length of the underlying random access file.
      *
-     * @throws IOException
+     * @throws IOException Thrown if length cannot be determined.
      */
     public synchronized long length() throws IOException
     {
@@ -181,6 +181,7 @@ public class DataFile
                 Thread.sleep(sleepTime);
                 sleepTime = targetTime - System.currentTimeMillis();
             } catch (InterruptedException e) {
+                /* Allow interruption */
             }
         }
     }

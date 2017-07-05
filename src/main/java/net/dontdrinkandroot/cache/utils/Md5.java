@@ -59,8 +59,7 @@ public class Md5
 
     public static Md5 fromMd5Hex(final String md5Hex) throws Md5Exception
     {
-        final Md5 md5 = new Md5(Md5.decodeHex(md5Hex.toCharArray()));
-        return md5;
+        return new Md5(Md5.decodeHex(md5Hex.toCharArray()));
     }
 
     public byte[] getBytes()

@@ -39,9 +39,9 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
 {
     private static final int DEFAULT_QUEUE_SIZE_WARNING_LIMIT = 1000;
 
-    protected Object indexFileLock = new Object();
+    protected final Object indexFileLock = new Object();
 
-    protected Object dataFileLock = new Object();
+    protected final Object dataFileLock = new Object();
 
     protected final IndexFile indexFile;
 
@@ -141,6 +141,7 @@ public abstract class AbstractIndexedDiskCache<K extends Serializable, V extends
         try {
             this.writerThread.join();
         } catch (InterruptedException e) {
+            /* Fall through */
         }
 
         synchronized (this.indexFileLock) {

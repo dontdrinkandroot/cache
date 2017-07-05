@@ -46,7 +46,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
     private long cleanUpInterval = Duration.hours(1);
 
-    private final MetaDataComparator<K, M> comparator = new LfuComparator<K, M>();
+    private final MetaDataComparator<K, M> comparator = new LfuComparator<>();
 
     private int maxSize;
 
@@ -57,7 +57,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
      *
      * @param name              The name of the cache.
      * @param defaultTimeToLive The default time to live for Cache entries.
-     * @param expungeStrategy   The {@link ExpungeStrategy} to use.
+     * @param maxSize           The maximum number of entries in the cache.
+     * @param recycleSize       How many entries can be added on top before triggering expunge.
      */
     public AbstractMapBackedCache(
             final String name,
@@ -75,7 +76,8 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
      * @param name               The name of the cache.
      * @param defaultTimeToLive  The default time to live for Cache entries.
      * @param defaultMaxIdleTime The default max idle time for cache entries.
-     * @param expungeStrategy    The {@link ExpungeStrategy} to use.
+     * @param maxSize            The maximum number of entries in the cache.
+     * @param recycleSize        How many entries can be added on top before triggering expunge.
      */
     public AbstractMapBackedCache(
             final String name,
@@ -87,7 +89,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
     {
         super(name, defaultTimeToLive, defaultMaxIdleTime);
 
-        this.entriesMetaDataMap = new HashMap<K, M>();
+        this.entriesMetaDataMap = new HashMap<>();
         this.statistics = new SimpleCacheStatistics();
 
         this.maxSize = maxSize;
@@ -98,7 +100,6 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
     public synchronized <T extends V> T put(K key, T data)
     {
         try {
-
             return this.putWithErrors(key, data);
         } catch (CacheException e) {
             this.getLogger().warn(this.getName() + ": Putting " + key + " to cache failed", e);
@@ -260,7 +261,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
 
         final M metaData = this.entriesMetaDataMap.get(key);
 
-        if (metaData == null) {
+        if (null == metaData) {
 
 			/* Entry not found: cache miss */
             this.statistics.increaseCacheMissesNotFound();
@@ -270,7 +271,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
             return null;
         }
 
-        if (metaData != null && metaData.isExpired()) {
+        if (metaData.isExpired()) {
 
 			/* Entry expired: cache miss expired */
             this.statistics.increaseCacheMissesExpired();
@@ -390,7 +391,7 @@ public abstract class AbstractMapBackedCache<K, V, M extends MetaData> extends A
      */
     public synchronized List<M> getEntriesMetaData()
     {
-        return new ArrayList<M>(this.entriesMetaDataMap.values());
+        return new ArrayList<>(this.entriesMetaDataMap.values());
     }
 
     protected boolean triggerExpunge()

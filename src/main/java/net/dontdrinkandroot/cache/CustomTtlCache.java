@@ -27,9 +27,9 @@ public interface CustomTtlCache<K, V> extends Cache<K, V>
 {
     /**
      * Store an entry in the cache with a specific time to live. Any errors are swallowed, use
-     * {@link CustomTtlCache#put(Object, Object, long)} if you want to handle them.
+     * {@link CustomTtlCache#putWithErrors(Object, Object, long)} if you want to handle them.
      *
-     * @param id         A unique identifier.
+     * @param key        A unique identifier.
      * @param data       The data to store, make sure that you don't alter the data after it has been put
      *                   to cache as (depending on the implementation) this might lead to altering the
      *                   entry in the cache. Use the returned entry instead.
@@ -42,7 +42,7 @@ public interface CustomTtlCache<K, V> extends Cache<K, V>
     /**
      * Store an entry in the cache with a specific time to live.
      *
-     * @param id         A unique identifier.
+     * @param key        A unique identifier.
      * @param data       The data to store, make sure that you don't alter the data after it has been put
      *                   to cache as (depending on the implementation) this might lead to altering the
      *                   entry in the cache. Use the returned entry instead.
@@ -58,7 +58,7 @@ public interface CustomTtlCache<K, V> extends Cache<K, V>
      * swallowed, use {@link CustomTtlCache#putWithErrors(Object, Object, long)} if you want to
      * handle them.
      *
-     * @param id          A unique identifier.
+     * @param key         A unique identifier.
      * @param data        The data to store, make sure that you don't alter the data after it has been put
      *                    to cache as (depending on the implementation) this might lead to altering the
      *                    entry in the cache. Use the returned entry instead.
@@ -67,14 +67,13 @@ public interface CustomTtlCache<K, V> extends Cache<K, V>
      *                    being expunged.
      * @return The entry that has been stored in the cache. It is save to alter this as
      * implementations as implementations make sure that this is always a copy.
-     * @throws CacheException Thrown if the storage fails.
      */
     <T extends V> T put(K key, T data, long timeToLive, long maxIdleTime);
 
     /**
      * Store an entry in the cache with a specific time to live and max idle time.
      *
-     * @param id          A unique identifier.
+     * @param key         A unique identifier.
      * @param data        The data to store, make sure that you don't alter the data after it has been put
      *                    to cache as (depending on the implementation) this might lead to altering the
      *                    entry in the cache. Use the returned entry instead.

@@ -202,7 +202,7 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
                         return false;
                     } else {
 
-						/* Entry was not written make sure it doen't */
+						/* Entry was not written make sure it doesn't */
                         this.skipWrite = true;
                         return true;
                     }
@@ -271,6 +271,7 @@ class WriterThread<K extends Serializable, V extends Serializable> extends Threa
                     try {
                         Thread.sleep(10000L);
                     } catch (InterruptedException e) {
+                        /* Allow interruption */
                     }
                 }
             }
