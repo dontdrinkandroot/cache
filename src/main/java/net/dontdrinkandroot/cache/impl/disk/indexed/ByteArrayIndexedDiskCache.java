@@ -57,7 +57,6 @@ public class ByteArrayIndexedDiskCache extends AbstractIndexedDiskCache<Serializ
         return data;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public byte[] dataFromBytes(final byte[] data) throws CacheException
     {

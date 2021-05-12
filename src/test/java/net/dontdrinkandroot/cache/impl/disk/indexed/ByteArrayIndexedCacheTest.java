@@ -29,6 +29,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 
 public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serializable, byte[]>
 {
@@ -62,7 +63,7 @@ public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serial
 
         Assert.assertEquals(0, cache.getDataFileNumAllocatedBlocks());
         Assert.assertEquals(0, cache.getMetaFileNumAllocatedBlocks());
-        cache.assertAllocatedConsistency();
+        Assert.assertTrue(cache.assertAllocatedConsistency());
 
         this.testCustomGetPutDelete(cache);
 
@@ -85,7 +86,7 @@ public class ByteArrayIndexedCacheTest extends AbstractCustomTtlCacheTest<Serial
             s.append(Long.toString(key));
         }
 
-        return s.toString().getBytes("UTF-8");
+        return s.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

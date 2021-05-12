@@ -28,7 +28,7 @@ import java.io.Serializable;
 /**
  * @author Philip Washington Sorst <philip@sorst.net>
  */
-public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Serializable, Serializable>
+public class SerializableIndexedDiskCache<K extends Serializable, V extends Serializable> extends AbstractIndexedDiskCache<K, V>
 {
     public SerializableIndexedDiskCache(
             final String name,
@@ -36,8 +36,7 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
             final int maxSize,
             final int recycleSize,
             final File baseDir
-    ) throws IOException
-    {
+    ) throws IOException {
         super(name, defaultTimeToLive, maxSize, recycleSize, baseDir);
     }
 
@@ -54,8 +53,7 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
     }
 
     @Override
-    public <T extends Serializable> byte[] dataToBytes(final T data) throws CacheException
-    {
+    protected <T extends V> byte[] dataToBytes(T data) throws CacheException {
         try {
 
             return Serializer.serialize(data);
@@ -64,13 +62,11 @@ public class SerializableIndexedDiskCache extends AbstractIndexedDiskCache<Seria
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T extends Serializable> T dataFromBytes(final byte[] dataBytes) throws CacheException
-    {
+    @SuppressWarnings("unchecked")
+    protected <T extends V> T dataFromBytes(byte[] data) throws CacheException {
         try {
-
-            return (T) Serializer.deserialize(dataBytes);
+            return (T) Serializer.deserialize(data);
         } catch (final SerializationException e) {
             throw new CacheException(e);
         }

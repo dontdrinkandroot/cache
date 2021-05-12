@@ -39,10 +39,10 @@ import java.util.TreeSet;
  *
  * @author Philip Washington Sorst <philip@sorst.net>
  */
-public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDiskCache
-        implements BufferedRecyclingCache<Serializable, Serializable>
+public class BufferedSerializableIndexedDiskCache<K extends Serializable, V extends Serializable> extends SerializableIndexedDiskCache<K, V>
+        implements BufferedRecyclingCache<K, V>
 {
-    private final Map<Serializable, Serializable> buffer;
+    private final Map<K, Serializable> buffer;
 
     private final SimpleCacheStatistics bufferStatistics;
 
@@ -95,8 +95,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
     }
 
     @Override
-    protected <T extends Serializable> T doGet(Serializable key, final BlockMetaData metaData) throws CacheException
-    {
+    protected <T extends V> T doGet(K key, BlockMetaData metaData) throws CacheException {
         this.bufferStatistics.increaseGetCount();
 
         @SuppressWarnings("unchecked")
@@ -105,10 +104,10 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
 
             this.bufferStatistics.increaseCacheHits();
 
-			/*
+            /*
              * Return a copy if desired so changes on the data after the cache get are not reflected
-			 * in the buffer
-			 */
+             * in the buffer
+             */
             if (this.copyOnRead) {
                 return this.copyData(bufferedValue);
             } else {
@@ -119,7 +118,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
             this.bufferStatistics.increaseCacheMissesNotFound();
         }
 
-		/* Get data from disk and store it in the buffer */
+        /* Get data from disk and store it in the buffer */
         final T data = super.doGet(key, metaData);
         this.addToBuffer(key, data);
 
@@ -127,21 +126,20 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
     }
 
     @Override
-    protected <T extends Serializable> T doPut(
-            Serializable key,
-            final T data,
-            final long timeToLive,
-            final long maxIdleTime
-    ) throws CacheException
-    {
+    protected <T extends V> T doPut(
+            K key,
+            T data,
+            long timeToLive,
+            long maxIdleTime
+    ) throws CacheException {
         /* Put data to disk and store it in the buffer */
         T putData = super.doPut(key, data, timeToLive, maxIdleTime);
         this.addToBuffer(key, putData);
 
-		/*
+        /*
          * Return a copy if desired so changes on the data after the cache put are not reflected in
-		 * the buffer
-		 */
+         * the buffer
+         */
         if (this.copyOnWrite) {
             return this.copyData(putData);
         } else {
@@ -150,8 +148,7 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
     }
 
     @Override
-    protected void doDelete(Serializable key, final BlockMetaData metaData) throws CacheException
-    {
+    protected void doDelete(K key, final BlockMetaData metaData) throws CacheException {
         /* Remove entry from buffer and from disk */
         this.buffer.remove(key);
         super.doDelete(key, metaData);
@@ -172,7 +169,6 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
     /**
      * Creates a copy of the given data.
      */
-    @SuppressWarnings("unchecked")
     protected <T extends Serializable> T copyData(T data)
     {
         return Serializer.clone(data);
@@ -211,16 +207,15 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
     /**
      * Adds an entry to the buffer.
      */
-    private void addToBuffer(Serializable key, final Serializable data)
-    {
+    private void addToBuffer(K key, final Serializable data) {
         if (this.buffer.size() >= this.bufferSize) {
 
             int toDelete = this.buffer.size() - this.bufferSize + 1;
-            TreeSet<Entry<Serializable, BlockMetaData>> orderedSet =
-                    new TreeSet<Entry<Serializable, BlockMetaData>>(this.getComparator());
+            TreeSet<Entry<K, BlockMetaData>> orderedSet =
+                    new TreeSet<>(this.getComparator());
             orderedSet.addAll(this.buildBufferMetaDataMap().entrySet());
 
-            Iterator<Entry<Serializable, BlockMetaData>> iterator = orderedSet.iterator();
+            Iterator<Entry<K, BlockMetaData>> iterator = orderedSet.iterator();
             int numDeleted = 0;
             while (iterator.hasNext() && numDeleted < toDelete) {
                 this.buffer.remove(iterator.next().getKey());
@@ -236,20 +231,19 @@ public class BufferedSerializableIndexedDiskCache extends SerializableIndexedDis
      * Builds a map that holds the key metadata mapping of the buffer. Needed to run an expunge
      * strategy on the buffer.
      */
-    private Map<Serializable, BlockMetaData> buildBufferMetaDataMap()
-    {
-        Map<Serializable, BlockMetaData> bufferEntries = new HashMap<Serializable, BlockMetaData>();
-        Iterator<Serializable> keyIterator = this.buffer.keySet().iterator();
+    private Map<K, BlockMetaData> buildBufferMetaDataMap() {
+        Map<K, BlockMetaData> bufferEntries = new HashMap<>();
+        Iterator<K> keyIterator = this.buffer.keySet().iterator();
         while (keyIterator.hasNext()) {
 
-            Serializable key = keyIterator.next();
+            K key = keyIterator.next();
             BlockMetaData metaData = this.getEntry(key);
 
             if (metaData == null) {
                 /*
                  * Strange, metadata was not found anymore, so entry does not exist on disk. Warn
-				 * and also delete in buffer
-				 */
+                 * and also delete in buffer
+                 */
                 this.getLogger().warn(this.getName() + ": Metadata for {} was null", key.toString());
                 keyIterator.remove();
             } else {

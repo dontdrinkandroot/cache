@@ -54,7 +54,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
     public void testGetPutDelete() throws Exception
     {
         final AbstractIndexedDiskCache<Serializable, Serializable> cache =
-                new BufferedSerializableIndexedDiskCache(
+                new BufferedSerializableIndexedDiskCache<>(
                         "testCache",
                         Duration.minutes(1),
                         Cache.UNLIMITED_IDLE_TIME,
@@ -77,7 +77,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
     public void testSameFileSizeOnPut() throws IOException, CacheException
     {
         final AbstractIndexedDiskCache<Serializable, Serializable> cache =
-                new BufferedSerializableIndexedDiskCache(
+                new BufferedSerializableIndexedDiskCache<>(
                         "testCache",
                         Duration.minutes(1),
                         Cache.UNLIMITED_IDLE_TIME,
@@ -111,7 +111,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
     public void testReReadIndex() throws IOException, CacheException
     {
         AbstractIndexedDiskCache<Serializable, Serializable> cache =
-                new BufferedSerializableIndexedDiskCache(
+                new BufferedSerializableIndexedDiskCache<>(
                         "testCache",
                         Duration.minutes(1),
                         Cache.UNLIMITED_IDLE_TIME,
@@ -130,7 +130,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
         cache.close();
 
         cache =
-                new BufferedSerializableIndexedDiskCache(
+                new BufferedSerializableIndexedDiskCache<>(
                         "testCache",
                         Duration.minutes(1),
                         Cache.UNLIMITED_IDLE_TIME,
@@ -220,7 +220,7 @@ public class BufferedSerializableIndexedCacheTest extends AbstractSerializableCu
     @Override
     protected Serializable translateKey(int key)
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         for (int i = -1; i < key % 100; i++) {
             sb.append(Long.toString(key));
         }
